@@ -1,0 +1,86 @@
+/* GENERATED 2026-09-29 from the Google Fonts css2 response for the URL in SOURCES.txt; one rule per
+   subset, pointed at the local copy. Regenerate by re-running that fetch; never edit by hand. */
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrainsmono-normal-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrainsmono-normal-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:"Newsreader";font-style:italic;font-weight:400 600;font-display:swap;src:url(fonts/newsreader-italic-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"Newsreader";font-style:italic;font-weight:400 600;font-display:swap;src:url(fonts/newsreader-italic-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/newsreader-normal-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/newsreader-normal-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+/* loganw.dev - design E (design/README.md): D's page, A's colour, B's type and header.
+   The @font-face rules are prepended by the build from site/fonts/fontfaces.css. No other
+   host is ever asked for anything: the gate refuses a page that would. */
+:root{--bg:#fbfbf9;--ink:#15171a;--muted:#5b616a;--rule:#d9dbde;--faint:#f0f1f2;--accent:#1f4fd1;
+--serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+--map-ink:var(--ink);--map-muted:#8b9199;--map-accent:var(--accent);--map-font:var(--mono);--map-paper:var(--bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1114;--ink:#e6e8eb;--muted:#99a0aa;--rule:#2b3038;--faint:#181b20;--accent:#86a8ff;--map-muted:#6b737e}}
+:root[data-theme="dark"]{--bg:#0f1114;--ink:#e6e8eb;--muted:#99a0aa;--rule:#2b3038;--faint:#181b20;--accent:#86a8ff;--map-muted:#6b737e}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:18px/1.62 var(--serif);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg)}
+a{color:var(--accent);text-underline-offset:3px}
+main{max-width:1040px;margin:0 auto;padding:0 16px 64px}
+.measure{max-width:42rem}
+header{padding:46px 0 0}
+header .site{font:500 12.5px var(--mono);letter-spacing:.05em;color:var(--muted)}
+header .name{font:italic 500 46px/1.05 var(--serif);margin:.18em 0 .2em;letter-spacing:-.01em}
+nav{font:italic 17px/1.6 var(--serif);color:var(--muted);display:flex;flex-wrap:wrap}
+nav>*+*::before{content:"\00b7";margin:0 .55em;color:var(--rule);font-style:normal}
+nav a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px}
+nav a:not(.here){text-decoration-color:var(--rule)}
+.stamp{font:12.5px/1.5 var(--mono);color:var(--muted);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 0;margin:22px 0 30px}
+h1{font:italic 500 38px/1.15 var(--serif);margin:.4em 0 .3em}
+h2{font:italic 500 27px/1.2 var(--serif);margin:2.1em 0 .5em}
+h2 small{font:500 11px var(--mono);color:var(--muted);letter-spacing:.08em;margin-right:.7em;font-style:normal;vertical-align:.32em}
+.lede{font-size:21px;line-height:1.55;margin:0}
+.fig{font-family:var(--mono);font-size:.8em;font-variant-numeric:tabular-nums}
+.src{font:11.5px/1.45 var(--mono);color:var(--muted)}
+.src a{color:inherit;text-decoration-color:var(--rule)}
+td .src{display:block;white-space:normal;overflow-wrap:break-word}
+code{font-family:var(--mono);font-size:.8em}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:1000px;font-size:16px;line-height:1.45}
+th{text-align:left;font:italic 500 15px var(--serif);color:var(--muted);border-bottom:1px solid var(--ink);padding:0 14px 6px 0}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+td.p{font:500 .8em var(--mono);white-space:nowrap;padding-top:.75em}
+td.d{min-width:10.5em}td.n{min-width:8.5em}th.n,td.n{text-align:right}
+tr.th td{font:italic 500 17px var(--serif);color:var(--accent);padding-top:1.1em}
+.cap,.map figcaption{color:var(--muted);font-size:15px;margin:.8em 0 0;max-width:42rem}
+.prints{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:42rem}
+.prints figure{margin:0}.prints img{display:block;width:100%;height:auto}
+.prints figcaption{font:italic 15px var(--serif);color:var(--muted)}
+.cta{background:var(--faint);padding:14px 18px;border-radius:4px}
+.cta p{margin:0 0 6px;font:italic 500 21px/1.3 var(--serif)}
+.cta ol{margin:0;padding-left:1.3em}.cta li{margin:.35em 0}
+ul.plain{padding-left:1.1em}ul.plain li{margin:.35em 0}
+footer{font:12px/1.6 var(--mono);color:var(--muted);margin-top:3.4em;border-top:1px solid var(--rule);padding-top:1em}
+.pins{list-style:none;padding:0;margin:.4em 0;display:flex;flex-wrap:wrap;gap:2px 18px}
+/* the map */
+.map{margin:0}.map-scroll{overflow-x:auto}.map-scroll>svg{display:block;width:100%;height:auto;min-width:820px}
+.map svg text{font-family:var(--map-font);font-size:13px;fill:var(--map-ink)}
+.map .lane{font-size:10.5px;letter-spacing:.14em;fill:var(--map-muted)}
+.map .sep{stroke:var(--map-muted);stroke-width:.6;stroke-dasharray:2 3}
+.map .axis{stroke:var(--map-muted);stroke-width:.8;fill:none}
+.map .tick{font-size:11px;fill:var(--map-muted)}
+.map .now{stroke:var(--map-accent);stroke-width:.8;stroke-dasharray:3 3}
+.map .node rect{fill:var(--map-ink)}
+.map .node.private rect{fill:var(--map-paper);stroke:var(--map-ink);stroke-width:1.3}
+.map .node.pre rect{fill:var(--map-muted)}.map .node.pre text{fill:var(--map-muted)}
+.map .node.trunk text{font-weight:700}
+.map .note{fill:var(--map-muted);font-size:11.5px}
+.map .edge{fill:none;stroke:var(--map-ink);stroke-width:1.2;opacity:.75}
+.map .edge.grew-into{stroke:var(--map-accent);stroke-width:1.9;opacity:1}
+.map .edge.extracted{stroke-width:3;opacity:.3}
+.map .edge.ports{stroke-dasharray:6 4}
+.map .edge.verified-by{stroke-dasharray:.5 4;stroke-linecap:round;stroke-width:2}
+.map .edge.distilled-from{stroke-dasharray:9 3 2 3}
+.map .range{stroke:var(--map-ink);stroke-width:5;opacity:.28}
+.map .ah{fill:var(--map-ink)}.map .ah-acc{fill:var(--map-accent)}
+.legend{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px 20px;font:12px var(--mono);color:var(--muted)}
+.legend li{white-space:nowrap}.legend svg{vertical-align:middle;margin-right:7px;overflow:visible}
+.evidence{margin-top:12px;font-size:15px;color:var(--muted)}
+.evidence summary{cursor:pointer;font:italic 16px var(--serif)}
+.evidence ol,.evidence ul{margin:.5em 0;padding-left:1.4em}.evidence li{margin:.25em 0}
+.evidence b{color:var(--ink);font-weight:500}
+@media (max-width:600px){header .name{font-size:38px}.lede{font-size:19px}}
+/* One stylesheet per parcel or page, added here and concatenated by the build after
+ * site/style.css in name order, so no two parcels edit the same stylesheet. */

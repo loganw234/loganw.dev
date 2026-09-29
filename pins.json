@@ -1,0 +1,32 @@
+{
+ "about": "The one list of what this site reads. Every figure on it is read at one of these commits, or from the GitHub snapshot named here, and nowhere else. A pin moves only by a dated commit that changes this file (docs/SPEC.md, decisions 3 and 4).",
+ "owner": "loganw234",
+ "snapshot": "sources/github-2026-09-29.json",
+ "repos": {
+  "PrettyCloud":           {"dir": "PrettyCloud",           "commit": "5161daa"},
+  "atlas-darkroom":        {"dir": "atlas-darkroom",        "commit": "6a33735"},
+  "atlas-optical":         {"dir": "atlas-optical",         "commit": "dbccafe"},
+  "atlas-film":            {"dir": "atlas-film",            "commit": "be1d674",
+                            "verified_by": {"ci": ["tests"]}},
+  "atlas-engine":          {"dir": "atlas-engine",          "commit": "867c57a",
+                            "verified_by": {"ci": ["gates"]}},
+  "cft-fp256":             {"dir": "cft-fp256",             "commit": "77b8440",
+                            "verified_by": {"ci": ["gates"],
+                                            "ledger": {"path": "docs/VALIDATION.md", "pattern": "VERDICT: PASS"}}},
+  "cft-rebound":           {"dir": "cft-rebound",           "commit": "039e3c3",
+                            "verified_by": {"ledger": {"path": "docs/VALIDATION.md", "pattern": "\\*\\*PASS\\*\\*"}}},
+  "ParcelRound":           {"dir": "ParcelRound",           "commit": "8767e23"},
+  "HonestFramework":       {"dir": "HonestFramework",       "commit": "65447fd"},
+  "Quantum-Film":          {"dir": "moth-quantum",          "commit": "a7f02db",
+                            "verified_by": {"ledger": {"path": "docs/VALIDATION.md",
+                                                       "pattern": "`(?:make verify(?:-quick)?|run\\.sh --require-all)`[^\\n]*?\\d+ passed"}}},
+  "binary-sites":          {"dir": "binary-sites",          "commit": "dacdcb8"},
+  "StoryDocs":             {"dir": "StoryDocs",             "commit": "673148c"},
+  "Mercenaries2":          {"dir": "Merc2Reborn",           "commit": "e51dcbe"},
+  "Merc2-Mods-Exp":        {"dir": "Merc2-Mods-Exp",        "commit": "0ec1db2"},
+  "mercs2-lua-essentials": {"dir": "mercs2-lua-essentials", "commit": "3430c0b",
+                            "verified_by": {"ci": ["CI"]}}
+ },
+ "github_only": ["CanonBracketTool", "Microscope-Stacker", "nextpnr-xilinx",
+                 "binary32.com", "binary64.com", "binary128.com", "binary256.com"]
+}

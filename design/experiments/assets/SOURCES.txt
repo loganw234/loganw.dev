@@ -1,0 +1,5 @@
+# Written by build.py from Quantum-Film at a7f02db099b4e83a02ade8b95a6bf8c54dedacb1. Each file is `git show`
+# of that commit, byte for byte; --check re-hashes them.
+assets/pauli-print.png  docs/prints/pauli-print.png  sha256 21faa7465c8fb5708bf442ba7f0948d71d66b64a948b84fd534ba47917b4966b
+assets/poisson-print.png  docs/prints/poisson-print.png  sha256 6d4ea89ca63f4e8c436eba06ce3e4ff01a934ca9d38bed484d6ae93bc7d356a2
+assets/trix-print.png  docs/prints/trix-print.png  sha256 97018dcf31bb20c2b2f8f88ed6188927b456646bb4bb7eab084541659d5cebc7

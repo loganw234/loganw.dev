@@ -1,0 +1,8 @@
+# LF everywhere, in the repository and on checkout. verify/run.sh is a bash
+# script, and a CRLF checkout makes bash fail on it with a syntax error naming
+# a token that ends in a carriage return (HonestFramework learned this once).
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.woff2 binary
+*.png binary

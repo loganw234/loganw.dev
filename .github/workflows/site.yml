@@ -1,0 +1,53 @@
+# The gate on every push and pull request, and on main the deploy, which runs
+# only once the gate has passed. Logan's rule (2026-09-29): every push deploys,
+# from the start. Nothing here deploys a push that failed its gate.
+#
+# CI has only the public repositories, which it fetches at their pins
+# (LOGANW_FETCH=1). The private ones cannot be fetched, so the `build` stage
+# and the private figures are SKIPPED BY NAME, never passed. The desktop,
+# which has every clone, runs `bash verify/run.sh --require-all` before any
+# push (CLAUDE.md).
+#
+# Runs are grouped per ref, and a superseded run is cancelled. A cancelled run
+# is not a pass: check that the tip's run finished.
+name: site
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: LOGANW_FETCH=1 bash verify/run.sh
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: gate
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: stage public/ as committed, and write which commit it is into BUILD
+        run: |
+          cp -r public _site
+          printf 'Deployed from %s\n' "$GITHUB_SHA" > _site/BUILD
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

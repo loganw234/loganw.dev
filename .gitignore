@@ -1,0 +1,7 @@
+# Fetched clones of the public repositories (LOGANW_FETCH=1), and run state.
+.cache/
+verify/state/
+__pycache__/
+*.pyc
+# Local tooling config (the preview server), not part of the site.
+.claude/

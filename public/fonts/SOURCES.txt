@@ -1,0 +1,13 @@
+# The fonts, where they came from, and their bytes. Fetched 2026-09-29 at the owner's word
+# (all eight files, 512,869 bytes). Both families are SIL Open Font License 1.1: see the OFL files.
+# css2 request: https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=JetBrains+Mono:wght@400..600&display=swap
+
+fontfaces.css                               2331 bytes  sha256 a98e782cb198a0110fc0d3de129300b862767364b9622f914b3ed591f289253e
+jetbrainsmono-normal-latin-ext.woff2       11624 bytes  sha256 db5ff4db83e580426280e9337a58dc57d3a83784a1b03ad80914651594441d52
+jetbrainsmono-normal-latin.woff2           31432 bytes  sha256 83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be
+newsreader-italic-latin-ext.woff2          95540 bytes  sha256 bb24f6648f75d909eb74535916015c97ef72a1344e532ec7bbaf3f80eb6f389f
+newsreader-italic-latin.woff2             146872 bytes  sha256 5dfcd10d24af8c82927ba57f7983dd997f7b200594c09c35a1b1ed9fc4597506
+newsreader-normal-latin-ext.woff2          86608 bytes  sha256 45683de03de37187604102316c0b42c0cb2d8dc9c4140a20ad471c3148cc1278
+newsreader-normal-latin.woff2             132000 bytes  sha256 6e4f2958c3a7c4a80acde4e5a679abe7e01bc1e30b92be3c7a8b696ef401d101
+OFL-JetBrainsMono.txt                       4399 bytes  sha256 b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d
+OFL-Newsreader.txt                          4394 bytes  sha256 fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8

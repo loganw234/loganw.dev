@@ -1,0 +1,286 @@
+{
+ "command": "python snapshot_github.py (gh repo list + gh api, see its docstring)",
+ "not_cloned": {
+  "CanonBracketTool": {
+   "agent_coauthored": 0,
+   "files": {
+    "CLAUDE.md": false,
+    "docs/VALIDATION.md": false
+   },
+   "first": "2025-11-04",
+   "total": 9
+  },
+  "Microscope-Stacker": {
+   "agent_coauthored": 0,
+   "files": {
+    "CLAUDE.md": false,
+    "docs/VALIDATION.md": false
+   },
+   "first": "2025-11-06",
+   "total": 7
+  }
+ },
+ "owner": "loganw234",
+ "repos": [
+  {
+   "createdAt": "2026-07-27T15:04:06Z",
+   "description": "",
+   "name": "atlas-darkroom",
+   "url": "https://github.com/loganw234/atlas-darkroom",
+   "visibility": "PRIVATE"
+  },
+  {
+   "createdAt": "2026-08-22T17:13:42Z",
+   "description": "",
+   "name": "atlas-engine",
+   "url": "https://github.com/loganw234/atlas-engine",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-08-29T02:43:11Z",
+   "description": "",
+   "name": "atlas-film",
+   "url": "https://github.com/loganw234/atlas-film",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-08-28T20:47:07Z",
+   "description": "",
+   "name": "atlas-optical",
+   "url": "https://github.com/loganw234/atlas-optical",
+   "visibility": "PRIVATE"
+  },
+  {
+   "createdAt": "2025-11-04T04:01:39Z",
+   "description": "A python based webtool and sdk wrapper for interacting with the Canon SDK to create shot sequences easily and automate shooting.",
+   "name": "CanonBracketTool",
+   "url": "https://github.com/loganw234/CanonBracketTool",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-08-29T14:13:40Z",
+   "description": "",
+   "name": "cft-fp256",
+   "url": "https://github.com/loganw234/cft-fp256",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-09-10T10:45:16Z",
+   "description": "",
+   "name": "cft-rebound",
+   "url": "https://github.com/loganw234/cft-rebound",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-09-13T02:29:49Z",
+   "description": "A framework for AI-written projects whose claims do not depend on the AI",
+   "name": "HonestFramework",
+   "url": "https://github.com/loganw234/HonestFramework",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-06-29T20:14:46Z",
+   "description": "Experimental/Dev builds of things, no promises. ",
+   "name": "Merc2-Mods-Exp",
+   "url": "https://github.com/loganw234/Merc2-Mods-Exp",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-01T14:57:53Z",
+   "description": "A community resource for learning about the Lua capability accessible within Mercenaries 2",
+   "name": "merc2-tools-wiki",
+   "url": "https://github.com/loganw234/merc2-tools-wiki",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-06-27T09:42:44Z",
+   "description": "An attempt at restoring the FESL and Theater services EA shut down for Mercenaries 2, as well as expose the underlying lua scripting.",
+   "name": "Mercenaries2",
+   "url": "https://github.com/loganw234/Mercenaries2",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-19T23:47:11Z",
+   "description": "A browser-based 3D mission editor for Mercenaries 2 - place entities on recovered terrain and mirror them into the running game over the lua-bridge",
+   "name": "mercs2-3d-editor",
+   "url": "https://github.com/loganw234/mercs2-3d-editor",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-19T23:47:07Z",
+   "description": "A live, moddable Encounters system for Mercenaries 2 - ambient and scripted world content (patrols, ambushes, bounties) riding on the Ess Lua framework",
+   "name": "mercs2-ess-encounters",
+   "url": "https://github.com/loganw234/mercs2-ess-encounters",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-24T17:29:46Z",
+   "description": "A draft node-graph visual scripting editor for Ess mods, built on litegraph.js",
+   "name": "mercs2-ess-visual",
+   "url": "https://github.com/loganw234/mercs2-ess-visual",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-24T01:30:33Z",
+   "description": "Com -- the community add-on pack for Ess (mercs2-lua-essentials): callable utility functions from different contributors, one namespace each, loaded after Ess.",
+   "name": "mercs2-lua-community",
+   "url": "https://github.com/loganw234/mercs2-lua-community",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-17T01:38:46Z",
+   "description": "A Lua framework for Mercenaries 2 to make scripting more user accessible",
+   "name": "mercs2-lua-essentials",
+   "url": "https://github.com/loganw234/mercs2-lua-essentials",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-10T00:22:31Z",
+   "description": "Mercenaries 2 Lua Mods Repository",
+   "name": "mercs2-lua-mods",
+   "url": "https://github.com/loganw234/mercs2-lua-mods",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-17T20:21:23Z",
+   "description": "A purely web based IDE able to communicate with the Lua Bridge mod for Mercenaries 2 (PC)",
+   "name": "mercs2-lua-web-ide",
+   "url": "https://github.com/loganw234/mercs2-lua-web-ide",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-22T03:50:45Z",
+   "description": "AI assistant fork of the Mercs2 Lua web IDE: 11-tool agent, grounding check, context-budget tiers, IndexedDB chat store, cross-ecosystem benchmarks. Merges back into the base IDE once proven.",
+   "name": "mercs2-lua-web-ide-ai",
+   "url": "https://github.com/loganw234/mercs2-lua-web-ide-ai",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-20T14:32:22Z",
+   "description": "UNVERIFIED - Retarget rigged glTF characters onto the Mercenaries 2 skeleton, in the browser. Exports the skin/position/palette data a WAD patch needs. No output has been confirmed in-game yet.",
+   "name": "mercs2-mesher",
+   "url": "https://github.com/loganw234/mercs2-mesher",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-06-30T00:56:09Z",
+   "description": "",
+   "name": "mercs2-qol-mods",
+   "url": "https://github.com/loganw234/mercs2-qol-mods",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-20T17:02:16Z",
+   "description": "UNVERIFIED - Paint new skins for existing Mercenaries 2 characters in the browser. Draws the model's UV layout over each texture, previews in 3D, and exports NEW assets rather than overwriting the originals.",
+   "name": "mercs2-skinner",
+   "url": "https://github.com/loganw234/mercs2-skinner",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-25T15:25:15Z",
+   "description": "Browser control panel + live debugger for Ess.Followers/Ess.Squad (Mercenaries 2 modding)",
+   "name": "mercs2-squad-tool",
+   "url": "https://github.com/loganw234/mercs2-squad-tool",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-06-29T01:52:21Z",
+   "description": "A basic save editor for the game Mercenaries 2 on PC",
+   "name": "mercs2-tools",
+   "url": "https://github.com/loganw234/mercs2-tools",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-06T13:10:21Z",
+   "description": "A very rough compiler and visual editor for creating custom SWF/GFX UI elements in Mercenaries 2 (PC)",
+   "name": "mercs2-tools-gfxforge",
+   "url": "https://github.com/loganw234/mercs2-tools-gfxforge",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-06T18:54:02Z",
+   "description": "A JS port of the Python GfxForge tool",
+   "name": "mercs2-tools-gfxforge-web",
+   "url": "https://github.com/loganw234/mercs2-tools-gfxforge-web",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-06T13:21:20Z",
+   "description": "Companion tool to Wad Simulator",
+   "name": "mercs2-tools-gfxtool",
+   "url": "https://github.com/loganw234/mercs2-tools-gfxtool",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-24T17:32:52Z",
+   "description": "Shared design tokens + EssBridge WebSocket client for the mercs2.tools ecosystem -- vendor at build time, don't runtime-import",
+   "name": "mercs2-tools-shared",
+   "url": "https://github.com/loganw234/mercs2-tools-shared",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-18T02:29:05Z",
+   "description": "",
+   "name": "mercs2-webmap",
+   "url": "https://github.com/loganw234/mercs2-webmap",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-24T17:29:38Z",
+   "description": "A boilerplate web tool for the mercs2.tools ecosystem -- WebSocket bridge + build pattern, ready to fork",
+   "name": "mercs2-webtool-template",
+   "url": "https://github.com/loganw234/mercs2-webtool-template",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-19T23:47:18Z",
+   "description": "A browser-based 3D world enhancement editor for Mercenaries 2 - author lightweight random/scripted encounters, synced live with the running game",
+   "name": "mercs2-world-enhancement",
+   "url": "https://github.com/loganw234/mercs2-world-enhancement",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2025-11-06T19:01:05Z",
+   "description": "A tool for stacking images captured on microscopes at various magnifications and exporting a final combined photo retaining detail at all magnifications in one image.",
+   "name": "Microscope-Stacker",
+   "url": "https://github.com/loganw234/Microscope-Stacker",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-09-23T20:06:30Z",
+   "description": "Experimental flows using nextpnr for Xilinx devices",
+   "name": "nextpnr-xilinx",
+   "url": "https://github.com/loganw234/nextpnr-xilinx",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-09-11T21:30:45Z",
+   "description": "Splitting work across several coding agents is easy; the seam between them is what fails. A method for the seam (briefs, a shared ledger, verifiers) with PASS/FAIL decided by the project's own deterministic gates and named negative controls, never by LLM judgement. Platform-agnostic in principle, measured on Claude Code.",
+   "name": "ParcelRound",
+   "url": "https://github.com/loganw234/ParcelRound",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-15T21:07:22Z",
+   "description": "Pretty WebGL Clouds",
+   "name": "PrettyCloud",
+   "url": "https://github.com/loganw234/PrettyCloud",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-09-25T19:46:45Z",
+   "description": "Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll identical everywhere. Moth Hack 2026 (not a cash-prize candidate).",
+   "name": "Quantum-Film",
+   "url": "https://github.com/loganw234/Quantum-Film",
+   "visibility": "PUBLIC"
+  },
+  {
+   "createdAt": "2026-07-22T11:52:27Z",
+   "description": "Manage Mercenaries 2 patch WADs in your browser — add/merge/delete. A byte-faithful JS port of Mercenaries-Fan-Build/mercs2-wad-simulator.",
+   "name": "wad-simulator-js",
+   "url": "https://github.com/loganw234/wad-simulator-js",
+   "visibility": "PUBLIC"
+  }
+ ],
+ "taken": "2026-09-29T12:57:10-07:00"
+}
