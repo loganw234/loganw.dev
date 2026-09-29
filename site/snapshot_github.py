@@ -14,10 +14,15 @@ read here and nowhere else. What it records, all through `gh`:
     "verified_by": every run of those workflows - its commit, conclusion,
     date and URL - which is what "last verified" is computed from.
 
-The file is named for the day it was taken, and pins.json names the file the
-build reads, so taking a new snapshot is a deliberate change of source.
+A repository key is 'owner/name' where the owner is not pins.json's own
+(the Mercenaries-Fan-Build organisation's repositories, for the Preservation
+thread's credits); each owner the keys name is listed.
 
-    python site/snapshot_github.py      # writes sources/github-<today>.json
+The file is named for the minute it was taken, is never overwritten, and
+pins.json names the file the build reads, so taking a new snapshot is a
+deliberate change of source.
+
+    python site/snapshot_github.py      # writes sources/github-<date>-<HHMM>.json
 """
 import datetime
 import json
@@ -48,31 +53,41 @@ def lines_json(out):
     return [json.loads(l) for l in out.splitlines() if l.strip()]
 
 
+def full(key):
+    """'owner/name' for a key; a bare key is the default owner's."""
+    return key if "/" in key else "%s/%s" % (OWNER, key)
+
+
 def main():
-    repos = json.loads(gh("repo", "list", OWNER, "--limit", "500", "--json",
-                          "name,visibility,createdAt,description,url,isFork"))
-    if len(repos) >= 500:
-        sys.exit("the account lists 500 or more repositories; raise --limit, "
-                 "or this snapshot is silently partial")
-    names = {r["name"] for r in repos}
+    keys = list(PINS["repos"]) + list(PINS["github_only"])
+    owners = sorted({full(k).split("/")[0] for k in keys})
+    repos = []
+    for owner in owners:
+        got = json.loads(gh("repo", "list", owner, "--limit", "500", "--json",
+                            "name,visibility,createdAt,description,url,isFork"))
+        if len(got) >= 500:
+            sys.exit("%s lists 500 or more repositories; raise --limit, "
+                     "or this snapshot is silently partial" % owner)
+        repos += [dict(r, owner=owner) for r in got]
+    names = {"%s/%s" % (r["owner"], r["name"]) for r in repos}
     # This file is published. It records every public repository, which is
     # public anyway, and a private one only if the site reads it. The first
     # snapshot recorded every private repository on the account, and was
     # filtered before the first commit.
-    reads = set(PINS["repos"]) | set(PINS["github_only"])
-    repos = [r for r in repos if r["visibility"] == "PUBLIC" or r["name"] in reads]
+    reads = {full(k) for k in keys}
+    repos = [r for r in repos if r["visibility"] == "PUBLIC" or "%s/%s" % (r["owner"], r["name"]) in reads]
 
     github_only = {}
     for name in PINS["github_only"]:
-        if name not in names:
-            sys.exit("pins.json lists %s under github_only, and the account has no such repository" % name)
-        recs = lines_json(gh("api", "--paginate", "repos/%s/%s/commits?per_page=100" % (OWNER, name),
+        if full(name) not in names:
+            sys.exit("pins.json lists %s under github_only, and no such repository exists" % name)
+        recs = lines_json(gh("api", "--paginate", "repos/%s/commits?per_page=100" % full(name),
                              "--jq", ".[] | {date: .commit.author.date, message: .commit.message}"))
         if not recs:
             sys.exit("%s: the API returned no commits" % name)
         files = {}
         for path in ASKED_FILES:
-            files[path] = gh("api", "repos/%s/%s/contents/%s" % (OWNER, name, path),
+            files[path] = gh("api", "repos/%s/contents/%s" % (full(name), path),
                              "--jq", ".name", allow_404=True) is not None
         github_only[name] = {
             "total": len(recs),
@@ -86,7 +101,7 @@ def main():
         wanted = cfg.get("verified_by", {}).get("ci", [])
         if not wanted:
             continue
-        got = lines_json(gh("api", "--paginate", "repos/%s/%s/actions/runs?per_page=100" % (OWNER, name),
+        got = lines_json(gh("api", "--paginate", "repos/%s/actions/runs?per_page=100" % full(name),
                             "--jq", ".workflow_runs[] | {workflow: .name, sha: .head_sha, branch: .head_branch, "
                                     "status: .status, conclusion: .conclusion, created: .created_at, url: .html_url}"))
         mine = [r for r in got if r["workflow"] in wanted]
@@ -99,12 +114,17 @@ def main():
     snap = {
         "taken": now.isoformat(timespec="seconds"),
         "owner": OWNER,
+        "owners": owners,
         "command": "python site/snapshot_github.py (gh repo list and gh api; see its docstring)",
         "repos": sorted(repos, key=lambda r: r["name"].lower()),
         "github_only": github_only,
         "runs": runs,
     }
-    out = ROOT / "sources" / ("github-%s.json" % now.date().isoformat())
+    # Named to the minute: a second snapshot on one day is a new file, never a
+    # silent overwrite of the one a published build was read from.
+    out = ROOT / "sources" / ("github-%s.json" % now.strftime("%Y-%m-%d-%H%M"))
+    if out.exists():
+        sys.exit("%s exists; a snapshot is never overwritten" % out.relative_to(ROOT))
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(snap, indent=1, sort_keys=True, ensure_ascii=False) + "\n",
                    encoding="utf-8", newline="\n")

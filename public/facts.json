@@ -711,7 +711,7 @@
     ],
     "match": "(mercs2-|merc2-|wad-simulator)"
    },
-   "detail": "public repositories matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
+   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
    "href": "",
    "id": 45,
    "kind": "api",
@@ -729,9 +729,9 @@
    "kind": "file",
    "method": "facts.snapshot_date",
    "private": false,
-   "raw": "2026-09-29T14:33:24-07:00",
+   "raw": "2026-09-29T15:20:25-07:00",
    "text": "2026-09-29",
-   "where": "sources/github-2026-09-29.json"
+   "where": "sources/github-2026-09-29-1520.json"
   },
   {
    "args": {
@@ -2061,7 +2061,7 @@
     ],
     "match": "(mercs2-|merc2-|wad-simulator)"
    },
-   "detail": "public repositories matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
+   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
    "href": "",
    "id": 130,
    "kind": "api",
@@ -2287,8 +2287,8 @@
    "kind": "file",
    "method": "facts.pin_count",
    "private": false,
-   "raw": "15",
-   "text": "15",
+   "raw": "19",
+   "text": "19",
    "where": "pins.json"
   },
   {
@@ -2299,14 +2299,18 @@
    "kind": "file",
    "method": "facts.snapshot_date",
    "private": false,
-   "raw": "2026-09-29T14:33:24-07:00",
+   "raw": "2026-09-29T15:20:25-07:00",
    "text": "2026-09-29",
-   "where": "sources/github-2026-09-29.json"
+   "where": "sources/github-2026-09-29-1520.json"
   }
  ],
  "pins": {
   "HonestFramework": "65447fd",
   "Merc2-Mods-Exp": "0ec1db2",
+  "Mercenaries-Fan-Build/mercs2-modkit": "3a4d888",
+  "Mercenaries-Fan-Build/mercs2-qol-mods": "6f1fc59",
+  "Mercenaries-Fan-Build/mercs2-wad-simulator": "fdf3597",
+  "Mercenaries-Fan-Build/notes-on-the-released-game": "b8c3958",
   "Mercenaries2": "e51dcbe",
   "ParcelRound": "8767e23",
   "PrettyCloud": "5161daa",
@@ -2321,5 +2325,5 @@
   "cft-rebound": "039e3c3",
   "mercs2-lua-essentials": "3430c0b"
  },
- "snapshot": "sources/github-2026-09-29.json"
+ "snapshot": "sources/github-2026-09-29-1520.json"
 }

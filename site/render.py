@@ -110,7 +110,7 @@ def footer():
             li.append('<li>%s <span class="fig">%s</span> <i>private for now</i></li>' % (esc(name), esc(p.short)))
         else:
             li.append('<li>%s <a class="fig" href="https://github.com/%s/%s/commit/%s">%s</a></li>'
-                      % (esc(name), facts.OWNER, esc(name), p.full, esc(p.short)))
+                      % (esc(name), esc(p.owner), esc(p.ghname), p.full, esc(p.short)))
     return (
         '<p>Every figure on this page is read at these commits, or from the GitHub snapshot of %s, and '
         '<a href="facts.json">facts.json</a> lists each one with where it was read. <code>python site/build.py '

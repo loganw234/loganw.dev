@@ -13,5 +13,8 @@ A page module defines:
       byte for byte from the pin.
   extra_files(ctx) (optional) -> {flat .txt name: text}: a dossier's
       plain-text twin, for instance.
+  controls() (optional) -> [(name, caught, how)]: the page's own negative
+      controls, run by `build.py --control`. Each plants a fault the page's
+      own checks must catch; caught is True only when the check said no.
 
 """

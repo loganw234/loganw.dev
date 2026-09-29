@@ -137,12 +137,23 @@ def rederive(rec):
 _SNAP = {}
 
 
+def split(key):
+    """A repository key: 'owner/name', or a bare name for the default owner
+    (pins.json's "owner"). The Preservation thread's organisation,
+    Mercenaries-Fan-Build, is the reason for the first form: a name like
+    mercs2-qol-mods exists under both owners."""
+    return tuple(key.split("/", 1)) if "/" in key else (OWNER, key)
+
+
 def snap():
     if not _SNAP:
         if not SNAPSHOT.is_file():
             raise Refusal("%s is missing; run site/snapshot_github.py" % SNAPSHOT.relative_to(ROOT))
         s = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
-        s["by_name"] = {r["name"]: r for r in s["repos"]}
+        s["by_name"] = {}
+        for r in s["repos"]:
+            owner = r.get("owner", OWNER)
+            s["by_name"]["%s/%s" % (owner, r["name"])] = r
         _SNAP.update(s)
     return _SNAP
 
@@ -151,10 +162,10 @@ def snapdate():
     return snap()["taken"][:10]
 
 
-def repo_meta(name):
-    r = snap()["by_name"].get(name)
+def repo_meta(key):
+    r = snap()["by_name"].get("%s/%s" % split(key))
     if r is None:
-        raise Refusal("%s is not in %s" % (name, SNAPSHOT.name))
+        raise Refusal("%s is not in %s" % (key, SNAPSHOT.name))
     return r
 
 
@@ -181,19 +192,24 @@ def _git(cwd, *args, binary=False, ok=(0,)):
 
 
 def _checkout(name, d):
-    local = REPOS / d
-    if (local / ".git").exists():
+    """A pin with a "dir" is read from the owner's clone of that name, at the
+    pin. A pin with none is read only from the site's own clone under .cache/:
+    the organisation's repositories are pinned where GitHub has them, and the
+    owner's clones of them were behind it, one with a commit GitHub never had."""
+    local = REPOS / d if d else None
+    if local is not None and (local / ".git").exists():
         return local
-    cached = CACHE / name
+    cached = CACHE / name.replace("/", "--")
     if (cached / "HEAD").exists() or (cached / ".git").exists():
         return cached
+    where = local if local is not None else cached
     if not is_public(name):
-        raise Unavailable("%s is private and has no clone at %s" % (name, local))
+        raise Unavailable("%s is private and has no clone at %s" % (name, where))
     if os.environ.get("LOGANW_FETCH") != "1":
-        raise Unavailable("%s has no clone at %s; set LOGANW_FETCH=1 to fetch it" % (name, local))
+        raise Unavailable("%s has no clone at %s; set LOGANW_FETCH=1 to fetch it" % (name, where))
     cached.parent.mkdir(parents=True, exist_ok=True)
     r = subprocess.run(["git", "clone", "--quiet", "--filter=blob:none", "--no-checkout",
-                        "https://github.com/%s/%s" % (OWNER, name), str(cached)], capture_output=True)
+                        "https://github.com/%s/%s" % split(name), str(cached)], capture_output=True)
     if r.returncode != 0:
         raise Refusal("%s: fetching it failed: %s" % (name, r.stderr.decode("utf-8", "replace").strip()))
     return cached
@@ -205,8 +221,9 @@ class Pin:
         if cfg is None:
             raise Refusal("%s has no pin in pins.json" % name)
         self.name, self.short, self.cfg = name, cfg["commit"], cfg
+        self.owner, self.ghname = split(name)
         self.private = not is_public(name)
-        self.dir = _checkout(name, cfg["dir"])
+        self.dir = _checkout(name, cfg.get("dir"))
         self._memo, self._anc = {}, None
         self.full = self.git("rev-parse", "--verify", "--quiet", self.short + "^{commit}").strip()
 
@@ -234,7 +251,7 @@ class Pin:
     def href(self, path="", line=0):
         if self.private:
             return ""
-        u = "https://github.com/%s/%s/%s/%s" % (OWNER, self.name, "blob" if path else "tree", self.full)
+        u = "https://github.com/%s/%s/%s/%s" % (self.owner, self.ghname, "blob" if path else "tree", self.full)
         if path:
             u += "/" + path
         if line:
@@ -501,13 +518,13 @@ def family(match, exclude):
     """Public repositories whose names match, counted, with the span of their
     creation dates: -> 'N' with raw 'N first last'."""
     rs = [r for r in snap()["repos"] if r["visibility"] == "PUBLIC" and r["name"] not in exclude
-          and re.match(match, r["name"], re.I)]
+          and r.get("owner", OWNER) == OWNER and re.match(match, r["name"], re.I)]
     if not rs:
         raise Refusal("no public repository matches %r" % match)
     first, last = min(r["createdAt"][:10] for r in rs), max(r["createdAt"][:10] for r in rs)
     return V(str(len(rs)), Src("api", "GitHub snapshot %s" % snapdate(),
-                               "public repositories matching %r, except %s; created %s to %s"
-                               % (match, ", ".join(exclude) or "none", first, last)),
+                               "public repositories under %s matching %r, except %s; created %s to %s"
+                               % (OWNER, match, ", ".join(exclude) or "none", first, last)),
              raw="%d %s %s" % (len(rs), first, last), num=True)
 
 

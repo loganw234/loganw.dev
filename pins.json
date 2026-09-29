@@ -1,7 +1,7 @@
 {
- "about": "The one list of what this site reads. Every figure on it is read at one of these commits, or from the GitHub snapshot named here, and nowhere else. A pin moves only by a dated commit that changes this file (docs/SPEC.md, decisions 3 and 4).",
+ "about": "The one list of what this site reads. Every figure on it is read at one of these commits, or from the GitHub snapshot named here, and nowhere else. A pin moves only by a dated commit that changes this file (docs/SPEC.md, decisions 3 and 4). A key 'owner/name' is another owner's repository. A pin with a dir is read from the owner's clone of that name; one without is read only from the site's own clone under .cache/, fetched with LOGANW_FETCH=1.",
  "owner": "loganw234",
- "snapshot": "sources/github-2026-09-29.json",
+ "snapshot": "sources/github-2026-09-29-1520.json",
  "repos": {
   "PrettyCloud":           {"dir": "PrettyCloud",           "commit": "5161daa"},
   "atlas-darkroom":        {"dir": "atlas-darkroom",        "commit": "6a33735"},
@@ -25,7 +25,11 @@
   "Mercenaries2":          {"dir": "Merc2Reborn",           "commit": "e51dcbe"},
   "Merc2-Mods-Exp":        {"dir": "Merc2-Mods-Exp",        "commit": "0ec1db2"},
   "mercs2-lua-essentials": {"dir": "mercs2-lua-essentials", "commit": "3430c0b",
-                            "verified_by": {"ci": ["CI"]}}
+                            "verified_by": {"ci": ["CI"]}},
+  "Mercenaries-Fan-Build/mercs2-modkit":              {"commit": "3a4d888"},
+  "Mercenaries-Fan-Build/mercs2-qol-mods":            {"commit": "6f1fc59"},
+  "Mercenaries-Fan-Build/mercs2-wad-simulator":       {"commit": "fdf3597"},
+  "Mercenaries-Fan-Build/notes-on-the-released-game": {"commit": "b8c3958"}
  },
  "github_only": ["CanonBracketTool", "Microscope-Stacker", "nextpnr-xilinx",
                  "binary32.com", "binary64.com", "binary128.com", "binary256.com"]

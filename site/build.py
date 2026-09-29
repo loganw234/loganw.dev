@@ -440,14 +440,20 @@ def controls():
         except Refusal as e:
             report("seam", True, "an extra file named %s: %s" % (bad, e))
 
-    # 7. a figure no fact produced
+    # 7. each page module's own controls: controls() -> [(name, caught, how)],
+    #    so a parcel adds the controls for its page without editing this file
+    for m in pages():
+        for name, caught, how in getattr(m, "controls", lambda: [])():
+            report(name, caught, "%s: %s" % (m.__name__, how))
+
+    # 8. a figure no fact produced
     try:
         render.fig(facts.V("0.15", facts.Src("file", "typed by hand")))
         report("unlogged", False, "a figure with no fact behind it was rendered")
     except Refusal as e:
         report("unlogged", True, str(e))
 
-    # 8. a stale source: cft-fp256 pinned to its first commit
+    # 9. a stale source: cft-fp256 pinned to its first commit
     saved = facts.PINS["repos"]["cft-fp256"]["commit"]
     facts.PINS["repos"]["cft-fp256"]["commit"] = "644ee2d"
     facts.forget_pins()

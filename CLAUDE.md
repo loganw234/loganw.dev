@@ -60,6 +60,12 @@ The source repositories are the authority, each read at the commit named in
 8. **The Write tool on this desktop turns `\uXXXX` in code into the literal
    character** (observed 2026-09-29). That's harmless in a string, but check
    any regular expression that depends on the escape.
+9. **A pin with no `dir` is read only from the site's own clone** under
+   `.cache/repos/`. The Mercenaries-Fan-Build organisation's repositories are
+   pinned at GitHub's main. Logan's clones of them were behind that, and one
+   carried a commit GitHub never had. A fresh clone of this repository needs
+   `LOGANW_FETCH=1` once for those pins; until then, `build` skips by name.
+   Never fetch into Logan's own clones.
 
 ## The discipline that matters most here
 
