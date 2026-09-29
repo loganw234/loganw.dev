@@ -26,6 +26,8 @@ What that doesn't cover:
 - **Paraphrases.** A paraphrase prints its source's own words beside it, and
   can't add a numeral those words don't have. Whether it keeps their meaning
   is for the reader to judge.
+- **Images.** An image is checked only as the bytes its pin gives. What it
+  shows is not read.
 
 ## Does it still hold?
 

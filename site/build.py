@@ -376,6 +376,14 @@ def check_numbers(root=PUBLIC):
                 problems += _loose_problems(rel, text, tick, names, allowed)
             for t in p.attr_text:
                 problems += _loose_problems(rel, t, False, names, allowed)
+        elif rel.endswith(".css"):
+            # Generated content is text a reader sees and no page holds: a
+            # numeral typed there would pass every check on the HTML.
+            css = re.sub(r"/\*.*?\*/", "", (root / rel).read_text(encoding="utf-8"), flags=re.S)
+            for m in re.finditer(r"content\s*:\s*([^;}]*)", css, re.I):
+                if re.search(r"\b(?:counters?|attr)\s*\(", m.group(1), re.I):
+                    problems.append("%s: generated content %r prints what no fact holds" % (rel, m.group(1).strip()))
+                problems += _loose_problems("%s generated content" % rel, m.group(1), False, names, allowed)
         elif rel.endswith(".txt") and not rel.startswith("fonts/"):
             t = (root / rel).read_text(encoding="utf-8")
             cut, last = [], 0
@@ -807,6 +815,14 @@ def controls():
                     check_numbers, "fact %d's source" % agent["id"])
             planted("numbers", "a figure in a page's alt text", t.replace('alt="The Pauli print"', 'alt="The 3 prints"', 1),
                     check_numbers, "'3'")
+            css = root / "style.css"
+            saved_css = css.read_text(encoding="utf-8")
+            for what, rule, want in (("a figure in CSS generated content", '.stamp::after{content:" 3397 tests"}', "'3397'"),
+                                     ("a counter in CSS generated content", "li::after{content:counter(list-item)}", "counter")):
+                css.write_text(saved_css + rule + "\n", encoding="utf-8")
+                found = [f for f in check_numbers(root)[0] if want in f]
+                report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+            css.write_text(saved_css, encoding="utf-8")
 
         # links: a missing page, and shapes a server would not serve as a file
         for bad in ("nowhere.html", "style.css/", "index.html/.", "INDEX.HTML", "./index.html", "index.html#no-such-id"):

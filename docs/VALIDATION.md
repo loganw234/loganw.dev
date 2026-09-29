@@ -342,3 +342,20 @@ all 7 stages of that runner. Every finding is accepted.
 - **Build time.** The build takes 12 to 14 s against 4 s at P0. The code is
   not the cause: a bare `git rev-parse` took 0.68 s here this hour, and the
   build makes about 97 git calls.
+
+## 2026-09-29 - P0.1, continued: text in CSS generated content
+
+Before sending P0.1 back to verifier-P0, the lead looked for a way past the
+numbers stage. It found one: a stylesheet's `content:` puts text in front of
+a reader, and no check of the HTML reads it. A rule like
+`.stamp::after{content:" 3397 tests"}` would have printed a typed figure
+past every stage.
+
+The numbers stage now reads generated content in every published
+stylesheet, holding it to the same rule as a page's loose text. It refuses
+`counter()` and `attr()` there, since the text they print comes from no fact.
+Both are planted in `--control`, and both are caught. The count is now 67 of
+67.
+
+A new stated limit, in the README: an image is checked only as the bytes its
+pin gives. What it shows is not read.
