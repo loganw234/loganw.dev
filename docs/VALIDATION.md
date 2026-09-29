@@ -166,3 +166,52 @@ and logged.
   `stale-pin` control re-pins cft-fp256 to its first commit and requires a
   refusal. It does not edit a source repository, and never will: those
   repositories are read, never written.
+
+## 2026-09-29 - a correction: the trailer count is a lower bound, not a measure of AI use; and where StoryDocs came from
+
+**What the lead got wrong.** The first measurement of the day counted
+Claude and Gemini Co-Authored-By trailers per repository:
+CanonBracketTool 0 of 9, Microscope-Stacker 0 of 7, and 83% to 100% from
+PrettyCloud on. The lead read those counts as a measure of how much of each
+project an agent had done. On that reading it:
+
+- scoped the biography to "From PrettyCloud on";
+- called the spec's "agents write the lines" false for the two earliest
+  projects;
+- greyed those projects out on the map.
+
+Logan's correction: "basically every project was entirely AI driven, the
+commit co author line simply wasn't always there. So the counts are honest,
+but the overall work is basically entirely AI." A trailer count measures
+the trailers. Reading it as the work was a domain error, the same kind
+ParcelRound's round 4 found in its verifiers' figures.
+
+**Changed on branch `p0.1`:**
+
+- The biography: "AI agents have written essentially all of the code in
+  these projects", stated.
+- The Home column is renamed "agent-credited". Its caption calls the count a
+  lower bound and gives Logan's word, stated.
+- The map no longer greys out any node by its trailer count, and its legend
+  entry is gone.
+- `docs/SPEC.md`: decision 23, the corrected row in section 3, and the
+  definition in section 4.
+
+**StoryDocs** (decision 22). Logan: it "came from the darkroom project, its
+'art books' were the basis of the system", and it has touched most of the
+projects. Its README at `673148c` agrees: the book side was "taken out of
+atlas-darkroom", and the paper side is "a hybrid of a research paper and
+that book's idiom". Its `projects/` directories at that pin are atlas-engine,
+atlas-film, atlas-optical, cft-fp256, method, prettycloud and quantum-film.
+Its first commit is 2026-09-20. Its place on the map, and edges derived from
+those directories, are parcel P2's work.
+
+### Measured
+
+`python site/build.py` published 17 files, now holding 131 figures:
+
+- 14 figures fewer, because the map no longer reads each node's trailer
+  count;
+- 1 more, Logan's stated sentence.
+
+`bash verify/run.sh --require-all` passed, with nothing skipped.

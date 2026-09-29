@@ -18,8 +18,14 @@ ASSETS = [("assets/" + f, "Quantum-Film", "docs/prints/" + f) for f, _ in PRINTS
 LEDGER_CAP = ("Each row is read from the repository it names, at the commit in the footer. <i>Last verified</i>: the "
               "newest recorded pass of the repository's own gate at or before its pin &mdash; a CI workflow that "
               "passed on the pinned commit or an ancestor of it, or a ledger line that records a pass, as pins.json "
-              "declares for each; a dash means none is recorded. <i>Agent-written</i>: commits carrying a Claude or "
-              "Gemini Co-Authored-By trailer, of all its commits &mdash; a trailer, not a line count.")
+              "declares for each; a dash means none is recorded. <i>Agent-credited</i>: commits carrying a Claude or "
+              "Gemini Co-Authored-By trailer, of all its commits &mdash; a trailer, not a line count, and a lower "
+              "bound: ")
+
+# Logan, 2026-09-29, correcting the lead's reading of that column: the counts
+# are honest, and they are not a measure of how much of a project an agent did.
+# His words are recorded in docs/SPEC.md (decision 23); this is their meaning.
+AI_USE = "every project here was AI-driven, and the co-author line was not always added to its commits"
 
 
 @fact
@@ -143,7 +149,7 @@ def rows():
 
 def ledger_table():
     head = ("<thead><tr><th>project</th><th>what it is</th><th>state</th><th>last verified</th>"
-            "<th class=\"n\">agent-written</th><th>check it</th></tr></thead>")
+            "<th class=\"n\">agent-credited</th><th>check it</th></tr></thead>")
     body, thread = [], None
     for r in rows():
         if r["thread"] != thread:
@@ -197,12 +203,13 @@ def prints():
 
 def render_page(ctx):
     who = facts.stated("I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training "
-                       "in computing. From PrettyCloud on, AI agents have written essentially all of the code; gates "
+                       "in computing. AI agents have written essentially all of the code in these projects; gates "
                        "decide what is true, and the record keeps what they said.")
+    cap = LEDGER_CAP + render(["Logan's word is that ", facts.stated(AI_USE), "."])
     return ('<div class="measure"><p class="lede">%s</p></div>'
             '<h2><small>I</small>Where each project came from</h2>%s'
             '<h2><small>II</small>Ledger</h2><div class="table-wrap">%s</div><p class="cap">%s</p>'
             '<div class="measure"><h2><small>III</small>Check it yourself</h2><div class="cta"><p>Don\'t trust this page.</p>%s</div>'
             '<h2><small>IV</small>The film thread</h2>%s'
             '<h2><small>V</small>Not here</h2>%s</div>'
-            % (render(who), mapgen.block(), ledger_table(), LEDGER_CAP, checks(), prints(), not_here()))
+            % (render(who), mapgen.block(), ledger_table(), cap, checks(), prints(), not_here()))

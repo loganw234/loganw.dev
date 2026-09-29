@@ -142,6 +142,20 @@ where they were longer.
 21. **Design:** experiment E, "D looks good, but the color scheme of A (the
     blue), and the font and header choice of B", and then "E looks good as
     it is" (`design/README.md`).
+22. **StoryDocs.** In Logan's words: "StoryDocs came from the darkroom
+    project, its 'art books' were the basis of the system, it later
+    incorporated a 'hybrid' paper type system, where it's a bit more
+    stylistic than a traditional paper, but content more in line with one.
+    It can be shown connecting to all of the various projects it has
+    touched, which is most of them." Its README at the pin says the same:
+    the book side was "taken out of atlas-darkroom", and the paper side is
+    "a hybrid of a research paper and that book's idiom". The projects it
+    has touched are its `projects/` directories at that pin.
+23. **How much of the work is AI's.** In Logan's words: "basically every
+    project was entirely AI driven, the commit co author line simply wasn't
+    always there. So the counts are honest, but the overall work is
+    basically entirely AI." The trailer count is therefore a lower bound,
+    not a measure of AI use.
 
 ---
 
@@ -158,7 +172,7 @@ measured them are in `docs/VALIDATION.md`.
 | "atlas-darkroom is private" | atlas-optical is private too, and HonestFramework's public case study cites both. | Both are named on Home. |
 | Preservation is Logan's | Commits by Headless Rebase, Rebase and Austin Kregel. Four repositories belong to the Mercenaries-Fan-Build organisation. | Each is credited directly, with a link (decision 10). |
 | The Record merges every repository's VALIDATION.md | Only three repositories keep one: cft-fp256 (152 entries), cft-rebound (37) and Quantum-Film (19). Their headings come in three shapes, and cft-rebound's entries 30 to 33 carry no date anywhere. | Each ledger is parsed by a rule that refuses any heading it can't date. A numbered entry is dated by the commit that first wrote its heading. |
-| "Agents write the lines" | False for CanonBracketTool (0 of 9 commits) and Microscope-Stacker (0 of 7). | The biography says "From PrettyCloud on". |
+| "Agents write the lines" | The lead first read this as false for CanonBracketTool (0 of 9 commits carry an agent trailer) and Microscope-Stacker (0 of 7), and scoped the biography to "From PrettyCloud on". **That reading was wrong.** A trailer count measures the trailers, not the work. Logan's word (decision 23) is that every project was AI-driven, and the trailer was not always added. | The biography states Logan's word for every project. The column is renamed "agent-credited" and captioned as a lower bound. The map no longer greys out projects with no trailers. |
 | A fork's commit count | nextpnr-xilinx counts 45 of 3397 commits, but that count is mostly its parent's history. | A fork gets a dash, and the reason for it. |
 
 ---
@@ -178,9 +192,11 @@ measured them are in `docs/VALIDATION.md`.
 - **Open regressions.** The newest finished run, at or before the pin, of
   each declared workflow that did not pass. When every declared workflow
   passed, the site records that too, as an absence.
-- **Agent-written.** The number of commits carrying a Claude or Gemini
+- **Agent-credited.** The number of commits carrying a Claude or Gemini
   Co-Authored-By trailer, out of all commits at the pin. It counts commits,
-  not trailer lines and not lines of code. A fork gets a dash.
+  not trailer lines and not lines of code. It is a **lower bound** on the
+  agents' part in the work, not a measure of it: in Logan's words, the
+  trailer "simply wasn't always there" (decision 23). A fork gets a dash.
 - **Born.** A repository's earliest commit at its pin. The exceptions:
   - a repository split out of another with its history carried is born on
     the date its README states;

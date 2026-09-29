@@ -55,14 +55,16 @@ def build():
             b = facts.api_born(name)
         else:
             raise Refusal("the map names %s, which pins.json neither pins nor lists as github_only" % name)
-        a = facts.agents(name) if name in facts.PINS["repos"] else facts.api_agents(name)
+        # No node is greyed by its count of agent co-author trailers: that count
+        # is a lower bound, and Logan's word (2026-09-29) is that every project
+        # was AI-driven. Styling on it would have drawn a claim the record does
+        # not support.
         note = None
         if "note" in n:
             v = facts.prose(name, n["note"]["path"], n["note"]["pattern"])
             note = n["note"]["format"] % v.text
-        nodes[name] = dict(name=name, x=xpos(b.text, name), y=ROWY[n["lane"]][n["row"]], born=b, agents=a,
-                           private=not facts.is_public(name), pre=a.raw.startswith("0/"),
-                           trunk=n.get("trunk", False), note=note)
+        nodes[name] = dict(name=name, x=xpos(b.text, name), y=ROWY[n["lane"]][n["row"]], born=b,
+                           private=not facts.is_public(name), trunk=n.get("trunk", False), note=note)
     edges = []
     for e in DATA["edges"]:
         for end in (e["tail"], e["head"]):
@@ -124,7 +126,7 @@ def svg(M):
                  % (e["kind"], sx, sy, cx, cy, ex, ey, "ah-acc" if e["kind"] == "grew-into" else "ah",
                     esc(e["tail"]), esc(KIND[e["kind"]]), esc(e["head"])))
     for n in N.values():
-        cls = " ".join(["node"] + [k for k in ("private", "pre", "trunk") if n[k]])
+        cls = " ".join(["node"] + [k for k in ("private", "trunk") if n[k]])
         tail = '<tspan class="note"> private</tspan>' if n["private"] else ""
         if n["note"]:
             tail += '<tspan class="note"> %s</tspan>' % esc(n["note"])
@@ -139,7 +141,6 @@ def legend():
           % (k, esc(t)) for k, t in DATA["kinds"]]
     li += ['<li><svg width="10" height="10" aria-hidden="true"><g class="node"><rect x="1.5" y="1.5" width="7" height="7"/></g></svg>public</li>',
            '<li><svg width="10" height="10" aria-hidden="true"><g class="node private"><rect x="1.5" y="1.5" width="7" height="7"/></g></svg>private for now</li>',
-           '<li><svg width="10" height="10" aria-hidden="true"><g class="node pre"><rect x="1.5" y="1.5" width="7" height="7"/></g></svg>no agent-co-authored commits</li>',
            '<li><svg width="30" height="10" aria-hidden="true"><line class="range" x1="1" y1="5" x2="29" y2="5"/></svg>a family, first to last created</li>']
     return '<ul class="legend">%s</ul>' % "".join(li)
 
