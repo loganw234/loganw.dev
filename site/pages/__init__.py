@@ -1,7 +1,17 @@
 """One module per page. build.py finds them by glob; nothing lists them.
 
-A page module defines PAGE = {"file", "nav", "title", "description"}, a
-render_page(ctx) that returns the page's body HTML, and optionally ASSETS, a
-list of (published path, repository, path at its pin) for files copied byte
-for byte. ctx["built"] maps each built page's navigation label to its file.
+A page module defines:
+
+  PAGE = {"file", "nav", "title", "description"} and, in a section of more
+      than one page, "index": True on the one page the navigation links to.
+      "file" is a flat, lower-case .html name; every page is published beside
+      index.html, so one set of relative links works on both hosts.
+  render_page(ctx) -> the page's body HTML. ctx["built"] maps each navigation
+      label to the file it links to; ctx["pages"] maps each label to every
+      file in its section.
+  ASSETS (optional): [(published path, repository, path at its pin)], copied
+      byte for byte from the pin.
+  extra_files(ctx) (optional) -> {flat .txt name: text}: a dossier's
+      plain-text twin, for instance.
+
 """

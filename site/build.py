@@ -48,36 +48,81 @@ BUILD_NOTE = ("This is the committed copy of the site. The deploy replaces this 
 # ---------------------------------------------------------------------------
 
 def pages():
-    mods = []
-    for f in sorted((SITE / "pages").glob("*.py")):
-        if f.stem.startswith("_"):
-            continue
-        m = importlib.import_module("pages." + f.stem)
+    mods = [importlib.import_module("pages." + f.stem)
+            for f in sorted((SITE / "pages").glob("*.py")) if not f.stem.startswith("_")]
+    validate(mods)
+    return mods
+
+
+EXTRA_NAME = re.compile(r"[a-z0-9][a-z0-9.-]*\.txt")
+
+
+def validate(mods):
+    for m in mods:
         for need in ("PAGE", "render_page"):
             if not hasattr(m, need):
-                raise Refusal("site/pages/%s.py defines no %s" % (f.name, need))
+                raise Refusal("%s defines no %s" % (m.__name__, need))
         if m.PAGE["nav"] not in render.NAV:
-            raise Refusal("site/pages/%s.py claims nav entry %r, which is not in the navigation" % (f.name, m.PAGE["nav"]))
-        mods.append(m)
-    for key in ("file", "nav"):
-        seen = [m.PAGE[key] for m in mods]
-        dup = {x for x in seen if seen.count(x) > 1}
-        if dup:
-            raise Refusal("two pages share a %s: %s" % (key, sorted(dup)))
-    return mods
+            raise Refusal("%s claims nav entry %r, which is not in the navigation" % (m.__name__, m.PAGE["nav"]))
+        # Every page is published flat, beside index.html, so that one set of
+        # relative links works at loganw.dev/ and at loganw234.github.io/loganw.dev/.
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*\.html", m.PAGE["file"]):
+            raise Refusal("%s publishes %r; a page is a flat, lower-case .html name" % (m.__name__, m.PAGE["file"]))
+    files = [m.PAGE["file"] for m in mods]
+    dup = {x for x in files if files.count(x) > 1}
+    if dup:
+        raise Refusal("two pages publish the same file: %s" % sorted(dup))
+    # A navigation entry may have several pages (a section: the three threads,
+    # the dossiers); exactly one of them is the section's own page, which the
+    # navigation links to. A lone page is its section's own page.
+    for label in {m.PAGE["nav"] for m in mods}:
+        group = [m for m in mods if m.PAGE["nav"] == label]
+        heads = [m for m in group if m.PAGE.get("index", len(group) == 1)]
+        if len(heads) != 1:
+            raise Refusal("navigation entry %r has %d pages marked as its own page (index: True); it needs exactly one"
+                          % (label, len(heads)))
+
+
+def collect_extras(m, ctx, text):
+    """A page may publish text files of its own - a dossier's plain-text twin -
+    through extra_files(ctx) -> {flat name: text}. The one place they are taken
+    in, so the control below exercises the path the build uses."""
+    if not hasattr(m, "extra_files"):
+        return
+    for name, t in m.extra_files(ctx).items():
+        if not EXTRA_NAME.fullmatch(name):
+            raise Refusal("%s publishes %r; an extra file is a flat, lower-case .txt name" % (m.__name__, name))
+        if name in text:
+            raise Refusal("%s publishes %s, which another page already publishes" % (m.__name__, name))
+        text[name] = t
+
+
+def section_index(mods):
+    """-> {navigation label: the file the navigation links to}."""
+    out = {}
+    for m in mods:
+        group = [g for g in mods if g.PAGE["nav"] == m.PAGE["nav"]]
+        if m.PAGE.get("index", len(group) == 1):
+            out[m.PAGE["nav"]] = m.PAGE["file"]
+    return out
 
 
 def render_all():
     """-> (text files, binary files), each {published path: content}."""
     facts.reset_log()
     mods = pages()
-    built = {m.PAGE["nav"]: m.PAGE["file"] for m in mods}
+    built = section_index(mods)
+    pages_by_nav = {}
+    for m in mods:
+        pages_by_nav.setdefault(m.PAGE["nav"], []).append(m.PAGE["file"])
     text, binary = {}, {}
     for m in mods:
-        body = m.render_page({"built": built})
+        ctx = {"built": built, "pages": pages_by_nav}
+        body = m.render_page(ctx)
         text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"])
         for dest, repo, path in getattr(m, "ASSETS", []):
             binary[dest] = facts.pin(repo).show(path, binary=True)
+        collect_extras(m, ctx, text)
     # One stylesheet per parcel under site/styles/, found by glob, so no two
     # parcels edit the same file (ParcelRound section 2: aim for a glob).
     text["style.css"] = "".join(f.read_text(encoding="utf-8") for f in
@@ -373,14 +418,36 @@ def controls():
         found = check_stage_claims([copy])
         report("docs", bool(found), found[0] if found else "a wrong stage count passed")
 
-    # 6. a figure no fact produced
+    # 6. the page seam's rules, each on a fake page: a nested file, a section
+    #    with two pages claiming to be its own, an extra file that is not flat
+    import types
+    fake = lambda f, nav, idx=None: types.SimpleNamespace(
+        __name__="planted." + f, render_page=lambda ctx: "",
+        PAGE=dict(file=f, nav=nav, title="t", description="d", **({} if idx is None else {"index": idx})))
+    for what, mods in (("a nested page", [fake("work/x.html", "Work")]),
+                       ("two section pages", [fake("threads.html", "Threads", True), fake("thread-a.html", "Threads", True)])):
+        try:
+            validate(mods)
+            report("seam", False, "%s passed validation" % what)
+        except Refusal as e:
+            report("seam", True, "%s: %s" % (what, e))
+    for bad in ("work/x.txt", "X.TXT", "index.html"):
+        m = fake("x.html", "Work")
+        m.extra_files = lambda ctx, bad=bad: {bad: "planted"}
+        try:
+            collect_extras(m, {}, {})
+            report("seam", False, "an extra file named %s was taken in" % bad)
+        except Refusal as e:
+            report("seam", True, "an extra file named %s: %s" % (bad, e))
+
+    # 7. a figure no fact produced
     try:
         render.fig(facts.V("0.15", facts.Src("file", "typed by hand")))
         report("unlogged", False, "a figure with no fact behind it was rendered")
     except Refusal as e:
         report("unlogged", True, str(e))
 
-    # 6. a stale source: cft-fp256 pinned to its first commit
+    # 8. a stale source: cft-fp256 pinned to its first commit
     saved = facts.PINS["repos"]["cft-fp256"]["commit"]
     facts.PINS["repos"]["cft-fp256"]["commit"] = "644ee2d"
     facts.forget_pins()
