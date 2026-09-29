@@ -359,3 +359,20 @@ Both are planted in `--control`, and both are caught. The count is now 67 of
 
 A new stated limit, in the README: an image is checked only as the bytes its
 pin gives. What it shows is not read.
+
+## 2026-09-29 - P0.1, continued: two more ways past the numbers stage, closed while the verifier re-checks
+
+The lead found two more ways past its own numbers stage after sending P0.1
+to verifier-P0:
+
+- **A figure behind a sign.** A numeral counted only if its word started
+  with a digit or one of six prefixes, so `$5` or `=5` passed. Now any run
+  of digits counts unless a letter or an underscore comes before it, so a
+  name such as cft-fp256 or Mercenaries2 is still not a figure. A name
+  caught anyway, like "UTF-8", goes in a page's `NUMERAL_NAMES`.
+- **The tick exemption.** A month label was allowed in any element classed
+  `tick`, so `<span class="tick">Sep 2026</span>` could state a date in
+  prose. Now only SVG text of that class, inside an `svg`, is exempt.
+
+Both are planted in `--control` and caught, which makes 69 of 69. The page
+itself still passes: 270 marks, and no numeral outside one.

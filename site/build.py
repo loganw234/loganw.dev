@@ -313,7 +313,11 @@ class _Marks(html.parser.HTMLParser):
         if m is not None:
             m["buf"].append(data)
         elif data.strip():
-            self.loose.append((data, any("tick" in n["cls"] for n in self.stack)))
+            # A month tick on a chart's axis: SVG text of class tick, inside an
+            # svg, and nothing else, however it is classed.
+            tick = bool(self.stack) and self.stack[-1]["tag"] == "text" and "tick" in self.stack[-1]["cls"] \
+                and any(n["tag"] == "svg" for n in self.stack)
+            self.loose.append((data, tick))
 
 
 def numeral_names():
@@ -815,6 +819,11 @@ def controls():
                     check_numbers, "fact %d's source" % agent["id"])
             planted("numbers", "a figure in a page's alt text", t.replace('alt="The Pauli print"', 'alt="The 3 prints"', 1),
                     check_numbers, "'3'")
+            planted("numbers", "a figure behind a sign", t.replace("</footer>", "<p>costs $5</p></footer>", 1),
+                    check_numbers, "'$5'")
+            planted("numbers", "a date in an HTML element classed as a tick",
+                    t.replace("</footer>", '<p>shipped <span class="tick">Sep 2026</span></p></footer>', 1),
+                    check_numbers, "'2026'")
             css = root / "style.css"
             saved_css = css.read_text(encoding="utf-8")
             for what, rule, want in (("a figure in CSS generated content", '.stamp::after{content:" 3397 tests"}', "'3397'"),

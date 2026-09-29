@@ -97,14 +97,18 @@ NUMBER_WORDS = re.compile(
 
 
 def numerals(s):
-    """The tokens of s that are figures: a word that starts with a digit (after
-    an optional v, #, §, ~, ± or sign), or a hex word of 7 to 40 characters with
-    a digit in it (a commit). A name with digits inside it - cft-fp256,
-    binary32.com, Mercenaries2 - is not a figure."""
+    """The tokens of s that are figures: a word with a run of digits that
+    starts it or follows anything but a letter or an underscore ("2026-09-29",
+    "$5", "=5", "UTF-8"), a version ("v0.9"), or a hex word of 7 to 40
+    characters with a digit in it (a commit). A name whose digits follow a
+    letter - cft-fp256, binary32.com, Mercenaries2 - is not a figure. A name
+    that is caught anyway, like "UTF-8", goes in a page's NUMERAL_NAMES.
+    Digits are Arabic digits; "½" and roman numerals are not read."""
     out = []
     for m in _WORD.finditer(s):
         w = m.group(0).rstrip(".:")
-        if re.match(r"[v#§~±+\-−]?\d", w) or (_SHA.fullmatch(w) and re.search(r"\d", w)):
+        if (re.search(r"(?:^|[^A-Za-z_\d])\d", w) or re.match(r"v\d", w)
+                or (_SHA.fullmatch(w) and re.search(r"\d", w))):
             out.append(w)
     return out
 
