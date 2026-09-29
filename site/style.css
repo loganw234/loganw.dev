@@ -16,7 +16,7 @@ header{padding:46px 0 0}
 header .site{font:500 12.5px var(--mono);letter-spacing:.05em;color:var(--muted)}
 header .name{font:italic 500 46px/1.05 var(--serif);margin:.18em 0 .2em;letter-spacing:-.01em}
 nav{font:italic 17px/1.6 var(--serif);color:var(--muted);display:flex;flex-wrap:wrap}
-nav>*+*::before{content:"\00b7";margin:0 .55em;color:var(--rule);font-style:normal}
+nav>*+*::before{content:"·";margin:0 .55em;color:var(--rule);font-style:normal}
 nav a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px}
 nav a:not(.here){text-decoration-color:var(--rule)}
 .stamp{font:12.5px/1.5 var(--mono);color:var(--muted);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 0;margin:22px 0 30px}

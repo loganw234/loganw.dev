@@ -170,7 +170,7 @@ measured them are in `docs/VALIDATION.md`.
 | "1:24", "~1 hour per 24" | No file backs it. The only measurement is from round 2: 1 h 38 min of human-active time against 23 h 40 min of API time, read at about the twelfth hour. That is about 1:14.5, and Logan considers it inflated. | Logan's statement is shown as stated, and measurement starts now (decision 8). |
 | Co-authors named, "consistent with the READMEs" | The only README that names Gemini (Mercenaries2) says "substantial AI assistance". Across every repository, Gemini appears in one Co-Authored-By trailer, on `d66f97a` in Mercenaries2, alongside Claude. | Equal attribution, in Logan's words (decision 9), kept in one place: the Method page. |
 | "atlas-darkroom is private" | atlas-optical is private too, and HonestFramework's public case study cites both. | Both are named on Home. |
-| Preservation is Logan's | Commits by Headless Rebase, Rebase and Austin Kregel. Four repositories belong to the Mercenaries-Fan-Build organisation. | Each is credited directly, with a link (decision 10). |
+| Preservation is Logan's | Commits by two people besides Logan: Austin Kregel, and Headless Rebase, one GitHub account that also commits as "Rebase" and "Rebase Headless" (read from the four pinned organisation repositories). The Mercenaries-Fan-Build organisation has 12 public repositories (snapshot 2026-09-29-1621); the site pins 4 of them. *Corrected 2026-09-29: the first version named "Rebase" as a third person and said the organisation had four repositories (verifier-P0).* | Each is credited directly, with a link (decision 10). |
 | The Record merges every repository's VALIDATION.md | Only three repositories keep one: cft-fp256 (152 entries), cft-rebound (37) and Quantum-Film (19). Their headings come in three shapes, and cft-rebound's entries 30 to 33 carry no date anywhere. | Each ledger is parsed by a rule that refuses any heading it can't date. A numbered entry is dated by the commit that first wrote its heading. |
 | "Agents write the lines" | The lead first read this as false for CanonBracketTool (0 of 9 commits carry an agent trailer) and Microscope-Stacker (0 of 7), and scoped the biography to "From PrettyCloud on". **That reading was wrong.** A trailer count measures the trailers, not the work. Logan's word (decision 23) is that every project was AI-driven, and the trailer was not always added. | The biography states Logan's word for every project. The column is renamed "agent-credited" and captioned as a lower bound. The map no longer greys out projects with no trailers. |
 | A fork's commit count | nextpnr-xilinx counts 45 of 3397 commits, but that count is mostly its parent's history. | A fork gets a dash, and the reason for it. |
@@ -179,32 +179,53 @@ measured them are in `docs/VALIDATION.md`.
 
 ## 4. Definitions the build uses
 
+- **A pin.** A commit named in `pins.json` that GitHub has. The snapshot
+  records the full SHA GitHub gives for each pin, and the build refuses a pin
+  the snapshot didn't look up or GitHub doesn't have: a figure read at a
+  commit nobody else can fetch could be checked by no one else.
 - **Last verified.** The newest recorded pass of a repository's own gate, at
-  or before its pin. Two kinds of record count, and each repository declares
-  which it uses in `pins.json` under `verified_by`:
-  - a run of a named CI workflow that succeeded on the pinned commit or an
-    ancestor of it;
-  - a ledger line matching a declared pattern, dated by the entry it sits in.
+  or before its pin. Two kinds of record count:
+  - **a CI run.** In `pins.json`, every workflow of every pinned repository
+    is classed as `verifies`, `builds` or `deploys`. The build refuses a
+    workflow nobody classed. A run counts when its workflow is classed
+    `verifies` and it succeeded on the pinned commit or an ancestor of it.
+  - **a ledger line.** It must match one of the pass forms the repository
+    declares under `verified_by.ledger.passes`, and it is dated by the entry
+    it sits in. A pass recorded in a form nobody declared is not seen; that
+    is the limit of a declared form.
 
-  A repository that declares neither shows a dash, and the dash says why.
-  Deploy and release workflows don't count as verification, so they are
-  never declared.
-- **Open regressions.** The newest finished run, at or before the pin, of
-  each declared workflow that did not pass. When every declared workflow
-  passed, the site records that too, as an absence.
-- **Agent-credited.** The number of commits carrying a Claude or Gemini
-  Co-Authored-By trailer, out of all commits at the pin. It counts commits,
-  not trailer lines and not lines of code. It is a **lower bound** on the
-  agents' part in the work, not a measure of it: in Logan's words, the
-  trailer "simply wasn't always there" (decision 23). A fork gets a dash.
-- **Born.** A repository's earliest commit at its pin. The exceptions:
+  A CI run's time is converted to the calendar of the pinned commit's
+  author, since ledger dates are that author's own days. A repository with
+  neither kind of record shows a dash, and the dash says why.
+- **Open regressions.** For each workflow classed `verifies`, its newest run
+  at or before the pin that has a verdict, if that verdict is red:
+  - red is `failure`, `timed_out` or `startup_failure`;
+  - `success` is a pass;
+  - `cancelled`, `skipped`, `neutral`, `stale` and `action_required` are no
+    verdict at all, and are passed over.
+
+  The page says "red on" the newest red run's date, which is not when the
+  failures began. When every newest verdict is a pass, the site records
+  that too, as an absence.
+- **Agent-credited.** The number of commits whose message has a
+  Co-Authored-By line naming Claude or Gemini, out of all commits at the pin.
+  It counts commits, not trailer lines and not lines of code. It is a
+  **lower bound** on the agents' part in the work, not a measure of it: in
+  Logan's words, the trailer "simply wasn't always there" (decision 23). A
+  fork gets a dash.
+- **Born.** A repository's earliest commit at its pin, on its author's
+  calendar. The exceptions:
   - a repository split out of another with its history carried is born on
     the date its README states;
   - a repository read only through the snapshot is born on the snapshot's
-    earliest commit date.
+    earliest commit date, in UTC, because the API gives no author's offset.
 - **Private for now.** A figure from a private repository is printed with its
   source, which the reader can't open yet. That a repository is private is
   itself only the snapshot's word, because a stranger sees a private
   repository and a missing one the same way.
-- **Stated.** Logan's word, with no file behind it. It is printed as stated,
-  and it is never counted as sourced.
+- **Stated.** Someone's word, with no file behind it: printed with who said
+  it and when, and never counted as sourced. There are two variants:
+  - A statement about a repository names the pin it was made at, and refuses
+    the build once that pin moves.
+  - Words the lead drafted from Logan's own are labelled as a draft until
+    Logan approves them.

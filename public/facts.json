@@ -3,35 +3,43 @@
  "facts": [
   {
    "args": {
+    "draft": true,
+    "holds_at": null,
     "text": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
    "id": 1,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
+   "said": "",
    "text": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
-   "where": "stated"
+   "where": "drafted from Logan's words of 2026-09-29, not yet approved"
   },
   {
    "args": {
+    "draft": false,
+    "holds_at": null,
     "text": "every project here was AI-driven, and the co-author line was not always added to its commits",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
    "id": 2,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "every project here was AI-driven, and the co-author line was not always added to its commits",
+   "said": "",
    "text": "every project here was AI-driven, and the co-author line was not always added to its commits",
-   "where": "stated"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {
@@ -42,10 +50,30 @@
    "id": 3,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-07-15",
+   "said": "",
    "text": "2026-07-15",
    "where": "PrettyCloud 5161daa git log"
+  },
+  {
+   "args": {
+    "names": [
+     "PrettyCloud"
+    ]
+   },
+   "detail": "PrettyCloud: visibility PUBLIC",
+   "href": "",
+   "id": 4,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -53,13 +81,33 @@
    },
    "detail": "the earliest author date of 84 commits",
    "href": "https://github.com/loganw234/atlas-engine/tree/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4",
-   "id": 4,
+   "id": 5,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-08-22",
+   "said": "",
    "text": "2026-08-22",
    "where": "atlas-engine 867c57a git log"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-engine"
+    ]
+   },
+   "detail": "atlas-engine: visibility PUBLIC",
+   "href": "",
+   "id": 6,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -67,13 +115,33 @@
    },
    "detail": "the earliest author date of 1079 commits",
    "href": "https://github.com/loganw234/cft-fp256/tree/77b8440937a8f0376986c173f09fcc52a04185ad",
-   "id": 5,
+   "id": 7,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-08-28",
+   "said": "",
    "text": "2026-08-28",
    "where": "cft-fp256 77b8440 git log"
+  },
+  {
+   "args": {
+    "names": [
+     "cft-fp256"
+    ]
+   },
+   "detail": "cft-fp256: visibility PUBLIC",
+   "href": "",
+   "id": 8,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -81,13 +149,33 @@
    },
    "detail": "the earliest author date of 136 commits",
    "href": "https://github.com/loganw234/cft-rebound/tree/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc",
-   "id": 6,
+   "id": 9,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-09-09",
+   "said": "",
    "text": "2026-09-09",
    "where": "cft-rebound 039e3c3 git log"
+  },
+  {
+   "args": {
+    "names": [
+     "cft-rebound"
+    ]
+   },
+   "detail": "cft-rebound: visibility PUBLIC",
+   "href": "",
+   "id": 10,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -95,13 +183,33 @@
    },
    "detail": "the earliest author date of 86 commits",
    "href": "https://github.com/loganw234/ParcelRound/tree/8767e235fb739b43418165d13c9297133bdaf313",
-   "id": 7,
+   "id": 11,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-09-11",
+   "said": "",
    "text": "2026-09-11",
    "where": "ParcelRound 8767e23 git log"
+  },
+  {
+   "args": {
+    "names": [
+     "ParcelRound"
+    ]
+   },
+   "detail": "ParcelRound: visibility PUBLIC",
+   "href": "",
+   "id": 12,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -109,55 +217,135 @@
    },
    "detail": "the earliest author date of 4 commits",
    "href": "https://github.com/loganw234/HonestFramework/tree/65447fd4d8253034fd6d206479c5a5371c623c60",
-   "id": 8,
+   "id": 13,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-09-12",
+   "said": "",
    "text": "2026-09-12",
    "where": "HonestFramework 65447fd git log"
   },
   {
    "args": {
+    "names": [
+     "HonestFramework"
+    ]
+   },
+   "detail": "HonestFramework: visibility PUBLIC",
+   "href": "",
+   "id": 14,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
     "name": "CanonBracketTool"
    },
-   "detail": "CanonBracketTool: the earliest of its 9 commits",
+   "detail": "CanonBracketTool: the earliest of its 9 commits, as a UTC date (the API gives no author's offset)",
    "href": "https://github.com/loganw234/CanonBracketTool",
-   "id": 9,
+   "id": 15,
    "kind": "api",
    "method": "facts.api_born",
+   "num": true,
    "private": false,
    "raw": "2025-11-04",
+   "said": "",
    "text": "2025-11-04",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "names": [
+     "CanonBracketTool"
+    ]
+   },
+   "detail": "CanonBracketTool: visibility PUBLIC",
+   "href": "",
+   "id": 16,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "Microscope-Stacker"
    },
-   "detail": "Microscope-Stacker: the earliest of its 7 commits",
+   "detail": "Microscope-Stacker: the earliest of its 7 commits, as a UTC date (the API gives no author's offset)",
    "href": "https://github.com/loganw234/Microscope-Stacker",
-   "id": 10,
+   "id": 17,
    "kind": "api",
    "method": "facts.api_born",
+   "num": true,
    "private": false,
    "raw": "2025-11-06",
+   "said": "",
    "text": "2025-11-06",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "names": [
+     "Microscope-Stacker"
+    ]
+   },
+   "detail": "Microscope-Stacker: visibility PUBLIC",
+   "href": "",
+   "id": 18,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "atlas-darkroom"
    },
-   "detail": "the earliest author date of 1157 commits",
+   "detail": "the earliest author date of 1156 commits",
    "href": "",
-   "id": 11,
+   "id": 19,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": true,
    "raw": "2026-07-27",
+   "said": "",
    "text": "2026-07-27",
-   "where": "atlas-darkroom 6a33735 git log"
+   "where": "atlas-darkroom c1b9b6e git log"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-darkroom"
+    ]
+   },
+   "detail": "atlas-darkroom: visibility PRIVATE",
+   "href": "",
+   "id": 20,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -170,13 +358,33 @@
    },
    "detail": "",
    "href": "",
-   "id": 12,
+   "id": 21,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": true,
    "raw": "2026-08-28",
+   "said": "",
    "text": "2026-08-28",
    "where": "atlas-optical dbccafe README.md:6"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-optical"
+    ]
+   },
+   "detail": "atlas-optical: visibility PRIVATE",
+   "href": "",
+   "id": 22,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -189,13 +397,33 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-film/blob/be1d674ac875c797d33f35c57a59be4fc92ce195/README.md#L135",
-   "id": 13,
+   "id": 23,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": false,
    "raw": "2026-08-28",
+   "said": "",
    "text": "2026-08-28",
    "where": "atlas-film be1d674 README.md:135"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-film"
+    ]
+   },
+   "detail": "atlas-film: visibility PUBLIC",
+   "href": "",
+   "id": 24,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -203,13 +431,33 @@
    },
    "detail": "the earliest author date of 60 commits",
    "href": "https://github.com/loganw234/Quantum-Film/tree/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1",
-   "id": 14,
+   "id": 25,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-09-25",
+   "said": "",
    "text": "2026-09-25",
    "where": "Quantum-Film a7f02db git log"
+  },
+  {
+   "args": {
+    "names": [
+     "Quantum-Film"
+    ]
+   },
+   "detail": "Quantum-Film: visibility PUBLIC",
+   "href": "",
+   "id": 26,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -217,11 +465,13 @@
    },
    "detail": "the earliest author date of 46 commits",
    "href": "https://github.com/loganw234/Mercenaries2/tree/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
-   "id": 15,
+   "id": 27,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-06-27",
+   "said": "",
    "text": "2026-06-27",
    "where": "Mercenaries2 e51dcbe git log"
   },
@@ -236,13 +486,33 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/Mercenaries2/blob/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817/README.md#L145",
-   "id": 16,
+   "id": 28,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "refesl.live",
+   "said": "",
    "text": "refesl.live",
    "where": "Mercenaries2 e51dcbe README.md:145"
+  },
+  {
+   "args": {
+    "names": [
+     "Mercenaries2"
+    ]
+   },
+   "detail": "Mercenaries2: visibility PUBLIC",
+   "href": "",
+   "id": 29,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -250,13 +520,33 @@
    },
    "detail": "the earliest author date of 39 commits",
    "href": "https://github.com/loganw234/Merc2-Mods-Exp/tree/0ec1db259aa28658fba91847c52639724ab3e4c0",
-   "id": 17,
+   "id": 30,
    "kind": "git",
    "method": "facts.born",
+   "num": true,
    "private": false,
    "raw": "2026-06-29",
+   "said": "",
    "text": "2026-06-29",
    "where": "Merc2-Mods-Exp 0ec1db2 git log"
+  },
+  {
+   "args": {
+    "names": [
+     "Merc2-Mods-Exp"
+    ]
+   },
+   "detail": "Merc2-Mods-Exp: visibility PUBLIC",
+   "href": "",
+   "id": 31,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": false,
+   "raw": "public",
+   "said": "",
+   "text": "public",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -269,13 +559,15 @@
    },
    "detail": "",
    "href": "",
-   "id": 18,
+   "id": 32,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "A print engine for the Atlas of Mathematical Forms",
+   "said": "",
    "text": "A print engine for the Atlas of Mathematical Forms",
-   "where": "atlas-darkroom 6a33735 README.md:3"
+   "where": "atlas-darkroom c1b9b6e README.md:3"
   },
   {
    "args": {
@@ -288,11 +580,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-engine/blob/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4/README.md#L8",
-   "id": 19,
+   "id": 33,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Sixty-eight plates in PrettyCloud",
+   "said": "",
    "text": "Sixty-eight plates in PrettyCloud",
    "where": "atlas-engine 867c57a README.md:8"
   },
@@ -307,11 +601,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L421",
-   "id": 20,
+   "id": 34,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "The workload this tile exists to serve is [atlas-engine]",
+   "said": "",
    "text": "The workload this tile exists to serve is [atlas-engine]",
    "where": "cft-fp256 77b8440 README.md:421"
   },
@@ -326,11 +622,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L232",
-   "id": 21,
+   "id": 35,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A GPU agrees, bit for bit, on a real workload",
+   "said": "",
    "text": "A GPU agrees, bit for bit, on a real workload",
    "where": "cft-fp256 77b8440 README.md:232"
   },
@@ -345,13 +643,15 @@
    },
    "detail": "",
    "href": "",
-   "id": 22,
+   "id": 36,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "presentation from PrettyCloud, shape from atlas-engine",
+   "said": "",
    "text": "presentation from PrettyCloud, shape from atlas-engine",
-   "where": "atlas-darkroom 6a33735 README.md:282"
+   "where": "atlas-darkroom c1b9b6e README.md:282"
   },
   {
    "args": {
@@ -364,11 +664,13 @@
    },
    "detail": "",
    "href": "",
-   "id": 23,
+   "id": 37,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "Extracted whole from atlas-darkroom on 2026-08-28",
+   "said": "",
    "text": "Extracted whole from atlas-darkroom on 2026-08-28",
    "where": "atlas-optical dbccafe README.md:5"
   },
@@ -383,11 +685,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-film/blob/be1d674ac875c797d33f35c57a59be4fc92ce195/README.md#L135",
-   "id": 24,
+   "id": 38,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Born 2026-08-28 by extraction from the darkroom's develop monolith",
+   "said": "",
    "text": "Born 2026-08-28 by extraction from the darkroom's develop monolith",
    "where": "atlas-film be1d674 README.md:135"
   },
@@ -402,11 +706,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/README.md#L3",
-   "id": 25,
+   "id": 39,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "REBOUND's IAS15 integrator with its arithmetic routed through libcft",
+   "said": "",
    "text": "REBOUND's IAS15 integrator with its arithmetic routed through libcft",
    "where": "cft-rebound 039e3c3 README.md:3"
   },
@@ -417,16 +723,18 @@
     "name": "Quantum-Film",
     "num": false,
     "path": ".gitmodules",
-    "pattern": "path = (vendor/cft-fp256)"
+    "pattern": "(path = vendor/cft-fp256)"
    },
    "detail": "",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/.gitmodules#L2",
-   "id": 26,
+   "id": 40,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
-   "raw": "vendor/cft-fp256",
-   "text": "vendor/cft-fp256",
+   "raw": "path = vendor/cft-fp256",
+   "said": "",
+   "text": "path = vendor/cft-fp256",
    "where": "Quantum-Film a7f02db .gitmodules:2"
   },
   {
@@ -436,16 +744,18 @@
     "name": "Quantum-Film",
     "num": false,
     "path": ".gitmodules",
-    "pattern": "path = (vendor/atlas-film)"
+    "pattern": "(path = vendor/atlas-film)"
    },
    "detail": "",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/.gitmodules#L5",
-   "id": 27,
+   "id": 41,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
-   "raw": "vendor/atlas-film",
-   "text": "vendor/atlas-film",
+   "raw": "path = vendor/atlas-film",
+   "said": "",
+   "text": "path = vendor/atlas-film",
    "where": "Quantum-Film a7f02db .gitmodules:5"
   },
   {
@@ -459,11 +769,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/CASE-STUDY-4.md#L28",
-   "id": 28,
+   "id": 42,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "P2 moves atlas-film",
+   "said": "",
    "text": "P2 moves atlas-film",
    "where": "ParcelRound 8767e23 CASE-STUDY-4.md:28"
   },
@@ -478,11 +790,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/docs/PARCEL-ROUNDS.md#L13",
-   "id": 29,
+   "id": 43,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "lifted into a standalone repository",
+   "said": "",
    "text": "lifted into a standalone repository",
    "where": "cft-rebound 039e3c3 docs/PARCEL-ROUNDS.md:13"
   },
@@ -493,16 +807,18 @@
     "name": "HonestFramework",
     "num": false,
     "path": "CASE-STUDY.md",
-    "pattern": "^\\| `(cft-fp256)` \\|"
+    "pattern": "^\\| `cft-fp256` \\|.*\\| (§1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests) \\|$"
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/CASE-STUDY.md#L18",
-   "id": 30,
+   "id": 44,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
-   "raw": "cft-fp256",
-   "text": "cft-fp256",
+   "raw": "§1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests",
+   "said": "",
+   "text": "§1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests",
    "where": "HonestFramework 65447fd CASE-STUDY.md:18"
   },
   {
@@ -512,16 +828,18 @@
     "name": "Mercenaries2",
     "num": false,
     "path": "README.md",
-    "pattern": "visit \\[(Merc2-Mods-Exp)\\]"
+    "pattern": "(For the mods developed during this phase of the project, visit \\[Merc2-Mods-Exp\\])"
    },
    "detail": "",
    "href": "https://github.com/loganw234/Mercenaries2/blob/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817/README.md#L5",
-   "id": 31,
+   "id": 45,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
-   "raw": "Merc2-Mods-Exp",
-   "text": "Merc2-Mods-Exp",
+   "raw": "For the mods developed during this phase of the project, visit [Merc2-Mods-Exp]",
+   "said": "",
+   "text": "For the mods developed during this phase of the project, visit [Merc2-Mods-Exp]",
    "where": "Mercenaries2 e51dcbe README.md:5"
   },
   {
@@ -531,13 +849,34 @@
     ],
     "match": "(mercs2-|merc2-|wad-simulator)"
    },
-   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
+   "detail": "the creation dates of the 22 public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp: the first and the last, in UTC",
    "href": "",
-   "id": 32,
+   "id": 46,
+   "kind": "api",
+   "method": "facts.family_span",
+   "num": true,
+   "private": false,
+   "raw": "2026-06-29 2026-07-25",
+   "said": "",
+   "text": "06-29 to 07-25",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "exclude": [
+     "Merc2-Mods-Exp"
+    ],
+    "match": "(mercs2-|merc2-|wad-simulator)"
+   },
+   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp",
+   "href": "",
+   "id": 47,
    "kind": "api",
    "method": "facts.family",
+   "num": true,
    "private": false,
-   "raw": "22 2026-06-29 2026-07-25",
+   "raw": "22",
+   "said": "",
    "text": "22",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -545,13 +884,15 @@
    "args": {},
    "detail": "when the snapshot was taken",
    "href": "",
-   "id": 33,
+   "id": 48,
    "kind": "file",
    "method": "facts.snapshot_date",
+   "num": true,
    "private": false,
-   "raw": "2026-09-29T15:20:25-07:00",
+   "raw": "2026-09-29T16:21:15-07:00",
+   "said": "",
    "text": "2026-09-29",
-   "where": "sources/github-2026-09-29-1520.json"
+   "where": "sources/github-2026-09-29-1621.json"
   },
   {
    "args": {
@@ -564,11 +905,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/PrettyCloud/blob/5161daa28ecd8610f1284721818c073c13efcf75/README.md#L3",
-   "id": 34,
+   "id": 49,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A WebGL2 point-cloud atlas",
+   "said": "",
    "text": "A WebGL2 point-cloud atlas",
    "where": "PrettyCloud 5161daa README.md:3"
   },
@@ -583,11 +926,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/PrettyCloud/blob/5161daa28ecd8610f1284721818c073c13efcf75/README.md#L12",
-   "id": 35,
+   "id": 50,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "prettycloud.io",
+   "said": "",
    "text": "prettycloud.io",
    "where": "PrettyCloud 5161daa README.md:12"
   },
@@ -595,13 +940,15 @@
    "args": {
     "name": "PrettyCloud"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "no workflow of it verifies, and no ledger line is declared as a pass",
    "href": "https://github.com/loganw234/PrettyCloud/tree/5161daa28ecd8610f1284721818c073c13efcf75",
-   "id": 36,
+   "id": 51,
    "kind": "git",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "PrettyCloud 5161daa"
   },
@@ -609,13 +956,15 @@
    "args": {
     "name": "PrettyCloud"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/PrettyCloud/tree/5161daa28ecd8610f1284721818c073c13efcf75",
-   "id": 37,
+   "id": 52,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "33/39",
+   "said": "",
    "text": "33/39",
    "where": "PrettyCloud 5161daa git log"
   },
@@ -623,13 +972,15 @@
    "args": {
     "name": "PrettyCloud"
    },
-   "detail": "PrettyCloud: the newest finished run of each declared workflow at or before the pin",
+   "detail": "PrettyCloud: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 38,
+   "id": 53,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -644,11 +995,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-engine/blob/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4/README.md#L3",
-   "id": 39,
+   "id": 54,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A language for platonography",
+   "said": "",
    "text": "A language for platonography",
    "where": "atlas-engine 867c57a README.md:3"
   },
@@ -663,11 +1016,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-engine/blob/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4/README.md#L176",
-   "id": 40,
+   "id": 55,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Sixty-eight of sixty-eight, one hash",
+   "said": "",
    "text": "Sixty-eight of sixty-eight, one hash",
    "where": "atlas-engine 867c57a README.md:176"
   },
@@ -682,11 +1037,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L239",
-   "id": 41,
+   "id": 56,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "a minute and a half",
+   "said": "",
    "text": "a minute and a half",
    "where": "cft-fp256 77b8440 README.md:239"
   },
@@ -694,13 +1051,15 @@
    "args": {
     "name": "atlas-engine"
    },
-   "detail": "atlas-engine: workflow gates passed on 867c57a at 2026-09-18T14:37:16Z, the newest pass at or before the pin",
+   "detail": "atlas-engine: workflow gates passed on 867c57a, created 2026-09-18T14:37:16Z (2026-09-18 07:37 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "https://github.com/loganw234/atlas-engine/actions/runs/35357368612",
-   "id": 42,
+   "id": 57,
    "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "2026-09-18T14:37:16Z",
+   "said": "",
    "text": "2026-09-18",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -708,13 +1067,15 @@
    "args": {
     "name": "atlas-engine"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/atlas-engine/tree/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4",
-   "id": 43,
+   "id": 58,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "70/84",
+   "said": "",
    "text": "70/84",
    "where": "atlas-engine 867c57a git log"
   },
@@ -722,13 +1083,15 @@
    "args": {
     "name": "atlas-engine"
    },
-   "detail": "atlas-engine: the newest finished run of each declared workflow at or before the pin",
+   "detail": "atlas-engine: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 44,
+   "id": 59,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -743,11 +1106,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L3",
-   "id": 45,
+   "id": 60,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A math coprocessor that gets the same answer everywhere",
+   "said": "",
    "text": "A math coprocessor that gets the same answer everywhere",
    "where": "cft-fp256 77b8440 README.md:3"
   },
@@ -763,29 +1128,37 @@
    },
    "detail": "CFT_ABI_VERSION_MAJOR and CFT_ABI_VERSION_MINOR",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/host/include/cft.h#L111",
-   "id": 46,
+   "id": 61,
    "kind": "file",
    "method": "facts.macros",
+   "num": true,
    "private": false,
    "raw": "0.15",
+   "said": "",
    "text": "0.15",
    "where": "cft-fp256 77b8440 host/include/cft.h:111"
   },
   {
    "args": {
+    "draft": false,
+    "holds_at": {
+     "cft-fp256": "77b8440"
+    },
     "text": "a revision-7 round is under way off main",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
-   "id": 47,
+   "id": 62,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "a revision-7 round is under way off main",
+   "said": "",
    "text": "a revision-7 round is under way off main",
-   "where": "stated"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {
@@ -798,11 +1171,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/CLAUDE.md#L9",
-   "id": 48,
+   "id": 63,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": false,
    "raw": "~20 min, 28 of 41 stages",
+   "said": "",
    "text": "~20 min, 28 of 41 stages",
    "where": "cft-fp256 77b8440 CLAUDE.md:9"
   },
@@ -810,13 +1185,15 @@
    "args": {
     "name": "cft-fp256"
    },
-   "detail": "cft-fp256: workflow gates passed on 77b8440 at 2026-09-29T10:41:32Z, the newest pass at or before the pin",
+   "detail": "cft-fp256: workflow gates passed on 77b8440, created 2026-09-29T10:41:32Z (2026-09-29 03:41 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "https://github.com/loganw234/cft-fp256/actions/runs/36557117408",
-   "id": 49,
+   "id": 64,
    "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "2026-09-29T10:41:32Z",
+   "said": "",
    "text": "2026-09-29",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -824,13 +1201,15 @@
    "args": {
     "name": "cft-fp256"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/cft-fp256/tree/77b8440937a8f0376986c173f09fcc52a04185ad",
-   "id": 50,
+   "id": 65,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "1030/1079",
+   "said": "",
    "text": "1030/1079",
    "where": "cft-fp256 77b8440 git log"
   },
@@ -838,13 +1217,15 @@
    "args": {
     "name": "cft-fp256"
    },
-   "detail": "cft-fp256: the newest finished run of each declared workflow at or before the pin",
+   "detail": "cft-fp256: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 51,
+   "id": 66,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -859,11 +1240,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/README.md#L3",
-   "id": 52,
+   "id": 67,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "REBOUND's IAS15 integrator with its arithmetic routed through libcft",
+   "said": "",
    "text": "REBOUND's IAS15 integrator with its arithmetic routed through libcft",
    "where": "cft-rebound 039e3c3 README.md:3"
   },
@@ -878,11 +1261,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/README.md#L22",
-   "id": 53,
+   "id": 68,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "At binary64 it is REBOUND's own IAS15 bit for bit",
+   "said": "",
    "text": "At binary64 it is REBOUND's own IAS15 bit for bit",
    "where": "cft-rebound 039e3c3 README.md:22"
   },
@@ -897,11 +1282,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/CLAUDE.md#L26",
-   "id": 54,
+   "id": 69,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "5-second warm",
+   "said": "",
    "text": "5-second warm",
    "where": "cft-fp256 77b8440 CLAUDE.md:26"
   },
@@ -909,27 +1296,31 @@
    "args": {
     "name": "cft-rebound"
    },
-   "detail": "the last of 3 lines matching '\\\\*\\\\*PASS\\\\*\\\\*', in the entry dated 2026-09-13",
-   "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/docs/VALIDATION.md#L3283",
-   "id": 55,
+   "detail": "the newest of 7 lines matching a declared pass form; this one is device-test, 0 failed, in the entry dated 2026-09-14",
+   "href": "https://github.com/loganw234/cft-rebound/blob/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc/docs/VALIDATION.md#L3511",
+   "id": 70,
    "kind": "file",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
-   "raw": "PASS",
-   "text": "2026-09-13",
-   "where": "cft-rebound 039e3c3 docs/VALIDATION.md:3283"
+   "raw": "device-test 813 checks 0 failed",
+   "said": "",
+   "text": "2026-09-14",
+   "where": "cft-rebound 039e3c3 docs/VALIDATION.md:3511"
   },
   {
    "args": {
     "name": "cft-rebound"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/cft-rebound/tree/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc",
-   "id": 56,
+   "id": 71,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "130/136",
+   "said": "",
    "text": "130/136",
    "where": "cft-rebound 039e3c3 git log"
   },
@@ -937,13 +1328,15 @@
    "args": {
     "name": "cft-rebound"
    },
-   "detail": "cft-rebound: the newest finished run of each declared workflow at or before the pin",
+   "detail": "cft-rebound: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 57,
+   "id": 72,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -958,11 +1351,13 @@
    },
    "detail": "",
    "href": "",
-   "id": 58,
+   "id": 73,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "Four sites, one per IEEE 754 binary interchange format",
+   "said": "",
    "text": "Four sites, one per IEEE 754 binary interchange format",
    "where": "binary-sites dacdcb8 README.md:5"
   },
@@ -974,11 +1369,13 @@
    },
    "detail": "binary-sites: visibility PRIVATE",
    "href": "",
-   "id": 59,
+   "id": 74,
    "kind": "api",
    "method": "facts.api_visibility",
+   "num": false,
    "private": true,
    "raw": "private",
+   "said": "",
    "text": "private",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -993,11 +1390,13 @@
    },
    "detail": "",
    "href": "",
-   "id": 60,
+   "id": 75,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "binary32.com · binary64.com · binary128.com · binary256.com",
+   "said": "",
    "text": "binary32.com · binary64.com · binary128.com · binary256.com",
    "where": "binary-sites dacdcb8 README.md:3"
   },
@@ -1005,27 +1404,31 @@
    "args": {
     "name": "binary-sites"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "binary-sites: workflow build passed on dacdcb8, created 2026-09-21T19:37:16Z (2026-09-21 12:37 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "",
-   "id": 61,
-   "kind": "git",
+   "id": 76,
+   "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": true,
-   "raw": "",
-   "text": "—",
-   "where": "binary-sites dacdcb8"
+   "raw": "2026-09-21T19:37:16Z",
+   "said": "",
+   "text": "2026-09-21",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "binary-sites"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "",
-   "id": 62,
+   "id": 77,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": true,
    "raw": "6/6",
+   "said": "",
    "text": "6/6",
    "where": "binary-sites dacdcb8 git log"
   },
@@ -1033,33 +1436,37 @@
    "args": {
     "name": "binary-sites"
    },
-   "detail": "binary-sites: the newest finished run of each declared workflow at or before the pin",
+   "detail": "binary-sites: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 63,
+   "id": 78,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": true,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
-    "display": "a fork of openXC7's router for the tile's dense routing",
+    "display": "a fork of openXC7's router, which does not converge on the tile",
     "last": false,
     "name": "cft-fp256",
     "num": false,
     "path": "docs/README.md",
-    "pattern": "(a fork of it \\(loganw234/nextpnr-xilinx, `dense`\\) starts at the pinned 0\\.9\\.6)"
+    "pattern": "(openXC7's router does not converge on the tile, what to change in it and in what order, and why a fork of it \\(loganw234/nextpnr-xilinx, `dense`\\) starts at the pinned 0\\.9\\.6)"
    },
-   "detail": "“a fork of it (loganw234/nextpnr-xilinx, dense) starts at the pinned 0.9.6”",
+   "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/docs/README.md#L118",
-   "id": 64,
+   "id": 79,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
-   "raw": "a fork of it (loganw234/nextpnr-xilinx, dense) starts at the pinned 0.9.6",
-   "text": "a fork of openXC7's router for the tile's dense routing",
+   "raw": "openXC7's router does not converge on the tile, what to change in it and in what order, and why a fork of it (loganw234/nextpnr-xilinx, dense) starts at the pinned 0.9.6",
+   "said": "openXC7's router does not converge on the tile, what to change in it and in what order, and why a fork of it (loganw234/nextpnr-xilinx, dense) starts at the pinned 0.9.6",
+   "text": "a fork of openXC7's router, which does not converge on the tile",
    "where": "cft-fp256 77b8440 docs/README.md:118"
   },
   {
@@ -1068,11 +1475,13 @@
    },
    "detail": "nextpnr-xilinx: read only through the GitHub snapshot; no gate runs are read for it",
    "href": "https://github.com/loganw234/nextpnr-xilinx",
-   "id": 65,
+   "id": 80,
    "kind": "api",
    "method": "pages.home.unread_gate",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1082,11 +1491,13 @@
    },
    "detail": "nextpnr-xilinx: a fork: a count over its history would mostly count its parent's commits, so none is given",
    "href": "https://github.com/loganw234/nextpnr-xilinx",
-   "id": 66,
+   "id": 81,
    "kind": "api",
    "method": "pages.home.fork_agents",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1101,11 +1512,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/README.md#L3",
-   "id": 67,
+   "id": 82,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A method for splitting one body of work across several coding agents at once",
+   "said": "",
    "text": "A method for splitting one body of work across several coding agents at once",
    "where": "ParcelRound 8767e23 README.md:3"
   },
@@ -1117,11 +1530,13 @@
    },
    "detail": "CASE-STUDY*.md files at the pin",
    "href": "https://github.com/loganw234/ParcelRound/tree/8767e235fb739b43418165d13c9297133bdaf313",
-   "id": 68,
+   "id": 83,
    "kind": "git",
    "method": "facts.count_paths",
+   "num": true,
    "private": false,
    "raw": "4",
+   "said": "",
    "text": "4",
    "where": "ParcelRound 8767e23 ls-tree"
   },
@@ -1132,25 +1547,46 @@
    },
    "detail": "the last commit touching it",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/METHOD.md",
-   "id": 69,
+   "id": 84,
    "kind": "git",
    "method": "facts.last_change",
+   "num": true,
    "private": false,
    "raw": "2026-09-16",
+   "said": "",
    "text": "2026-09-16",
    "where": "ParcelRound 8767e23 git log -- METHOD.md"
   },
   {
    "args": {
+    "name": "ParcelRound",
+    "path": "CASE-STUDY-4.md"
+   },
+   "detail": "CASE-STUDY-4.md exists at the pin",
+   "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/CASE-STUDY-4.md",
+   "id": 85,
+   "kind": "git",
+   "method": "facts.exists",
+   "num": false,
+   "private": false,
+   "raw": "CASE-STUDY-4.md",
+   "said": "",
+   "text": "CASE-STUDY-4.md",
+   "where": "ParcelRound 8767e23"
+  },
+  {
+   "args": {
     "name": "ParcelRound"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "no workflow of it verifies, and no ledger line is declared as a pass",
    "href": "https://github.com/loganw234/ParcelRound/tree/8767e235fb739b43418165d13c9297133bdaf313",
-   "id": 70,
+   "id": 86,
    "kind": "git",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "ParcelRound 8767e23"
   },
@@ -1158,13 +1594,15 @@
    "args": {
     "name": "ParcelRound"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/ParcelRound/tree/8767e235fb739b43418165d13c9297133bdaf313",
-   "id": 71,
+   "id": 87,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "86/86",
+   "said": "",
    "text": "86/86",
    "where": "ParcelRound 8767e23 git log"
   },
@@ -1172,13 +1610,15 @@
    "args": {
     "name": "ParcelRound"
    },
-   "detail": "ParcelRound: the newest finished run of each declared workflow at or before the pin",
+   "detail": "ParcelRound: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 72,
+   "id": 88,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1193,11 +1633,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/README.md#L3",
-   "id": 73,
+   "id": 89,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A way to lay out a project so that an AI can write nearly all of it and no claim about it ever rests on the AI's judgement",
+   "said": "",
    "text": "A way to lay out a project so that an AI can write nearly all of it and no claim about it ever rests on the AI's judgement",
    "where": "HonestFramework 65447fd README.md:3"
   },
@@ -1212,11 +1654,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/README.md#L38",
-   "id": 74,
+   "id": 90,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "ten",
+   "said": "",
    "text": "ten",
    "where": "HonestFramework 65447fd README.md:38"
   },
@@ -1227,11 +1671,13 @@
    },
    "detail": "tools/check_claims.py exists at the pin",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/tools/check_claims.py",
-   "id": 75,
+   "id": 91,
    "kind": "git",
    "method": "facts.exists",
+   "num": false,
    "private": false,
    "raw": "tools/check_claims.py",
+   "said": "",
    "text": "tools/check_claims.py",
    "where": "HonestFramework 65447fd"
   },
@@ -1239,13 +1685,15 @@
    "args": {
     "name": "HonestFramework"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "no workflow of it verifies, and no ledger line is declared as a pass",
    "href": "https://github.com/loganw234/HonestFramework/tree/65447fd4d8253034fd6d206479c5a5371c623c60",
-   "id": 76,
+   "id": 92,
    "kind": "git",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "HonestFramework 65447fd"
   },
@@ -1253,13 +1701,15 @@
    "args": {
     "name": "HonestFramework"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/HonestFramework/tree/65447fd4d8253034fd6d206479c5a5371c623c60",
-   "id": 77,
+   "id": 93,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "4/4",
+   "said": "",
    "text": "4/4",
    "where": "HonestFramework 65447fd git log"
   },
@@ -1267,13 +1717,15 @@
    "args": {
     "name": "HonestFramework"
    },
-   "detail": "HonestFramework: the newest finished run of each declared workflow at or before the pin",
+   "detail": "HonestFramework: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 78,
+   "id": 94,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1283,29 +1735,35 @@
    },
    "detail": "CanonBracketTool: its description",
    "href": "https://github.com/loganw234/CanonBracketTool",
-   "id": 79,
+   "id": 95,
    "kind": "api",
    "method": "facts.api_description",
+   "num": false,
    "private": false,
    "raw": "A python based webtool and sdk wrapper for interacting with the Canon SDK to create shot sequences easily and automate shooting.",
+   "said": "",
    "text": "A python based webtool and sdk wrapper for interacting with the Canon SDK to create shot sequences easily and automate shooting.",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
+    "draft": false,
+    "holds_at": null,
     "text": "a beginning project, from before the method",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
-   "id": 80,
+   "id": 96,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "a beginning project, from before the method",
+   "said": "",
    "text": "a beginning project, from before the method",
-   "where": "stated"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {
@@ -1313,11 +1771,13 @@
    },
    "detail": "CanonBracketTool: read only through the GitHub snapshot; no gate runs are read for it",
    "href": "https://github.com/loganw234/CanonBracketTool",
-   "id": 81,
+   "id": 97,
    "kind": "api",
    "method": "pages.home.unread_gate",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1325,13 +1785,15 @@
    "args": {
     "name": "CanonBracketTool"
    },
-   "detail": "CanonBracketTool: commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "CanonBracketTool: commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/CanonBracketTool",
-   "id": 82,
+   "id": 98,
    "kind": "api",
    "method": "facts.api_agents",
+   "num": true,
    "private": false,
    "raw": "0/9",
+   "said": "",
    "text": "0/9",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1341,29 +1803,35 @@
    },
    "detail": "Microscope-Stacker: its description",
    "href": "https://github.com/loganw234/Microscope-Stacker",
-   "id": 83,
+   "id": 99,
    "kind": "api",
    "method": "facts.api_description",
+   "num": false,
    "private": false,
    "raw": "A tool for stacking images captured on microscopes at various magnifications and exporting a final combined photo retaining detail at all magnifications in one image.",
+   "said": "",
    "text": "A tool for stacking images captured on microscopes at various magnifications and exporting a final combined photo retaining detail at all magnifications in one image.",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
+    "draft": false,
+    "holds_at": null,
     "text": "a beginning project, from before the method",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
-   "id": 84,
+   "id": 100,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "a beginning project, from before the method",
+   "said": "",
    "text": "a beginning project, from before the method",
-   "where": "stated"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {
@@ -1371,11 +1839,13 @@
    },
    "detail": "Microscope-Stacker: read only through the GitHub snapshot; no gate runs are read for it",
    "href": "https://github.com/loganw234/Microscope-Stacker",
-   "id": 85,
+   "id": 101,
    "kind": "api",
    "method": "pages.home.unread_gate",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1383,13 +1853,15 @@
    "args": {
     "name": "Microscope-Stacker"
    },
-   "detail": "Microscope-Stacker: commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "Microscope-Stacker: commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/Microscope-Stacker",
-   "id": 86,
+   "id": 102,
    "kind": "api",
    "method": "facts.api_agents",
+   "num": true,
    "private": false,
    "raw": "0/7",
+   "said": "",
    "text": "0/7",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1404,13 +1876,15 @@
    },
    "detail": "",
    "href": "",
-   "id": 87,
+   "id": 103,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "A print engine for the Atlas of Mathematical Forms",
+   "said": "",
    "text": "A print engine for the Atlas of Mathematical Forms",
-   "where": "atlas-darkroom 6a33735 README.md:3"
+   "where": "atlas-darkroom c1b9b6e README.md:3"
   },
   {
    "args": {
@@ -1420,11 +1894,13 @@
    },
    "detail": "atlas-darkroom: visibility PRIVATE",
    "href": "",
-   "id": 88,
+   "id": 104,
    "kind": "api",
    "method": "facts.api_visibility",
+   "num": false,
    "private": true,
    "raw": "private",
+   "said": "",
    "text": "private",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1432,41 +1908,47 @@
    "args": {
     "name": "atlas-darkroom"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "atlas-darkroom: workflow tests passed on c1b9b6e, created 2026-09-05T15:34:29Z (2026-09-05 08:34 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "",
-   "id": 89,
-   "kind": "git",
+   "id": 105,
+   "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": true,
-   "raw": "",
-   "text": "—",
-   "where": "atlas-darkroom 6a33735"
+   "raw": "2026-09-05T15:34:29Z",
+   "said": "",
+   "text": "2026-09-05",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "atlas-darkroom"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "",
-   "id": 90,
+   "id": 106,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": true,
-   "raw": "1006/1157",
-   "text": "1006/1157",
-   "where": "atlas-darkroom 6a33735 git log"
+   "raw": "1005/1156",
+   "said": "",
+   "text": "1005/1156",
+   "where": "atlas-darkroom c1b9b6e git log"
   },
   {
    "args": {
     "name": "atlas-darkroom"
    },
-   "detail": "atlas-darkroom: the newest finished run of each declared workflow at or before the pin",
+   "detail": "atlas-darkroom: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 91,
+   "id": 107,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": true,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1481,11 +1963,13 @@
    },
    "detail": "",
    "href": "",
-   "id": 92,
+   "id": 108,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": true,
    "raw": "The glass of the Eidograph, on its own",
+   "said": "",
    "text": "The glass of the Eidograph, on its own",
    "where": "atlas-optical dbccafe README.md:3"
   },
@@ -1497,11 +1981,13 @@
    },
    "detail": "atlas-optical: visibility PRIVATE",
    "href": "",
-   "id": 93,
+   "id": 109,
    "kind": "api",
    "method": "facts.api_visibility",
+   "num": false,
    "private": true,
    "raw": "private",
+   "said": "",
    "text": "private",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1516,11 +2002,13 @@
    },
    "detail": "",
    "href": "",
-   "id": 94,
+   "id": 110,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": true,
    "raw": "2026-08-28",
+   "said": "",
    "text": "2026-08-28",
    "where": "atlas-optical dbccafe README.md:6"
   },
@@ -1528,27 +2016,31 @@
    "args": {
     "name": "atlas-optical"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "atlas-optical: workflow tests passed on dbccafe, created 2026-09-05T13:52:52Z (2026-09-05 06:52 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "",
-   "id": 95,
-   "kind": "git",
+   "id": 111,
+   "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": true,
-   "raw": "",
-   "text": "—",
-   "where": "atlas-optical dbccafe"
+   "raw": "2026-09-05T13:52:52Z",
+   "said": "",
+   "text": "2026-09-05",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "atlas-optical"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "",
-   "id": 96,
+   "id": 112,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": true,
    "raw": "91/91",
+   "said": "",
    "text": "91/91",
    "where": "atlas-optical dbccafe git log"
   },
@@ -1556,13 +2048,15 @@
    "args": {
     "name": "atlas-optical"
    },
-   "detail": "atlas-optical: the newest finished run of each declared workflow at or before the pin",
+   "detail": "atlas-optical: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 97,
+   "id": 113,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": true,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1577,11 +2071,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/atlas-film/blob/be1d674ac875c797d33f35c57a59be4fc92ce195/README.md#L3",
-   "id": 98,
+   "id": 114,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "The medium of the Eidograph",
+   "said": "",
    "text": "The medium of the Eidograph",
    "where": "atlas-film be1d674 README.md:3"
   },
@@ -1596,11 +2092,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/CASE-STUDY-4.md#L382",
-   "id": 99,
+   "id": 115,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": false,
    "raw": "d4007b2",
+   "said": "",
    "text": "d4007b2",
    "where": "ParcelRound 8767e23 CASE-STUDY-4.md:382"
   },
@@ -1613,13 +2111,15 @@
     "path": "CASE-STUDY-4.md",
     "pattern": "(Whether atlas-film's `pinned` merges into its main)"
    },
-   "detail": "“Whether atlas-film's pinned merges into its main”",
+   "detail": "",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/CASE-STUDY-4.md#L388",
-   "id": 100,
+   "id": 116,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Whether atlas-film's pinned merges into its main",
+   "said": "Whether atlas-film's pinned merges into its main",
    "text": "its merge left open",
    "where": "ParcelRound 8767e23 CASE-STUDY-4.md:388"
   },
@@ -1630,11 +2130,13 @@
    },
    "detail": "PROVENANCE.md exists at the pin",
    "href": "https://github.com/loganw234/atlas-film/blob/be1d674ac875c797d33f35c57a59be4fc92ce195/PROVENANCE.md",
-   "id": 101,
+   "id": 117,
    "kind": "git",
    "method": "facts.exists",
+   "num": false,
    "private": false,
    "raw": "PROVENANCE.md",
+   "said": "",
    "text": "PROVENANCE.md",
    "where": "atlas-film be1d674"
   },
@@ -1642,13 +2144,15 @@
    "args": {
     "name": "atlas-film"
    },
-   "detail": "atlas-film: workflow tests passed on be1d674 at 2026-09-05T12:08:40Z, the newest pass at or before the pin",
+   "detail": "atlas-film: workflow tests passed on be1d674, created 2026-09-05T12:08:40Z (2026-09-05 05:08 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "https://github.com/loganw234/atlas-film/actions/runs/33965210511",
-   "id": 102,
+   "id": 118,
    "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "2026-09-05T12:08:40Z",
+   "said": "",
    "text": "2026-09-05",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1656,13 +2160,15 @@
    "args": {
     "name": "atlas-film"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/atlas-film/tree/be1d674ac875c797d33f35c57a59be4fc92ce195",
-   "id": 103,
+   "id": 119,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "74/74",
+   "said": "",
    "text": "74/74",
    "where": "atlas-film be1d674 git log"
   },
@@ -1670,33 +2176,37 @@
    "args": {
     "name": "atlas-film"
    },
-   "detail": "atlas-film: the newest finished run of each declared workflow at or before the pin",
+   "detail": "atlas-film: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 104,
+   "id": 120,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
-    "display": "the web demo",
+    "display": null,
     "last": false,
     "name": "Quantum-Film",
     "num": false,
     "path": "README.md",
-    "pattern": "(https://loganw234\\.github\\.io/Quantum-Film/)"
+    "pattern": "\\]\\((https://loganw234\\.github\\.io/Quantum-Film/)\\)"
    },
-   "detail": "“https://loganw234.github.io/Quantum-Film/”",
+   "detail": "",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/README.md#L75",
-   "id": 105,
+   "id": 121,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "https://loganw234.github.io/Quantum-Film/",
-   "text": "the web demo",
+   "said": "",
+   "text": "https://loganw234.github.io/Quantum-Film/",
    "where": "Quantum-Film a7f02db README.md:75"
   },
   {
@@ -1710,11 +2220,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/README.md#L3",
-   "id": 106,
+   "id": 122,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Film stocks whose crystals are laid by quantum circuits",
+   "said": "",
    "text": "Film stocks whose crystals are laid by quantum circuits",
    "where": "Quantum-Film a7f02db README.md:3"
   },
@@ -1725,25 +2237,50 @@
    },
    "detail": "its stage lines, counted",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/verify/run.sh",
-   "id": 107,
+   "id": 123,
    "kind": "file",
    "method": "facts.stage_count",
+   "num": true,
    "private": false,
    "raw": "14",
+   "said": "",
    "text": "14",
    "where": "Quantum-Film a7f02db verify/run.sh"
   },
   {
    "args": {
+    "display": null,
+    "last": false,
+    "name": "Quantum-Film",
+    "num": false,
+    "path": "README.md",
+    "pattern": "^- \\*\\*(The web demo)\\*\\*, live at"
+   },
+   "detail": "",
+   "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/README.md#L74",
+   "id": 124,
+   "kind": "file",
+   "method": "facts.prose",
+   "num": false,
+   "private": false,
+   "raw": "The web demo",
+   "said": "",
+   "text": "The web demo",
+   "where": "Quantum-Film a7f02db README.md:74"
+  },
+  {
+   "args": {
     "name": "Quantum-Film"
    },
-   "detail": "the last of 6 lines matching '`(?:make verify(?:-quick)?|run\\\\.sh --require-all)`[^\\\\n]*?\\\\d+ passed', in the entry dated 2026-09-26",
+   "detail": "the newest of 5 lines matching a declared pass form; this one is the full runner, N passed, none skipped, in the entry dated 2026-09-26",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/docs/VALIDATION.md#L1026",
-   "id": 108,
+   "id": 125,
    "kind": "file",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
-   "raw": "run.sh --require-all (run 20260925-234943-9312-04fe2fe): 13 passed",
+   "raw": "run.sh --require-all (run 20260925-234943-9312-04fe2fe): 13 passed, none skipped",
+   "said": "",
    "text": "2026-09-26",
    "where": "Quantum-Film a7f02db docs/VALIDATION.md:1026"
   },
@@ -1751,13 +2288,15 @@
    "args": {
     "name": "Quantum-Film"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/Quantum-Film/tree/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1",
-   "id": 109,
+   "id": 126,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "60/60",
+   "said": "",
    "text": "60/60",
    "where": "Quantum-Film a7f02db git log"
   },
@@ -1765,13 +2304,15 @@
    "args": {
     "name": "Quantum-Film"
    },
-   "detail": "Quantum-Film: the newest finished run of each declared workflow at or before the pin",
+   "detail": "Quantum-Film: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 110,
+   "id": 127,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1786,11 +2327,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/Mercenaries2/blob/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817/README.md#L9",
-   "id": 111,
+   "id": 128,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "A revival project for Mercenaries 2: World in Flames",
+   "said": "",
    "text": "A revival project for Mercenaries 2: World in Flames",
    "where": "Mercenaries2 e51dcbe README.md:9"
   },
@@ -1805,25 +2348,46 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/Mercenaries2/blob/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817/README.md#L145",
-   "id": 112,
+   "id": 129,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "refesl.live",
+   "said": "",
    "text": "refesl.live",
    "where": "Mercenaries2 e51dcbe README.md:145"
   },
   {
    "args": {
+    "name": "Mercenaries2",
+    "path": "README.md"
+   },
+   "detail": "README.md exists at the pin",
+   "href": "https://github.com/loganw234/Mercenaries2/blob/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817/README.md",
+   "id": 130,
+   "kind": "git",
+   "method": "facts.exists",
+   "num": false,
+   "private": false,
+   "raw": "README.md",
+   "said": "",
+   "text": "README.md",
+   "where": "Mercenaries2 e51dcbe"
+  },
+  {
+   "args": {
     "name": "Mercenaries2"
    },
-   "detail": "records no gate run this site can read (no verified_by in pins.json)",
+   "detail": "no workflow of it verifies, and no ledger line is declared as a pass",
    "href": "https://github.com/loganw234/Mercenaries2/tree/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
-   "id": 113,
+   "id": 131,
    "kind": "git",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "—",
    "where": "Mercenaries2 e51dcbe"
   },
@@ -1831,13 +2395,15 @@
    "args": {
     "name": "Mercenaries2"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/Mercenaries2/tree/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
-   "id": 114,
+   "id": 132,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "20/46",
+   "said": "",
    "text": "20/46",
    "where": "Mercenaries2 e51dcbe git log"
   },
@@ -1845,13 +2411,15 @@
    "args": {
     "name": "Mercenaries2"
    },
-   "detail": "Mercenaries2: the newest finished run of each declared workflow at or before the pin",
+   "detail": "Mercenaries2: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 115,
+   "id": 133,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1866,11 +2434,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/mercs2-lua-essentials/blob/3430c0bee3a9429bcf24bd0c0b8c46c18d78358a/README.md#L3",
-   "id": 116,
+   "id": 134,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "the foundational Lua library for Mercenaries 2 modding",
+   "said": "",
    "text": "the foundational Lua library for Mercenaries 2 modding",
    "where": "mercs2-lua-essentials 3430c0b README.md:3"
   },
@@ -1881,13 +2451,15 @@
     ],
     "match": "(mercs2-|merc2-|wad-simulator)"
    },
-   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp; created 2026-06-29 to 2026-07-25",
+   "detail": "public repositories under loganw234 matching '(mercs2-|merc2-|wad-simulator)', except Merc2-Mods-Exp",
    "href": "",
-   "id": 117,
+   "id": 135,
    "kind": "api",
    "method": "facts.family",
+   "num": true,
    "private": false,
-   "raw": "22 2026-06-29 2026-07-25",
+   "raw": "22",
+   "said": "",
    "text": "22",
    "where": "GitHub snapshot 2026-09-29"
   },
@@ -1895,27 +2467,31 @@
    "args": {
     "name": "mercs2-lua-essentials"
    },
-   "detail": "mercs2-lua-essentials: workflow CI passed on 3430c0b at 2026-08-05T02:21:37Z, the newest pass at or before the pin",
+   "detail": "mercs2-lua-essentials: workflow CI passed on 3430c0b, created 2026-08-05T02:21:37Z (2026-08-04 19:21 -0700 on the pinned commit's calendar); the newest pass at or before the pin",
    "href": "https://github.com/loganw234/mercs2-lua-essentials/actions/runs/30969127131",
-   "id": 118,
+   "id": 136,
    "kind": "api",
    "method": "facts.last_verified",
+   "num": true,
    "private": false,
    "raw": "2026-08-05T02:21:37Z",
-   "text": "2026-08-05",
+   "said": "",
+   "text": "2026-08-04",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
     "name": "mercs2-lua-essentials"
    },
-   "detail": "commits with a Claude or Gemini Co-Authored-By trailer, of all commits",
+   "detail": "commits with a Co-Authored-By line naming Claude or Gemini, of all commits",
    "href": "https://github.com/loganw234/mercs2-lua-essentials/tree/3430c0bee3a9429bcf24bd0c0b8c46c18d78358a",
-   "id": 119,
+   "id": 137,
    "kind": "git",
    "method": "facts.agents",
+   "num": true,
    "private": false,
    "raw": "188/211",
+   "said": "",
    "text": "188/211",
    "where": "mercs2-lua-essentials 3430c0b git log"
   },
@@ -1923,52 +2499,79 @@
    "args": {
     "name": "mercs2-lua-essentials"
    },
-   "detail": "mercs2-lua-essentials: the newest finished run of each declared workflow at or before the pin",
+   "detail": "mercs2-lua-essentials: the newest verdict of each verifying workflow at or before the pin, on the pinned commit's calendar",
    "href": "",
-   "id": 120,
+   "id": 138,
    "kind": "api",
    "method": "facts.ci_red",
+   "num": false,
    "private": false,
    "raw": "",
+   "said": "",
    "text": "",
    "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
-    "display": "Replay the published conformance vectors",
+    "display": null,
     "last": false,
     "name": "cft-fp256",
     "num": false,
     "path": "README.md",
     "pattern": "\\*\\*<(https://loganw234\\.github\\.io/cft-fp256/)>\\*\\*"
    },
-   "detail": "“https://loganw234.github.io/cft-fp256/”",
+   "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L28",
-   "id": 121,
+   "id": 139,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "https://loganw234.github.io/cft-fp256/",
-   "text": "Replay the published conformance vectors",
+   "said": "",
+   "text": "https://loganw234.github.io/cft-fp256/",
    "where": "cft-fp256 77b8440 README.md:28"
   },
   {
    "args": {
-    "display": "the golden model's self-tests",
+    "display": null,
+    "last": false,
+    "name": "cft-fp256",
+    "num": false,
+    "path": "README.md",
+    "pattern": "It (replays\\s+the published conformance vectors in front of you)"
+   },
+   "detail": "",
+   "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L30",
+   "id": 140,
+   "kind": "file",
+   "method": "facts.prose",
+   "num": false,
+   "private": false,
+   "raw": "replays the published conformance vectors in front of you",
+   "said": "",
+   "text": "replays the published conformance vectors in front of you",
+   "where": "cft-fp256 77b8440 README.md:30"
+  },
+  {
+   "args": {
+    "display": null,
     "last": false,
     "name": "cft-fp256",
     "num": false,
     "path": "README.md",
     "pattern": "^(The golden model's self-tests)"
    },
-   "detail": "“The golden model's self-tests”",
+   "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/README.md#L254",
-   "id": 122,
+   "id": 141,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "The golden model's self-tests",
-   "text": "the golden model's self-tests",
+   "said": "",
+   "text": "The golden model's self-tests",
    "where": "cft-fp256 77b8440 README.md:254"
   },
   {
@@ -1982,13 +2585,66 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/CLAUDE.md#L9",
-   "id": 123,
+   "id": 142,
    "kind": "file",
    "method": "facts.prose",
+   "num": true,
    "private": false,
    "raw": "~20 min, 28 of 41 stages",
+   "said": "",
    "text": "~20 min, 28 of 41 stages",
    "where": "cft-fp256 77b8440 CLAUDE.md:9"
+  },
+  {
+   "args": {
+    "name": "Quantum-Film",
+    "path": "docs/prints/pauli-print.png"
+   },
+   "detail": "the last commit touching it: e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "href": "https://github.com/loganw234/Quantum-Film/commit/e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "id": 143,
+   "kind": "git",
+   "method": "facts.last_commit",
+   "num": true,
+   "private": false,
+   "raw": "e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "said": "",
+   "text": "e7935ef",
+   "where": "Quantum-Film a7f02db git log -- docs/prints/pauli-print.png"
+  },
+  {
+   "args": {
+    "name": "Quantum-Film",
+    "path": "docs/prints/poisson-print.png"
+   },
+   "detail": "the last commit touching it: e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "href": "https://github.com/loganw234/Quantum-Film/commit/e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "id": 144,
+   "kind": "git",
+   "method": "facts.last_commit",
+   "num": true,
+   "private": false,
+   "raw": "e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "said": "",
+   "text": "e7935ef",
+   "where": "Quantum-Film a7f02db git log -- docs/prints/poisson-print.png"
+  },
+  {
+   "args": {
+    "name": "Quantum-Film",
+    "path": "docs/prints/trix-print.png"
+   },
+   "detail": "the last commit touching it: e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "href": "https://github.com/loganw234/Quantum-Film/commit/e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "id": 145,
+   "kind": "git",
+   "method": "facts.last_commit",
+   "num": true,
+   "private": false,
+   "raw": "e7935ef98878ca4a69727f065f4df7caf8a19728",
+   "said": "",
+   "text": "e7935ef",
+   "where": "Quantum-Film a7f02db git log -- docs/prints/trix-print.png"
   },
   {
    "args": {
@@ -2001,11 +2657,13 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/Quantum-Film/blob/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1/README.md#L30",
-   "id": 124,
+   "id": 146,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Pauli, its Poisson twin and TRI-X",
+   "said": "",
    "text": "Pauli, its Poisson twin and TRI-X",
    "where": "Quantum-Film a7f02db README.md:30"
   },
@@ -2020,13 +2678,34 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/ParcelRound/blob/8767e235fb739b43418165d13c9297133bdaf313/CASE-STUDY-4.md#L213",
-   "id": 125,
+   "id": 147,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "Every print re-developed to the same bits",
+   "said": "",
    "text": "Every print re-developed to the same bits",
    "where": "ParcelRound 8767e23 CASE-STUDY-4.md:213"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-darkroom",
+     "atlas-optical"
+    ]
+   },
+   "detail": "atlas-darkroom and atlas-optical: visibility PRIVATE",
+   "href": "",
+   "id": 148,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
   },
   {
    "args": {
@@ -2039,75 +2718,68 @@
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/CASE-STUDY.md#L19",
-   "id": 126,
+   "id": 149,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "atlas-darkroom",
+   "said": "",
    "text": "atlas-darkroom",
    "where": "HonestFramework 65447fd CASE-STUDY.md:19"
   },
   {
    "args": {
-    "names": [
-     "atlas-darkroom",
-     "atlas-optical"
-    ]
-   },
-   "detail": "atlas-darkroom and atlas-optical: visibility PRIVATE",
-   "href": "",
-   "id": 127,
-   "kind": "api",
-   "method": "facts.api_visibility",
-   "private": true,
-   "raw": "private",
-   "text": "private",
-   "where": "GitHub snapshot 2026-09-29"
-  },
-  {
-   "args": {
-    "display": "cites both",
+    "display": null,
     "last": false,
     "name": "HonestFramework",
     "num": false,
     "path": "CASE-STUDY.md",
     "pattern": "^\\| `(atlas-optical)` \\|"
    },
-   "detail": "“atlas-optical”",
+   "detail": "",
    "href": "https://github.com/loganw234/HonestFramework/blob/65447fd4d8253034fd6d206479c5a5371c623c60/CASE-STUDY.md#L20",
-   "id": 128,
+   "id": 150,
    "kind": "file",
    "method": "facts.prose",
+   "num": false,
    "private": false,
    "raw": "atlas-optical",
-   "text": "cites both",
+   "said": "",
+   "text": "atlas-optical",
    "where": "HonestFramework 65447fd CASE-STUDY.md:20"
   },
   {
    "args": {
+    "draft": false,
+    "holds_at": null,
     "text": "Nothing here is for sale, and there is no newsletter.",
     "when": "2026-09-29",
     "who": "Logan"
    },
-   "detail": "by Logan, 2026-09-29; no file backs it",
+   "detail": "no file backs it",
    "href": "",
-   "id": 129,
+   "id": 151,
    "kind": "stated",
    "method": "facts.stated",
+   "num": false,
    "private": false,
    "raw": "Nothing here is for sale, and there is no newsletter.",
+   "said": "",
    "text": "Nothing here is for sale, and there is no newsletter.",
-   "where": "stated"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {},
    "detail": "the repositories this site reads",
    "href": "",
-   "id": 130,
+   "id": 152,
    "kind": "file",
    "method": "facts.pin_count",
+   "num": true,
    "private": false,
    "raw": "19",
+   "said": "",
    "text": "19",
    "where": "pins.json"
   },
@@ -2115,13 +2787,419 @@
    "args": {},
    "detail": "when the snapshot was taken",
    "href": "",
-   "id": 131,
+   "id": 153,
    "kind": "file",
    "method": "facts.snapshot_date",
+   "num": true,
    "private": false,
-   "raw": "2026-09-29T15:20:25-07:00",
+   "raw": "2026-09-29T16:21:15-07:00",
+   "said": "",
    "text": "2026-09-29",
-   "where": "sources/github-2026-09-29-1520.json"
+   "where": "sources/github-2026-09-29-1621.json"
+  },
+  {
+   "args": {},
+   "detail": "navigation entries with a page, of the 9 in the navigation",
+   "href": "",
+   "id": 154,
+   "kind": "file",
+   "method": "render.pages_built",
+   "num": true,
+   "private": false,
+   "raw": "Home",
+   "said": "",
+   "text": "1 of 9",
+   "where": "site/pages/"
+  },
+  {
+   "args": {
+    "name": "PrettyCloud"
+   },
+   "detail": "PrettyCloud is read at 5161daa28ecd8610f1284721818c073c13efcf75",
+   "href": "https://github.com/loganw234/PrettyCloud/commit/5161daa28ecd8610f1284721818c073c13efcf75",
+   "id": 155,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "5161daa28ecd8610f1284721818c073c13efcf75",
+   "said": "",
+   "text": "5161daa",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "atlas-darkroom"
+   },
+   "detail": "atlas-darkroom is read at c1b9b6eaa0854cc011807dbb64de6c070f0dbac7",
+   "href": "",
+   "id": 156,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": true,
+   "raw": "c1b9b6eaa0854cc011807dbb64de6c070f0dbac7",
+   "said": "",
+   "text": "c1b9b6e",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-darkroom"
+    ]
+   },
+   "detail": "atlas-darkroom: visibility PRIVATE",
+   "href": "",
+   "id": 157,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "name": "atlas-optical"
+   },
+   "detail": "atlas-optical is read at dbccafe0c6e34ec64ba4f2d9b6687aa2bbdf9629",
+   "href": "",
+   "id": 158,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": true,
+   "raw": "dbccafe0c6e34ec64ba4f2d9b6687aa2bbdf9629",
+   "said": "",
+   "text": "dbccafe",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "names": [
+     "atlas-optical"
+    ]
+   },
+   "detail": "atlas-optical: visibility PRIVATE",
+   "href": "",
+   "id": 159,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "name": "atlas-film"
+   },
+   "detail": "atlas-film is read at be1d674ac875c797d33f35c57a59be4fc92ce195",
+   "href": "https://github.com/loganw234/atlas-film/commit/be1d674ac875c797d33f35c57a59be4fc92ce195",
+   "id": 160,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "be1d674ac875c797d33f35c57a59be4fc92ce195",
+   "said": "",
+   "text": "be1d674",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "atlas-engine"
+   },
+   "detail": "atlas-engine is read at 867c57a922ceb234a2aaf3ef1874d8edc98eb1d4",
+   "href": "https://github.com/loganw234/atlas-engine/commit/867c57a922ceb234a2aaf3ef1874d8edc98eb1d4",
+   "id": 161,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "867c57a922ceb234a2aaf3ef1874d8edc98eb1d4",
+   "said": "",
+   "text": "867c57a",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "cft-fp256"
+   },
+   "detail": "cft-fp256 is read at 77b8440937a8f0376986c173f09fcc52a04185ad",
+   "href": "https://github.com/loganw234/cft-fp256/commit/77b8440937a8f0376986c173f09fcc52a04185ad",
+   "id": 162,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "77b8440937a8f0376986c173f09fcc52a04185ad",
+   "said": "",
+   "text": "77b8440",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "cft-rebound"
+   },
+   "detail": "cft-rebound is read at 039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc",
+   "href": "https://github.com/loganw234/cft-rebound/commit/039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc",
+   "id": 163,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "039e3c35c45e4a4b7696e5da1fa6ab5d622a67bc",
+   "said": "",
+   "text": "039e3c3",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "ParcelRound"
+   },
+   "detail": "ParcelRound is read at 8767e235fb739b43418165d13c9297133bdaf313",
+   "href": "https://github.com/loganw234/ParcelRound/commit/8767e235fb739b43418165d13c9297133bdaf313",
+   "id": 164,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "8767e235fb739b43418165d13c9297133bdaf313",
+   "said": "",
+   "text": "8767e23",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "HonestFramework"
+   },
+   "detail": "HonestFramework is read at 65447fd4d8253034fd6d206479c5a5371c623c60",
+   "href": "https://github.com/loganw234/HonestFramework/commit/65447fd4d8253034fd6d206479c5a5371c623c60",
+   "id": 165,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "65447fd4d8253034fd6d206479c5a5371c623c60",
+   "said": "",
+   "text": "65447fd",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Quantum-Film"
+   },
+   "detail": "Quantum-Film is read at a7f02db099b4e83a02ade8b95a6bf8c54dedacb1",
+   "href": "https://github.com/loganw234/Quantum-Film/commit/a7f02db099b4e83a02ade8b95a6bf8c54dedacb1",
+   "id": 166,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "a7f02db099b4e83a02ade8b95a6bf8c54dedacb1",
+   "said": "",
+   "text": "a7f02db",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "binary-sites"
+   },
+   "detail": "binary-sites is read at dacdcb8a413569da71ead6e221576e5d58784943",
+   "href": "",
+   "id": 167,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": true,
+   "raw": "dacdcb8a413569da71ead6e221576e5d58784943",
+   "said": "",
+   "text": "dacdcb8",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "names": [
+     "binary-sites"
+    ]
+   },
+   "detail": "binary-sites: visibility PRIVATE",
+   "href": "",
+   "id": 168,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "name": "StoryDocs"
+   },
+   "detail": "StoryDocs is read at 673148c962b5c685f71af6e1e25f350a4547e250",
+   "href": "",
+   "id": 169,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": true,
+   "raw": "673148c962b5c685f71af6e1e25f350a4547e250",
+   "said": "",
+   "text": "673148c",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "names": [
+     "StoryDocs"
+    ]
+   },
+   "detail": "StoryDocs: visibility PRIVATE",
+   "href": "",
+   "id": 170,
+   "kind": "api",
+   "method": "facts.api_visibility",
+   "num": false,
+   "private": true,
+   "raw": "private",
+   "said": "",
+   "text": "private",
+   "where": "GitHub snapshot 2026-09-29"
+  },
+  {
+   "args": {
+    "name": "Mercenaries2"
+   },
+   "detail": "Mercenaries2 is read at e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
+   "href": "https://github.com/loganw234/Mercenaries2/commit/e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
+   "id": 171,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "e51dcbecdf67a078ba4c8eda4866bbf9fe6f4817",
+   "said": "",
+   "text": "e51dcbe",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Merc2-Mods-Exp"
+   },
+   "detail": "Merc2-Mods-Exp is read at 0ec1db259aa28658fba91847c52639724ab3e4c0",
+   "href": "https://github.com/loganw234/Merc2-Mods-Exp/commit/0ec1db259aa28658fba91847c52639724ab3e4c0",
+   "id": 172,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "0ec1db259aa28658fba91847c52639724ab3e4c0",
+   "said": "",
+   "text": "0ec1db2",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "mercs2-lua-essentials"
+   },
+   "detail": "mercs2-lua-essentials is read at 3430c0bee3a9429bcf24bd0c0b8c46c18d78358a",
+   "href": "https://github.com/loganw234/mercs2-lua-essentials/commit/3430c0bee3a9429bcf24bd0c0b8c46c18d78358a",
+   "id": 173,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "3430c0bee3a9429bcf24bd0c0b8c46c18d78358a",
+   "said": "",
+   "text": "3430c0b",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Mercenaries-Fan-Build/mercs2-modkit"
+   },
+   "detail": "Mercenaries-Fan-Build/mercs2-modkit is read at 3a4d888dcab850d312328c0cb6fba3be5ad56149",
+   "href": "https://github.com/Mercenaries-Fan-Build/mercs2-modkit/commit/3a4d888dcab850d312328c0cb6fba3be5ad56149",
+   "id": 174,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "3a4d888dcab850d312328c0cb6fba3be5ad56149",
+   "said": "",
+   "text": "3a4d888",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Mercenaries-Fan-Build/mercs2-qol-mods"
+   },
+   "detail": "Mercenaries-Fan-Build/mercs2-qol-mods is read at 6f1fc599560d9c5c6bf9adbac2a0b68c3a4f4120",
+   "href": "https://github.com/Mercenaries-Fan-Build/mercs2-qol-mods/commit/6f1fc599560d9c5c6bf9adbac2a0b68c3a4f4120",
+   "id": 175,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "6f1fc599560d9c5c6bf9adbac2a0b68c3a4f4120",
+   "said": "",
+   "text": "6f1fc59",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Mercenaries-Fan-Build/mercs2-wad-simulator"
+   },
+   "detail": "Mercenaries-Fan-Build/mercs2-wad-simulator is read at fdf35972c4a86bd1c95ed84874d45c0ff99bfd24",
+   "href": "https://github.com/Mercenaries-Fan-Build/mercs2-wad-simulator/commit/fdf35972c4a86bd1c95ed84874d45c0ff99bfd24",
+   "id": 176,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "fdf35972c4a86bd1c95ed84874d45c0ff99bfd24",
+   "said": "",
+   "text": "fdf3597",
+   "where": "pins.json"
+  },
+  {
+   "args": {
+    "name": "Mercenaries-Fan-Build/notes-on-the-released-game"
+   },
+   "detail": "Mercenaries-Fan-Build/notes-on-the-released-game is read at b8c3958d02b425d568a8f2279175dcef9e605c4d",
+   "href": "https://github.com/Mercenaries-Fan-Build/notes-on-the-released-game/commit/b8c3958d02b425d568a8f2279175dcef9e605c4d",
+   "id": 177,
+   "kind": "file",
+   "method": "facts.pin_commit",
+   "num": true,
+   "private": false,
+   "raw": "b8c3958d02b425d568a8f2279175dcef9e605c4d",
+   "said": "",
+   "text": "b8c3958",
+   "where": "pins.json"
+  },
+  {
+   "args": {},
+   "detail": "when the snapshot was taken",
+   "href": "",
+   "id": 178,
+   "kind": "file",
+   "method": "facts.snapshot_date",
+   "num": true,
+   "private": false,
+   "raw": "2026-09-29T16:21:15-07:00",
+   "said": "",
+   "text": "2026-09-29",
+   "where": "sources/github-2026-09-29-1621.json"
   }
  ],
  "pins": {
@@ -2136,7 +3214,7 @@
   "PrettyCloud": "5161daa",
   "Quantum-Film": "a7f02db",
   "StoryDocs": "673148c",
-  "atlas-darkroom": "6a33735",
+  "atlas-darkroom": "c1b9b6e",
   "atlas-engine": "867c57a",
   "atlas-film": "be1d674",
   "atlas-optical": "dbccafe",
@@ -2145,5 +3223,5 @@
   "cft-rebound": "039e3c3",
   "mercs2-lua-essentials": "3430c0b"
  },
- "snapshot": "sources/github-2026-09-29-1520.json"
+ "snapshot": "sources/github-2026-09-29-1621.json"
 }

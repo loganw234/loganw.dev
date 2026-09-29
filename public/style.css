@@ -1,3 +1,4 @@
+@charset "utf-8";
 /* GENERATED 2026-09-29 from the Google Fonts css2 response for the URL in SOURCES.txt; one rule per
    subset, pointed at the local copy. Regenerate by re-running that fetch; never edit by hand. */
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrainsmono-normal-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
@@ -24,7 +25,7 @@ header{padding:46px 0 0}
 header .site{font:500 12.5px var(--mono);letter-spacing:.05em;color:var(--muted)}
 header .name{font:italic 500 46px/1.05 var(--serif);margin:.18em 0 .2em;letter-spacing:-.01em}
 nav{font:italic 17px/1.6 var(--serif);color:var(--muted);display:flex;flex-wrap:wrap}
-nav>*+*::before{content:"\00b7";margin:0 .55em;color:var(--rule);font-style:normal}
+nav>*+*::before{content:"·";margin:0 .55em;color:var(--rule);font-style:normal}
 nav a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px}
 nav a:not(.here){text-decoration-color:var(--rule)}
 .stamp{font:12.5px/1.5 var(--mono);color:var(--muted);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 0;margin:22px 0 30px}

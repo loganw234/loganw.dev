@@ -10,9 +10,15 @@ read here and nowhere else. What it records, all through `gh`:
     the build machine): every commit's date and whether it carries a Claude
     or Gemini Co-Authored-By trailer, and whether the ledger and agent-notes
     files exist on its default branch;
-  * for each pinned repository that declares CI workflows under
-    "verified_by": every run of those workflows - its commit, conclusion,
-    date and URL - which is what "last verified" is computed from.
+  * for every pinned repository, the full SHA GitHub gives for its pin, or
+    null where GitHub does not have that commit (the build refuses such a
+    pin, and a pin this snapshot did not look up);
+  * for every pinned repository, the name of every GitHub Actions workflow
+    it has, which pins.json must class, one by one;
+  * for every workflow pins.json classes as "verifies": every run - its
+    commit, conclusion, date and URL - which is what "last verified" is
+    computed from. A verifying workflow that never ran simply has no runs;
+    the build then finds no pass, and says so.
 
 A repository key is 'owner/name' where the owner is not pins.json's own
 (the Mercenaries-Fan-Build organisation's repositories, for the Preservation
@@ -32,17 +38,23 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "site"))
+from facts import agent_credited          # noqa: E402  the one rule, shared with facts.agents
+
 PINS = json.loads((ROOT / "pins.json").read_text(encoding="utf-8"))
 OWNER = PINS["owner"]
 ASKED_FILES = ["docs/VALIDATION.md", "CLAUDE.md"]
-AGENT = re.compile(r"^Co-Authored-By:.*\b(claude|gemini)\b", re.I | re.M)
 
 
-def gh(*args, allow_404=False):
+def gh(*args, allow_404=False, allow_missing=False):
+    """allow_404: a missing file is None. allow_missing: a commit GitHub does
+    not have (404, or 422 for a SHA it cannot resolve) is None."""
     r = subprocess.run(["gh", *args], capture_output=True)
     out = r.stdout.decode("utf-8", "replace")
     if r.returncode != 0:
-        if allow_404 and '"status":"404"' in out.replace(" ", ""):
+        status = re.search(r'"status":"(\d+)"', out.replace(" ", ""))
+        code = status.group(1) if status else ""
+        if (code == "404" and (allow_404 or allow_missing)) or (code == "422" and allow_missing):
             return None
         sys.exit("gh %s failed (%d): %s" % (" ".join(args), r.returncode,
                                             r.stderr.decode("utf-8", "replace").strip() or out[:200]))
@@ -91,23 +103,36 @@ def main():
                              "--jq", ".name", allow_404=True) is not None
         github_only[name] = {
             "total": len(recs),
-            "agent_coauthored": sum(1 for c in recs if AGENT.search(c["message"])),
+            "agent_coauthored": sum(1 for c in recs if agent_credited(c["message"])),
             "first": min(c["date"] for c in recs)[:10],
             "files": files,
         }
 
+    # Every pin, as GitHub resolves it. A commit GitHub does not have gives
+    # 404 or 422, recorded as null: atlas-darkroom was pinned at a commit that
+    # existed only in the owner's clone (verifier-P0, 2026-09-29).
+    pins = {}
+    for name, cfg in sorted(PINS["repos"].items()):
+        out = gh("api", "repos/%s/commits/%s" % (full(name), cfg["commit"]), "--jq", ".sha", allow_missing=True)
+        pins[name] = {"commit": cfg["commit"], "sha": out.strip() if out else None}
+
+    # Every workflow of every pinned repository, so that pins.json must class
+    # each one: verifier-P0 found two repositories' test workflows passing
+    # while Home showed a dash, because nothing had declared them.
+    workflows = {}
+    for name in sorted(PINS["repos"]):
+        workflows[name] = sorted(lines_json(gh("api", "--paginate", "repos/%s/actions/workflows" % full(name),
+                                               "--jq", ".workflows[] | .name | @json")))
+
     runs = {}
     for name, cfg in sorted(PINS["repos"].items()):
-        wanted = cfg.get("verified_by", {}).get("ci", [])
+        wanted = [w for w, c in cfg.get("workflows", {}).items() if c == "verifies"]
         if not wanted:
             continue
         got = lines_json(gh("api", "--paginate", "repos/%s/actions/runs?per_page=100" % full(name),
                             "--jq", ".workflow_runs[] | {workflow: .name, sha: .head_sha, branch: .head_branch, "
                                     "status: .status, conclusion: .conclusion, created: .created_at, url: .html_url}"))
         mine = [r for r in got if r["workflow"] in wanted]
-        missing = set(wanted) - {r["workflow"] for r in mine}
-        if missing:
-            sys.exit("%s: pins.json declares CI workflow(s) %s, which never ran" % (name, sorted(missing)))
         runs[name] = sorted(mine, key=lambda r: (r["created"], r["sha"]))
 
     now = datetime.datetime.now().astimezone()
@@ -118,6 +143,8 @@ def main():
         "command": "python site/snapshot_github.py (gh repo list and gh api; see its docstring)",
         "repos": sorted(repos, key=lambda r: r["name"].lower()),
         "github_only": github_only,
+        "pins": pins,
+        "workflows": workflows,
         "runs": runs,
     }
     # Named to the minute: a second snapshot on one day is a new file, never a
@@ -131,6 +158,10 @@ def main():
     print("wrote %s: %d repositories, %d read through the API only, CI runs for %s"
           % (out.relative_to(ROOT).as_posix(), len(repos), len(github_only),
              ", ".join("%s (%d)" % (k, len(v)) for k, v in runs.items())))
+    missing = sorted(k for k, v in pins.items() if not v["sha"])
+    if missing:
+        print("NOT ON GITHUB: %s; the build refuses these pins"
+              % ", ".join("%s@%s" % (k, pins[k]["commit"]) for k in missing))
 
 
 if __name__ == "__main__":

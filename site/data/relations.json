@@ -29,7 +29,7 @@
   {"name": "Merc2-Mods-Exp", "lane": 2, "row": 1}
  ],
  "families": [
-  {"label": "mercs2 tools", "lane": 2, "row": 2, "match": "(mercs2-|merc2-|wad-simulator)", "exclude": ["Merc2-Mods-Exp"]}
+  {"label": "mercs2 repositories", "lane": 2, "row": 2, "match": "(mercs2-|merc2-|wad-simulator)", "exclude": ["Merc2-Mods-Exp"]}
  ],
  "edges": [
   {"tail": "PrettyCloud", "head": "atlas-darkroom", "kind": "grew-into", "bend": 0,
@@ -50,16 +50,16 @@
   {"tail": "cft-fp256", "head": "cft-rebound", "kind": "built-on", "bend": 0,
    "repo": "cft-rebound", "path": "README.md", "pattern": "^(REBOUND's IAS15 integrator with its arithmetic routed through libcft)"},
   {"tail": "cft-fp256", "head": "Quantum-Film", "kind": "built-on", "bend": 0,
-   "repo": "Quantum-Film", "path": ".gitmodules", "pattern": "path = (vendor/cft-fp256)"},
+   "repo": "Quantum-Film", "path": ".gitmodules", "pattern": "(path = vendor/cft-fp256)"},
   {"tail": "atlas-film", "head": "Quantum-Film", "kind": "built-on", "bend": 0,
-   "repo": "Quantum-Film", "path": ".gitmodules", "pattern": "path = (vendor/atlas-film)"},
+   "repo": "Quantum-Film", "path": ".gitmodules", "pattern": "(path = vendor/atlas-film)"},
   {"tail": "cft-fp256", "head": "atlas-film", "kind": "ports", "bend": 66,
    "repo": "ParcelRound", "path": "CASE-STUDY-4.md", "pattern": "(P2 moves atlas-film)"},
   {"tail": "cft-rebound", "head": "ParcelRound", "kind": "distilled-from", "bend": 0,
    "repo": "cft-rebound", "path": "docs/PARCEL-ROUNDS.md", "pattern": "(lifted into a standalone repository)"},
   {"tail": "cft-fp256", "head": "HonestFramework", "kind": "distilled-from", "bend": 0,
-   "repo": "HonestFramework", "path": "CASE-STUDY.md", "pattern": "^\\| `(cft-fp256)` \\|"},
+   "repo": "HonestFramework", "path": "CASE-STUDY.md", "pattern": "^\\| `cft-fp256` \\|.*\\| (§1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests) \\|$"},
   {"tail": "Mercenaries2", "head": "Merc2-Mods-Exp", "kind": "grew-into", "bend": 0,
-   "repo": "Mercenaries2", "path": "README.md", "pattern": "visit \\[(Merc2-Mods-Exp)\\]"}
+   "repo": "Mercenaries2", "path": "README.md", "pattern": "(For the mods developed during this phase of the project, visit \\[Merc2-Mods-Exp\\])"}
  ]
 }

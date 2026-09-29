@@ -7,9 +7,14 @@ out of another with its history carried - the date that README states,
 because the carried history would otherwise place it where its parent began.
 
 Every edge is a claim and names the file that makes it; its words are read at
-the pin, and an edge whose words are gone refuses the build. A date that falls
-outside both stretches of the axis refuses too: the axis gets redrawn, the
-date is never clamped.
+the pin, and an edge whose words are gone refuses the build. The axis has two
+stretches: a short one for the first projects, whose start and end are fixed
+here, and the main one, which starts on a fixed day and ends just after the
+latest of the snapshot and every birth in it, so time moving on never breaks
+the build. A birth outside both stretches refuses: the axis gets redrawn, the
+date is never clamped. Every date the map prints is a figure, marked with its
+fact; the month ticks are the only text the numbers stage lets through
+unmarked, and only in the shape of a month.
 """
 import datetime
 import json
@@ -18,29 +23,51 @@ import pathlib
 
 import facts
 from facts import Refusal
-from render import esc, fig
+from render import esc, fig, mark
 
 DATA = json.loads((pathlib.Path(__file__).resolve().parent / "data" / "relations.json").read_text(encoding="utf-8"))
 
-MAIN0, MAIN1 = datetime.date(2026, 6, 20), datetime.date(2026, 9, 30)
+MAIN0 = datetime.date(2026, 6, 20)
 MAIN_X0, MAIN_X1 = 230.0, 985.0
-PX = (MAIN_X1 - MAIN_X0) / (MAIN1 - MAIN0).days
 STUB0, STUB1 = datetime.date(2025, 11, 1), datetime.date(2025, 11, 9)
 STUB_X0 = 140.0
+MARGIN = datetime.timedelta(days=2)
 LANE_TOP = [30, 178, 306]
 ROWY = {0: [58, 88, 118, 148], 1: [210, 240, 270], 2: [332, 358, 384]}
 AXIS_Y = 418
 KIND = dict(DATA["kinds"])
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 
-def xpos(iso, what):
-    d = datetime.date.fromisoformat(iso[:10])
-    if MAIN0 <= d <= MAIN1:
-        return MAIN_X0 + (d - MAIN0).days * PX
-    if STUB0 <= d <= STUB1:
-        return STUB_X0 + (d - STUB0).days * PX
-    raise Refusal("%s: %s falls outside both stretches of the map's axis (%s to %s, %s to %s); "
-                  "redraw the axis rather than clamp the date" % (what, iso, STUB0, STUB1, MAIN0, MAIN1))
+class Axis:
+    def __init__(self, dates):
+        """dates: every date the map places, the snapshot's among them."""
+        ds = [datetime.date.fromisoformat(d[:10]) for d in dates]
+        self.main1 = max([d for d in ds if d >= MAIN0] + [MAIN0]) + MARGIN
+        self.px = (MAIN_X1 - MAIN_X0) / (self.main1 - MAIN0).days
+
+    def x(self, iso, what):
+        d = datetime.date.fromisoformat(iso[:10])
+        if MAIN0 <= d <= self.main1:
+            return MAIN_X0 + (d - MAIN0).days * self.px
+        if STUB0 <= d <= STUB1:
+            return STUB_X0 + (d - STUB0).days * self.px
+        raise Refusal("%s: %s falls outside both stretches of the map's axis (%s to %s, and %s on); redraw the "
+                      "axis rather than clamp the date" % (what, iso, STUB0, STUB1, MAIN0))
+
+    def ticks(self):
+        """The first day of each month on the axis: 'Nov 2025', then 'Jul 2026',
+        'Aug', ... - a year where a stretch starts, and at each January."""
+        out = []
+        for lo, hi in ((STUB0, STUB1), (MAIN0, self.main1)):
+            d, first = datetime.date(lo.year, lo.month, 1), True
+            while d <= hi:
+                if d >= lo:
+                    out.append((d, "%s %d" % (MONTHS[d.month - 1], d.year) if first or d.month == 1
+                                else MONTHS[d.month - 1]))
+                    first = False
+                d = datetime.date(d.year + d.month // 12, d.month % 12 + 1, 1)
+        return out
 
 
 def build():
@@ -61,10 +88,10 @@ def build():
         # not support.
         note = None
         if "note" in n:
-            v = facts.prose(name, n["note"]["path"], n["note"]["pattern"])
-            note = n["note"]["format"] % v.text
-        nodes[name] = dict(name=name, x=xpos(b.text, name), y=ROWY[n["lane"]][n["row"]], born=b,
-                           private=not facts.is_public(name), trunk=n.get("trunk", False), note=note)
+            before, _, after = n["note"]["format"].partition("%s")
+            note = (before, facts.prose(name, n["note"]["path"], n["note"]["pattern"]), after)
+        nodes[name] = dict(name=name, y=ROWY[n["lane"]][n["row"]], born=b,
+                           vis=facts.api_visibility([name]), trunk=n.get("trunk", False), note=note)
     edges = []
     for e in DATA["edges"]:
         for end in (e["tail"], e["head"]):
@@ -75,13 +102,18 @@ def build():
         edges.append(dict(e, v=facts.prose(e["repo"], e["path"], e["pattern"])))
     fams = []
     for f in DATA["families"]:
-        v = facts.family(f["match"], f["exclude"])
-        _, first, last = v.raw.split()
-        fams.append(dict(f, v=v, first=first, last=last))
-    return dict(nodes=nodes, edges=edges, families=fams, now=facts.snapshot_date())
+        span = facts.family_span(f["match"], f["exclude"])
+        first, last = span.raw.split()
+        fams.append(dict(f, v=facts.family(f["match"], f["exclude"]), span=span, first=first, last=last))
+    now = facts.snapshot_date()
+    ax = Axis([n["born"].text for n in nodes.values()] + [now.text] + [f["last"] for f in fams])
+    for n in nodes.values():
+        n["x"] = ax.x(n["born"].text, n["name"])
+    return dict(nodes=nodes, edges=edges, families=fams, now=now, axis=ax)
 
 
 def svg(M):
+    ax = M["axis"]
     o = ['<svg viewBox="0 0 1080 440" role="img" aria-labelledby="map-t" xmlns="http://www.w3.org/2000/svg">',
          '<title id="map-t">Where each project came from: born dates across, threads down, typed relations between them</title>',
          '<defs>'
@@ -93,22 +125,22 @@ def svg(M):
         o.append('<text class="lane" x="14" y="%d">%s</text>' % (top + 16, esc(label)))
     for top in LANE_TOP[1:]:
         o.append('<line class="sep" x1="14" x2="1066" y1="%d" y2="%d"/>' % (top - 4, top - 4))
-    now = M["now"].text
-    xn = xpos(now, "the snapshot")
+    now = M["now"]
+    xn = ax.x(now.text, "the snapshot")
     o.append('<line class="now" x1="%.1f" x2="%.1f" y1="28" y2="%d"/>' % (xn, xn, AXIS_Y))
-    o.append('<text class="tick" x="%.1f" y="20" text-anchor="end">snapshot %s</text>' % (xn, esc(now)))
-    xs1 = xpos(STUB1.isoformat(), "axis")
+    o.append('<text class="tick" x="%.1f" y="20" text-anchor="end">snapshot %s</text>' % (xn, mark(now)))
+    xs1 = ax.x(STUB1.isoformat(), "axis")
     o.append('<path class="axis" d="M%.1f %dH%.1f M%.1f %dH%.1f"/>' % (STUB_X0 - 4, AXIS_Y, xs1 + 3, MAIN_X0 - 8, AXIS_Y, MAIN_X1))
     o.append('<path class="axis" d="M%.1f %d l6 -9 M%.1f %d l6 -9"/>' % (xs1 + 6, AXIS_Y + 4, xs1 + 13, AXIS_Y + 4))
-    for iso, label in (("2025-11-01", "Nov 2025"), ("2026-07-01", "Jul 2026"), ("2026-08-01", "Aug"), ("2026-09-01", "Sep")):
-        x = xpos(iso, "a tick")
+    for d, label in ax.ticks():
+        x = ax.x(d.isoformat(), "a tick")
         o.append('<path class="axis" d="M%.1f %dv5"/><text class="tick" x="%.1f" y="%d">%s</text>' % (x, AXIS_Y, x, AXIS_Y + 17, label))
     for f in M["families"]:
-        x0, x1 = xpos(f["first"], f["label"]), xpos(f["last"], f["label"])
+        x0, x1 = ax.x(f["first"], f["label"]), ax.x(f["last"], f["label"])
         y = ROWY[f["lane"]][f["row"]]
         o.append('<line class="range" x1="%.1f" x2="%.1f" y1="%d" y2="%d"/>' % (x0, x1, y, y))
-        o.append('<text x="%.1f" y="%.1f">%s %s<tspan class="note"> created %s to %s</tspan></text>'
-                 % (x1 + 9, y + 4.5, esc(f["v"].text), esc(f["label"]), f["first"][5:], f["last"][5:]))
+        o.append('<text x="%.1f" y="%.1f">%s %s<tspan class="note"> created %s</tspan></text>'
+                 % (x1 + 9, y + 4.5, mark(f["v"]), esc(f["label"]), mark(f["span"])))
     N = M["nodes"]
     for e in M["edges"]:
         a, b = N[e["tail"]], N[e["head"]]
@@ -126,10 +158,12 @@ def svg(M):
                  % (e["kind"], sx, sy, cx, cy, ex, ey, "ah-acc" if e["kind"] == "grew-into" else "ah",
                     esc(e["tail"]), esc(KIND[e["kind"]]), esc(e["head"])))
     for n in N.values():
-        cls = " ".join(["node"] + [k for k in ("private", "trunk") if n[k]])
-        tail = '<tspan class="note"> private</tspan>' if n["private"] else ""
+        private = n["vis"].text == "private"
+        cls = " ".join(["node"] + (["private"] if private else []) + (["trunk"] if n["trunk"] else []))
+        tail = '<tspan class="note"> %s</tspan>' % mark(n["vis"]) if private else ""
         if n["note"]:
-            tail += '<tspan class="note"> %s</tspan>' % esc(n["note"])
+            before, v, after = n["note"]
+            tail += '<tspan class="note"> %s%s%s</tspan>' % (esc(before), mark(v), esc(after))
         o.append('<g class="%s"><rect x="%.1f" y="%.1f" width="7" height="7"/><text x="%.1f" y="%.1f">%s%s</text></g>'
                  % (cls, n["x"] - 3.5, n["y"] - 3.5, n["x"] + 9, n["y"] + 4.5, esc(n["name"]), tail))
     o.append("</svg>")
@@ -151,10 +185,12 @@ def block():
                  for e in M["edges"])
     order = sorted(M["nodes"].values(), key=lambda n: (n["born"].text, n["name"]))
     pos = "".join('<li>%s: %s</li>' % (esc(n["name"]), fig(n["born"])) for n in order)
-    cap = ("Across: the day each repository was born &mdash; its first commit at the pin, or the date its README "
-           "states it was split out of another. Down: the three threads. Read each arrow as a sentence, tail to "
-           "head; each one names the file that says so.")
+    fam = "".join('<li>%s %s, created %s</li>' % (fig(f["v"]), esc(f["label"]), fig(f["span"])) for f in M["families"])
+    cap = ("Across: the day each repository was born &mdash; its first commit at the pin, on its author's calendar; "
+           "the date its README states it was split out of another; or, for a repository read only through the "
+           "GitHub snapshot, its first commit there, in UTC. Down: the threads. Read each arrow as a sentence, tail "
+           "to head; each one names the file that says so.")
     return ('<figure class="map"><div class="map-scroll">%s</div><figcaption>%s</figcaption>%s'
             '<details class="evidence"><summary>The file behind each arrow, and behind each position</summary>'
-            '<ol>%s</ol><p>Positions, earliest first:</p><ul>%s</ul></details></figure>'
-            % (svg(M), cap, legend(), ev, pos))
+            '<ol>%s</ol><p>Positions, earliest first:</p><ul>%s</ul><p>Families:</p><ul>%s</ul></details></figure>'
+            % (svg(M), cap, legend(), ev, pos, fam))

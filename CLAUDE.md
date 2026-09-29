@@ -7,15 +7,16 @@ bite you.
 ## Start here: one command answers "does it still hold?"
 
 ```bash
-bash verify/run.sh --require-all   # 7 stages, about 15 s on the desktop
-bash verify/run.sh --list          # every stage, with * on the ones this invocation would run
+bash verify/run.sh --require-all   # every stage; any skip fails
+bash verify/run.sh --list          # the stages, with * on the ones this invocation would run
 ```
 
 **Run this before every push.** A push to main deploys the site, and that
 has been the rule since the first push (Logan, 2026-09-29).
 
 There is no cache across runs; each fresh run does everything again.
-`--resume` continues the last run of the same tree.
+`--resume` continues the last run, and only on a clean tree. `--require-all`
+refuses `--only` and `--skip`.
 
 ## The authority
 
@@ -23,13 +24,19 @@ The source repositories are the authority, each read at the commit named in
 `pins.json`. The site never states a figure it didn't read there.
 
 - **Write figures through `@fact`.** A figure must come out of a function
-  decorated with `@fact` (`site/facts.py`). The renderer refuses any figure
-  that didn't, because `facts.json` couldn't read it again.
+  decorated with `@fact` (`site/facts.py`). `fig()` refuses a figure that
+  isn't exactly what its fact returned. The `numbers` stage refuses any
+  numeral on a page outside a figure's mark, and any mark whose text isn't
+  its own fact's.
 - **Put new facts in your own page module.** Re-derivation imports the module
   each fact was defined in, so a new fact never needs an edit to `facts.py`.
 - **What a check proves.** A figure lifted from prose shows that the page
-  quotes its source faithfully at the pin. It doesn't show the source's claim
-  is true; the source's own gates do that. This is a stated limit.
+  quotes its source at the pin. It doesn't show the source's claim is true;
+  the source's own gates do that.
+  - A paraphrase (`display=`) prints its source's words beside it, and can't
+    add a numeral they don't have. Whether it keeps their meaning isn't
+    checked.
+  - These are stated limits.
 
 ## Traps
 
@@ -43,29 +50,47 @@ The source repositories are the authority, each read at the commit named in
    repeated read. `Pin.git` memoises, and `is_ancestor` reads one `rev-list`.
 3. **A ledger heading the parser doesn't recognise refuses the build.** A
    heading has to be dated at its start, dated in brackets at its end, or
-   numbered. Anything else refuses by name. A numbered entry is dated by the
-   commit that wrote its heading, because cft-rebound's entries 30 to 33
-   carry no date anywhere.
+   numbered. Anything else refuses by name. Headings inside code fences are
+   not entries. A numbered entry is dated by the first commit that added its
+   heading, because cft-rebound's entries 30 to 33 carry no date anywhere.
+   A retitled heading is therefore dated at its retitling.
 4. **Count commits, not trailer lines.** Merc2Reborn has 20 agent commits but
    21 trailer lines, because `d66f97a` credits both Claude and Gemini. Our
-   first figure there was wrong for this reason.
+   first figure there was wrong for this reason. `facts.agent_credited` is
+   the one rule, and `snapshot_github.py` uses it too.
 5. **A count over a fork's history counts its parent.** nextpnr-xilinx showed
    45 of 3397. A fork gets a dash, and the reason.
-6. **Links must be relative.** The site is served at
-   `loganw234.github.io/loganw.dev/` as well as at the root of loganw.dev, so a
-   leading `/` breaks one of the two.
+6. **Links must be relative, and name a published file exactly.** The site is
+   served at `loganw234.github.io/loganw.dev/` as well as at the root of
+   loganw.dev, so a leading `/` breaks one of the two.
 7. **Don't hand-edit `public/`.** It is generated, and `--check` fails on
    drift. If two branches conflict in `public/`, resolve it by rebuilding,
    never by merging the text.
-8. **The Write tool on this desktop turns `\uXXXX` in code into the literal
-   character** (observed 2026-09-29). That's harmless in a string, but check
-   any regular expression that depends on the escape.
+8. **Backslashes don't survive every tool here.** The Write tool turned
+   `\uXXXX` in code into the literal character (2026-09-29). Python sent
+   through a Bash heredoc had its `\\` arrive as `\` the same day. Write code
+   with the Write or Edit tool, and check any regular expression that
+   depends on an escape.
 9. **A pin with no `dir` is read only from the site's own clone** under
    `.cache/repos/`. The Mercenaries-Fan-Build organisation's repositories are
    pinned at GitHub's main. Logan's clones of them were behind that, and one
    carried a commit GitHub never had. A fresh clone of this repository needs
    `LOGANW_FETCH=1` once for those pins; until then, `build` skips by name.
    Never fetch into Logan's own clones.
+10. **Moving a pin means taking a new snapshot.** The build refuses a pin that
+    the snapshot didn't look up, and a pin that GitHub doesn't have.
+    atlas-darkroom was pinned at a commit that existed only in Logan's clone.
+    Point `pins.json` at the new snapshot by its exact name. `ls | tail`
+    picked the wrong one once, because `-1554.json` sorts before `.json`.
+11. **A pattern passed to `prose()` must match exactly once,** or it is
+    refused. `last=True` asks for the last match, on purpose.
+12. **`stated()` takes who and when.**
+    - A statement about a repository takes `holds_at={name: commit}`, and
+      refuses the build once that pin moves.
+    - Words the lead drafted for someone take `draft=True` until that person
+      approves them.
+13. **No document states how many stages the runner has.** `--list` prints
+    them, and `--docs` refuses a count in any form.
 
 ## The discipline that matters most here
 

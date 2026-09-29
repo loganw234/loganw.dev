@@ -6,25 +6,39 @@ A figure is read from one of three places, and from nowhere else:
     at that SHA, never a working tree, where another session may be
     mid-round (docs/SPEC.md, decision 3);
   * the GitHub snapshot pins.json names, taken once by snapshot_github.py;
-  * the owner's word, which is rendered as STATED and never as sourced.
+  * someone's word, which is rendered as STATED, with who said it and when,
+    and never as sourced.
 
 Every figure comes out of a function decorated with @fact. The decorator
 logs what was read and how - the method, its arguments, the value - and gives
-the figure an id. The renderer refuses a figure without an id, so nothing
-reaches a page that is not in facts.json. facts.json is what `build.py
---verify-facts` re-reads, on this machine or on anyone else's.
+the figure an id. The renderer prints a figure only if it is exactly what the
+log holds for its id, and marks it with that id; the `numbers` stage then
+refuses any numeral on a page that is not inside such a mark, and any mark
+whose text is not its own fact's. So every figure a page prints in digits is
+in facts.json, and `build.py --verify-facts` reads each one again: at its pin,
+or from the committed snapshot.
 
-What a check here proves, and what it does not. A figure lifted from prose
-proves that the page quotes the source faithfully at the pin. It does not
-prove the source's claim is true; the source's own gates do that. That is a
-stated limit, not a gap to be closed with more patterns (ParcelRound,
-CASE-STUDY-4, observation 14).
+What a check here proves, and what it does not:
+
+  * A figure lifted from prose proves that the page quotes the source at the
+    pin. It does not prove the source's claim is true; the source's own gates
+    do that (ParcelRound, CASE-STUDY-4, observation 14).
+  * A figure the page paraphrases (`display`) prints the source's own words
+    beside it, and no numeral the source's words do not have. Whether the
+    paraphrase keeps the meaning is not checked by any gate: the reader has
+    both, side by side.
+  * A figure read from the snapshot is compared, on re-reading, with the
+    committed snapshot, not with GitHub today. Its label dates it.
+  * A figure written in words ("seventy") is seen only for the number words
+    the numbers stage lists; "one" and ordinals are ordinary English, and are
+    not checked.
 
 A page module may define facts of its own with @fact. Re-derivation imports
 the module a fact was defined in, so no parcel needs to edit this file to add
 one.
 """
 import dataclasses
+import datetime
 import functools
 import importlib
 import inspect
@@ -66,7 +80,33 @@ class V:
     src: Src
     raw: str = ""
     num: bool = False   # set in mono: a number, a date or a hash
+    said: str = ""      # the source's own words, when `text` paraphrases them; printed beside it
     id: int = 0         # given by @fact; 0 means no fact produced it
+
+
+# ---------------------------------------------------------------------------
+# Numerals: one definition, used by prose() and by build.py's numbers stage
+# ---------------------------------------------------------------------------
+
+_WORD = re.compile(r"[^\s()\[\]{}<>\"'“”‘’,;!?|*`]+")
+_SHA = re.compile(r"[0-9a-f]{7,40}")
+NUMBER_WORDS = re.compile(
+    r"\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|"
+    r"seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|"
+    r"million|billion|dozen|twice|thrice)\b", re.I)
+
+
+def numerals(s):
+    """The tokens of s that are figures: a word that starts with a digit (after
+    an optional v, #, §, ~, ± or sign), or a hex word of 7 to 40 characters with
+    a digit in it (a commit). A name with digits inside it - cft-fp256,
+    binary32.com, Mercenaries2 - is not a figure."""
+    out = []
+    for m in _WORD.finditer(s):
+        w = m.group(0).rstrip(".:")
+        if re.match(r"[v#§~±+\-−]?\d", w) or (_SHA.fullmatch(w) and re.search(r"\d", w)):
+            out.append(w)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -101,13 +141,39 @@ def fact(fn):
         if _depth[0] or not _recording[0]:
             return v
         v = dataclasses.replace(v, id=len(LOG) + 1)
-        LOG.append({"id": v.id, "method": key, "args": dict(bound.arguments),
-                    "text": v.text, "raw": v.raw, "kind": v.src.kind, "where": v.src.short,
-                    "detail": v.src.detail, "href": v.src.href, "private": v.src.private})
+        LOG.append(record(v, key, dict(bound.arguments)))
         return v
 
     REGISTRY[key] = fn
     return wrapper
+
+
+def record(v, method="", args=None):
+    return {"id": v.id, "method": method, "args": args or {}, "text": v.text, "raw": v.raw, "said": v.said,
+            "num": v.num, "kind": v.src.kind, "where": v.src.short, "detail": v.src.detail,
+            "href": v.src.href, "private": v.src.private}
+
+
+def logged(v):
+    """The log's record for a figure, if the figure is exactly what its fact
+    returned; None otherwise. A figure copied with its text or source changed
+    (dataclasses.replace keeps the id) is not what the log holds."""
+    if not isinstance(v, V) or not 0 < v.id <= len(LOG):
+        return None
+    rec = LOG[v.id - 1]
+    mine = record(v, rec["method"], rec["args"])
+    return rec if mine == rec else None
+
+
+def label(rec):
+    """A figure's source, as the page prints it after the figure. One
+    definition, so the numbers stage can rebuild it from facts.json."""
+    body = rec["where"]
+    if rec["kind"] != "stated" and rec["private"]:
+        body += ", private for now"
+    if rec["said"]:
+        body += ": “%s”" % rec["said"]
+    return "(%s)" % body
 
 
 def rederive(rec):
@@ -179,6 +245,28 @@ def api_src(name, detail):
                repo_meta(name)["url"] if pub else "", private=not pub)
 
 
+def github_sha(name):
+    """The full SHA GitHub gave for a pin when the snapshot was taken. A pin
+    GitHub does not have is refused: its figures could be checked by no one
+    else, and its links would not open (atlas-darkroom was pinned at a local
+    commit, 2026-09-29). A pin the snapshot never looked up is refused too, so
+    moving a pin means taking a new snapshot."""
+    short = PINS["repos"][name]["commit"]
+    rec = snap().get("pins", {}).get(name)
+    if rec is None or rec["commit"] != short:
+        raise Refusal("%s: %s did not look up the pin %s; take a new snapshot after moving a pin"
+                      % (name, SNAPSHOT.name, short))
+    if not rec["sha"]:
+        raise Refusal("%s: GitHub did not have the pinned commit %s when %s was taken; push it, or pin a "
+                      "commit GitHub has" % (name, short, SNAPSHOT.name))
+    return rec["sha"]
+
+
+def check_pins():
+    for name in PINS["repos"]:
+        github_sha(name)
+
+
 # ---------------------------------------------------------------------------
 # The pins
 # ---------------------------------------------------------------------------
@@ -223,9 +311,15 @@ class Pin:
         self.name, self.short, self.cfg = name, cfg["commit"], cfg
         self.owner, self.ghname = split(name)
         self.private = not is_public(name)
+        want = github_sha(name)
         self.dir = _checkout(name, cfg.get("dir"))
         self._memo, self._anc = {}, None
         self.full = self.git("rev-parse", "--verify", "--quiet", self.short + "^{commit}").strip()
+        # A short SHA names a commit only within one repository: a directory
+        # that happens to share the name could resolve it to another commit.
+        if self.full != want:
+            raise Refusal("%s: %s resolves to %s in %s, and to %s on GitHub"
+                          % (name, self.short, self.full or "nothing", self.dir, want))
 
     def git(self, *args, binary=False):
         # Every read names the pinned commit or is relative to it, so an answer
@@ -247,6 +341,17 @@ class Pin:
         if self._anc is None:
             self._anc = set(self.git("rev-list", self.full).split())
         return sha in self._anc
+
+    def local(self, iso):
+        """A UTC time from the API, on the calendar of the pinned commit's
+        author: ledger dates and born dates are the author's own days, and one
+        calendar keeps them comparable (verifier-P0: a run three seconds after
+        its commit showed as the next day). -> (date, 'YYYY-MM-DD HH:MM +hhmm')."""
+        off = self.git("log", "-1", "--format=%ai", self.full).split()[-1]
+        sign = -1 if off[0] == "-" else 1
+        tz = datetime.timezone(sign * datetime.timedelta(hours=int(off[1:3]), minutes=int(off[3:5])))
+        t = datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(tz)
+        return t.date().isoformat(), "%s %s" % (t.strftime("%Y-%m-%d %H:%M"), off)
 
     def href(self, path="", line=0):
         if self.private:
@@ -289,22 +394,41 @@ def _line(text, pos):
     return text.count("\n", 0, pos) + 1
 
 
+def check_display(display, quoted):
+    """A paraphrase may not bring a numeral its source's words do not have:
+    'merged into main on 2026-09-27' for 'whether it merges' is refused."""
+    extra = [n for n in numerals(display) if n not in numerals(quoted)]
+    if extra:
+        raise Refusal("the display %r has %s, which the words it paraphrases (%r) do not"
+                      % (display, ", ".join(extra), quoted))
+
+
 @fact
 def prose(name, path, pattern, display=None, last=False, num=False):
-    """A figure lifted from a sentence: the file, the line, and the words."""
+    """A figure lifted from a sentence: the file, the line, and the words. A
+    pattern must match once; one that matches more than once is refused unless
+    the caller asks for the last match, because taking the first silently would
+    quote whichever sentence happens to come first."""
     p = pin(name)
     text = p.show(path)
     ms = list(re.finditer(pattern, text, re.M))
     if not ms:
         raise Refusal("%s %s %s: the pattern %r no longer matches" % (name, p.short, path, pattern))
-    m = ms[-1] if last else ms[0]
+    if len(ms) > 1 and not last:
+        raise Refusal("%s %s %s: the pattern %r matches %d times, at lines %s; make it match once, or ask for "
+                      "the last" % (name, p.short, path, pattern, len(ms), ", ".join(str(_line(text, m.start())) for m in ms)))
+    m = ms[-1]
     line = _line(text, m.start(1))
     quoted = md_plain(m.group(1))
-    detail = "“%s”" % quoted if display is not None else ""
-    if last and len(ms) > 1:
-        detail = (detail + " " if detail else "") + "(the last of %d matches)" % len(ms)
+    if display is not None:
+        try:
+            check_display(display, quoted)
+        except Refusal as e:
+            raise Refusal("%s %s %s:%d: %s" % (name, p.short, path, line, e))
+    detail = "the last of %d matches" % len(ms) if len(ms) > 1 else ""
     return V(display if display is not None else quoted,
-             p.src("file", "%s:%d" % (path, line), detail, path, line), raw=quoted, num=num)
+             p.src("file", "%s:%d" % (path, line), detail, path, line), raw=quoted, num=num,
+             said=quoted if display is not None else "")
 
 
 @fact
@@ -326,7 +450,8 @@ def macros(name, path, names, sep="."):
 
 @fact
 def born(name):
-    """The day a repository began: its earliest author date at the pin."""
+    """The day a repository began: its earliest author date at the pin, on the
+    author's own calendar."""
     p = pin(name)
     dates = p.git("log", p.full, "--format=%ad", "--date=short").split()
     if not dates:
@@ -335,31 +460,40 @@ def born(name):
              raw=min(dates), num=True)
 
 
+AGENT = re.compile(r"^Co-Authored-By:.*\b(?:claude|gemini)\b", re.I | re.M)
+
+
+def agent_credited(message):
+    """The one rule for an agent-credited commit, here and in
+    snapshot_github.py: its message has a Co-Authored-By line naming Claude or
+    Gemini. It counts commits, so a commit crediting both counts once."""
+    return AGENT.search(message) is not None
+
+
 @fact
 def agents(name):
-    """Commits carrying a Claude or Gemini Co-Authored-By trailer, of all
-    commits at the pin. A trailer, not a line count: it cannot see help that
-    was never credited."""
+    """Agent-credited commits, of all commits at the pin. A trailer, not a line
+    count, and a lower bound: it cannot see help that was never credited."""
     p = pin(name)
-    out = p.git("log", p.full, "--format=%x1e%(trailers:key=Co-Authored-By,valueonly)")
-    recs = out.split("\x1e")[1:]
-    ai = sum(1 for r in recs if re.search(r"claude|gemini", r, re.I))
+    recs = p.git("log", p.full, "--format=%x1e%B").split("\x1e")[1:]
+    ai = sum(1 for r in recs if agent_credited(r))
     return V("%d/%d" % (ai, len(recs)),
-             p.src("git", "git log", "commits with a Claude or Gemini Co-Authored-By trailer, of all commits"),
+             p.src("git", "git log", "commits with a Co-Authored-By line naming Claude or Gemini, of all commits"),
              raw="%d/%d" % (ai, len(recs)), num=True)
 
 
 @fact
 def api_born(name):
     c = snap()["github_only"][name]
-    return V(c["first"], api_src(name, "the earliest of its %d commits" % c["total"]), raw=c["first"], num=True)
+    return V(c["first"], api_src(name, "the earliest of its %d commits, as a UTC date (the API gives no author's "
+                                       "offset)" % c["total"]), raw=c["first"], num=True)
 
 
 @fact
 def api_agents(name):
     c = snap()["github_only"][name]
     t = "%d/%d" % (c["agent_coauthored"], c["total"])
-    return V(t, api_src(name, "commits with a Claude or Gemini Co-Authored-By trailer, of all commits"),
+    return V(t, api_src(name, "commits with a Co-Authored-By line naming Claude or Gemini, of all commits"),
              raw=t, num=True)
 
 
@@ -383,6 +517,19 @@ def api_visibility(names):
 
 
 @fact
+def pin_commit(name):
+    """The commit pins.json names, as GitHub resolved it when the snapshot was
+    taken. Read from pins.json and the snapshot alone, so a machine with no
+    clone of a private repository can still read it again."""
+    sha, (owner, gh) = github_sha(name), split(name)
+    pub = is_public(name)
+    return V(PINS["repos"][name]["commit"],
+             Src("file", "pins.json", "%s is read at %s" % (name, sha),
+                 "https://github.com/%s/%s/commit/%s" % (owner, gh, sha) if pub else "", not pub),
+             raw=sha, num=True)
+
+
+@fact
 def exists(name, path):
     p = pin(name)
     if not p.has(path):
@@ -390,100 +537,185 @@ def exists(name, path):
     return V(path, p.src("git", "", "%s exists at the pin" % path, path), raw=path)
 
 
+@fact
+def last_commit(name, path):
+    """The commit that last wrote a path, at or before the pin."""
+    p = pin(name)
+    h = p.git("log", "-1", "--format=%H", p.full, "--", path).strip()
+    if not h:
+        raise Refusal("%s %s: nothing ever touched %s" % (name, p.short, path))
+    return V(h[:7], Src("git", "%s %s git log -- %s" % (name, p.short, path), "the last commit touching it: %s" % h,
+                        "" if p.private else "https://github.com/%s/%s/commit/%s" % (p.owner, p.ghname, h), p.private),
+             raw=h, num=True)
+
+
+def ledger_headings(t):
+    """A ledger's `## ` headings outside fenced code: [(offset, line)]. A
+    heading shape inside a fence is an example, not an entry (verifier-P0 built
+    one that the first parser counted)."""
+    out, fence, pos = [], None, 0
+    for line in t.splitlines(keepends=True):
+        s = line.rstrip("\r\n")
+        m = re.match(r" {0,3}(`{3,}|~{3,})", s)
+        if fence is None and m:
+            fence = m.group(1)
+        elif fence is not None and m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) \
+                and s.strip() == m.group(1):
+            fence = None
+        elif fence is None and s.startswith("## "):
+            out.append((pos, s))
+        pos += len(line)
+    return out
+
+
 def entries(name, path):
-    """A ledger's entries: every `## ` heading, with its date. A heading is
-    dated at the start (`## 2026-09-29 - ...`), dated at the end in brackets
-    (`## div/sqrt as sequencer programs (2026-09-01)` - one such heading in
-    cft-fp256's ledger), or numbered (`## 37. ...`). A numbered one is dated
-    by the commit that first wrote its heading, found with `git log -S` at the
-    pin: cft-rebound's entries 30 to 33 carry no date anywhere, and the first
-    date in a body can be a date the entry only mentions. Anything else is
-    refused by name, because a parser that skipped it would drop an entry
-    without a word."""
+    """A ledger's entries: every `## ` heading outside a code fence, with its
+    date. A heading is dated at the start (`## 2026-09-29 - ...`), dated at the
+    end in brackets (`## div/sqrt as sequencer programs (2026-09-01)` - one
+    such heading in cft-fp256's ledger), or numbered (`## 37. ...`).
+
+    A numbered one is dated by the first commit, at or before the pin, that
+    added its heading's exact text to the file (`git log -S`): cft-rebound's
+    entries 30 to 33 carry no date anywhere, and the first date in a body can
+    be a date the entry only mentions. That is a stated limit: a heading
+    retitled later is dated at its retitling, and one whose exact text sat in
+    the file before (in a fence, say) is dated at that earlier commit.
+
+    Anything else is refused by name, because a parser that skipped it would
+    drop an entry without a word."""
     p = pin(name)
     t = p.show(path)
-    heads = list(re.finditer(r"^## (.+)$", t, re.M))
+    heads = ledger_headings(t)
     out = []
-    for i, h in enumerate(heads):
-        end = heads[i + 1].start() if i + 1 < len(heads) else len(t)
-        title, line = h.group(1).strip(), _line(t, h.start())
+    for i, (start, head) in enumerate(heads):
+        end = heads[i + 1][0] if i + 1 < len(heads) else len(t)
+        title, line = head[3:].strip(), _line(t, start)
         m = re.match(r"(\d{4}-\d{2}-\d{2})\b", title) or re.search(r"\((\d{4}-\d{2}-\d{2})\)$", title)
         if m:
             date, how = m.group(1), "dated"
         elif re.match(r"\d+\.", title):
-            dates = p.git("log", "--reverse", "--format=%ad", "--date=short", "-S", h.group(0),
+            dates = p.git("log", "--reverse", "--format=%ad", "--date=short", "-S", head,
                           p.full, "--", path).split()
             if not dates:
                 raise Refusal("%s %s %s:%d: no commit wrote this numbered heading" % (name, p.short, path, line))
-            date, how = dates[0], "numbered; dated by the commit that wrote its heading"
+            date, how = dates[0], "numbered; dated by the first commit that added its heading"
         else:
             raise Refusal("%s %s %s:%d: a heading that is neither dated nor numbered: %r"
                           % (name, p.short, path, line, title[:70]))
-        out.append(dict(date=date, how=how, title=title, line=line, start=h.start(), end=end))
+        out.append(dict(date=date, how=how, title=title, line=line, start=start, end=end))
     return t, out
+
+
+def verifying(name):
+    """The workflows pins.json classes as "verifies" for a pinned repository."""
+    return sorted(w for w, c in PINS["repos"][name].get("workflows", {}).items() if c == "verifies")
+
+
+CLASSES = ("verifies", "builds", "deploys")
+
+
+def check_workflows():
+    """Every workflow the snapshot lists for a pinned repository is classed in
+    pins.json, and every class names a workflow that exists. A test workflow
+    nothing classed is how Home showed a dash for two repositories whose
+    tests had passed (verifier-P0, 2026-09-29)."""
+    listed = snap().get("workflows")
+    if listed is None:
+        raise Refusal("%s lists no workflows; take a new snapshot" % SNAPSHOT.name)
+    for name, cfg in PINS["repos"].items():
+        have = set(listed.get(name, []))
+        classed = cfg.get("workflows", {})
+        for w in sorted(have - set(classed)):
+            raise Refusal("%s has a workflow %r that pins.json does not class (verifies, builds or deploys)" % (name, w))
+        for w, c in sorted(classed.items()):
+            if w not in have:
+                raise Refusal("pins.json classes %s's workflow %r, which the snapshot does not list" % (name, w))
+            if c not in CLASSES:
+                raise Refusal("pins.json classes %s's workflow %r as %r; the classes are %s" % (name, w, c, ", ".join(CLASSES)))
+
+
+def runs(name, wf):
+    return [r for r in snap()["runs"].get(name, []) if r["workflow"] == wf]
 
 
 @fact
 def last_verified(name):
     """The newest recorded pass of a repository's own gate, at or before its
-    pin. Two records count, each declared in pins.json under verified_by: a run
-    of a named CI workflow that succeeded on the pinned commit or an ancestor
-    of it, and a ledger line matching a declared pattern, dated by its entry.
-    A repository declaring neither shows a dash, and says so."""
+    pin, as a date on the pinned commit's author's calendar. Two records count:
+    a run of a workflow pins.json classes as "verifies" that succeeded on the
+    pinned commit or an ancestor of it; and a ledger line matching one of the
+    pass forms pins.json declares under verified_by, dated by its entry. A pass
+    recorded in a form nobody declared is not seen; that is the limit of a
+    declared form. A repository with neither record shows a dash, and says so."""
     p = pin(name)
-    cfg = p.cfg.get("verified_by")
-    if not cfg:
-        return V("—", p.src("git", "", "records no gate run this site can read (no verified_by in pins.json)"),
+    ledger = p.cfg.get("verified_by", {}).get("ledger")
+    wfs = verifying(name)
+    if not wfs and not ledger:
+        return V("—", p.src("git", "", "no workflow of it verifies, and no ledger line is declared as a pass"),
                  raw="", num=True)
     cands = []
-    for wf in cfg.get("ci", []):
-        runs = [r for r in snap()["runs"].get(name, []) if r["workflow"] == wf]
-        if not runs:
-            raise Refusal("%s: pins.json declares CI workflow %r, and the snapshot has no run of it" % (name, wf))
-        ok = [r for r in runs if r["conclusion"] == "success" and p.is_ancestor(r["sha"])]
+    for wf in wfs:
+        ok = [r for r in runs(name, wf) if r["conclusion"] == "success" and p.is_ancestor(r["sha"])]
         if ok:
             r = max(ok, key=lambda r: r["created"])
+            day, when = p.local(r["created"])
             src = Src("api", "GitHub snapshot %s" % snapdate(),
-                      "%s: workflow %s passed on %s at %s, the newest pass at or before the pin"
-                      % (name, wf, r["sha"][:7], r["created"]), "" if p.private else r["url"], p.private)
-            cands.append(((r["created"][:10], 1), V(r["created"][:10], src, raw=r["created"], num=True)))
-    if "ledger" in cfg:
-        path, pat = cfg["ledger"]["path"], cfg["ledger"]["pattern"]
+                      "%s: workflow %s passed on %s, created %s (%s on the pinned commit's calendar); the newest "
+                      "pass at or before the pin" % (name, wf, r["sha"][:7], r["created"], when),
+                      "" if p.private else r["url"], p.private)
+            cands.append(((day, 1), V(day, src, raw=r["created"], num=True)))
+    if ledger:
+        path = ledger["path"]
         t, ents = entries(name, path)
-        ms = list(re.finditer(pat, t, re.M))
-        if not ms:
-            raise Refusal("%s %s %s: the declared pass pattern %r matches nothing" % (name, p.short, path, pat))
-        m = ms[-1]
-        e = [e for e in ents if e["start"] <= m.start() < e["end"]]
-        if not e:
-            raise Refusal("%s %s %s: the last pass line is above every entry" % (name, p.short, path))
-        e, line = e[0], _line(t, m.start())
+        found = []
+        for what, pat in sorted(ledger["passes"].items()):
+            for m in re.finditer(pat, t, re.M):
+                e = [e for e in ents if e["start"] <= m.start() < e["end"]]
+                if not e:
+                    raise Refusal("%s %s %s:%d: a pass line above every entry" % (name, p.short, path, _line(t, m.start())))
+                found.append((e[0]["date"], m.start(), what, m))
+        if not found:
+            raise Refusal("%s %s %s: no declared pass form matches (%s)" % (name, p.short, path, ", ".join(ledger["passes"])))
+        date, pos, what, m = max(found, key=lambda f: (f[0], f[1]))
+        line = _line(t, pos)
         src = p.src("file", "%s:%d" % (path, line),
-                    "the last of %d lines matching %r, in the entry dated %s" % (len(ms), pat, e["date"]), path, line)
-        cands.append(((e["date"], 0), V(e["date"], src, raw=md_plain(m.group(0)), num=True)))
+                    "the newest of %d lines matching a declared pass form; this one is %s, in the entry dated %s"
+                    % (len(found), what, date), path, line)
+        cands.append(((date, 0), V(date, src, raw=md_plain(m.group(0)), num=True)))
     if not cands:
-        return V("—", p.src("git", "", "no recorded pass at or before the pin"), raw="", num=True)
+        return V("—", p.src("git", "", "no pass recorded at or before the pin, by %s"
+                                 % (", ".join(wfs + (["a declared ledger line"] if ledger else [])))),
+                 raw="", num=True)
     return max(cands, key=lambda c: c[0])[1]
+
+
+# A run's conclusion, as the site reads it: a pass, red, or no verdict at all.
+# cancelled, skipped, neutral, stale and action_required say nothing about the
+# tree, so they are passed over; docs/SPEC.md section 4 says the same.
+RED = ("failure", "timed_out", "startup_failure")
 
 
 @fact
 def ci_red(name):
-    """An open regression the site can see: the newest finished run of a
-    declared CI workflow, at or before the pin, that did not pass. Empty when
-    every declared workflow's newest run passed - a recorded absence."""
+    """An open regression the site can see: for each workflow classed
+    "verifies", its newest finished run with a verdict at or before the pin, if
+    that verdict is red. Empty when every newest verdict is a pass: a recorded
+    absence."""
     p = pin(name)
     red = []
-    for wf in p.cfg.get("verified_by", {}).get("ci", []):
-        runs = [r for r in snap()["runs"].get(name, []) if r["workflow"] == wf and r["status"] == "completed"
-                and r["conclusion"] in ("success", "failure", "timed_out") and p.is_ancestor(r["sha"])]
-        if runs:
-            r = max(runs, key=lambda r: r["created"])
+    for wf in verifying(name):
+        rs = [r for r in runs(name, wf) if r["status"] == "completed"
+              and r["conclusion"] in ("success",) + RED and p.is_ancestor(r["sha"])]
+        if rs:
+            r = max(rs, key=lambda r: r["created"])
             if r["conclusion"] != "success":
-                red.append("%s red since %s" % (wf, r["created"][:10]))
+                # "on", not "since": the newest verdict's date says nothing of
+                # when the failures began.
+                red.append("%s red on %s" % (wf, p.local(r["created"])[0]))
     t = "; ".join(red)
     return V(t, Src("api", "GitHub snapshot %s" % snapdate(),
-                    "%s: the newest finished run of each declared workflow at or before the pin" % name,
-                    "", p.private), raw=t)
+                    "%s: the newest verdict of each verifying workflow at or before the pin, on the pinned "
+                    "commit's calendar" % name, "", p.private), raw=t)
 
 
 @fact
@@ -513,25 +745,53 @@ def count_paths(name, pattern, what):
     return V(str(n), p.src("git", "ls-tree", what), raw=str(n), num=True)
 
 
-@fact
-def family(match, exclude):
-    """Public repositories whose names match, counted, with the span of their
-    creation dates: -> 'N' with raw 'N first last'."""
+def _family(match, exclude):
     rs = [r for r in snap()["repos"] if r["visibility"] == "PUBLIC" and r["name"] not in exclude
           and r.get("owner", OWNER) == OWNER and re.match(match, r["name"], re.I)]
     if not rs:
         raise Refusal("no public repository matches %r" % match)
-    first, last = min(r["createdAt"][:10] for r in rs), max(r["createdAt"][:10] for r in rs)
-    return V(str(len(rs)), Src("api", "GitHub snapshot %s" % snapdate(),
-                               "public repositories under %s matching %r, except %s; created %s to %s"
-                               % (OWNER, match, ", ".join(exclude) or "none", first, last)),
-             raw="%d %s %s" % (len(rs), first, last), num=True)
+    return rs, min(r["createdAt"][:10] for r in rs), max(r["createdAt"][:10] for r in rs)
 
 
 @fact
-def stated(text, who="Logan", when="2026-09-29"):
-    """The owner's word. Rendered as stated, never as sourced."""
-    return V(text, Src("stated", "stated", "by %s, %s; no file backs it" % (who, when)), raw=text)
+def family(match, exclude):
+    """Public repositories under the owner whose names match, counted."""
+    rs, first, last = _family(match, exclude)
+    return V(str(len(rs)), Src("api", "GitHub snapshot %s" % snapdate(),
+                               "public repositories under %s matching %r, except %s"
+                               % (OWNER, match, ", ".join(exclude) or "none")),
+             raw=str(len(rs)), num=True)
+
+
+@fact
+def family_span(match, exclude):
+    """The first and last creation dates of the same repositories, as month-day
+    (UTC, as the API gives them); raw has both in full."""
+    rs, first, last = _family(match, exclude)
+    return V("%s to %s" % (first[5:], last[5:]),
+             Src("api", "GitHub snapshot %s" % snapdate(),
+                 "the creation dates of the %d public repositories under %s matching %r, except %s: the first "
+                 "and the last, in UTC" % (len(rs), OWNER, match, ", ".join(exclude) or "none")),
+             raw="%s %s" % (first, last), num=True)
+
+
+@fact
+def stated(text, who, when, holds_at=None, draft=False):
+    """Someone's word, with no file behind it: printed as stated, with who said
+    it and when, and never counted as sourced.
+
+    holds_at ties a statement about a repository to the pin it was made at
+    ({name: commit}): when that pin moves, the statement refuses the build
+    until it is restated or removed, so a statement cannot outlive what it was
+    about. draft marks words the lead drafted from someone's own, which they
+    have yet to approve; the label says so until they do."""
+    for name, commit in (holds_at or {}).items():
+        now = PINS["repos"][name]["commit"]
+        if now != commit:
+            raise Refusal("%s's word of %s, %r, was about %s at %s, and the pin is now %s; restate it or remove it"
+                          % (who, when, text, name, commit, now))
+    short = ("drafted from %s's words of %s, not yet approved" if draft else "stated by %s, %s") % (who, when)
+    return V(text, Src("stated", short, "no file backs it"), raw=text)
 
 
 @fact
