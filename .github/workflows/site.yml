@@ -42,9 +42,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+      # The Python the desktop runs, from one file: the pages are read with
+      # Python's own HTML parser, which changes between releases.
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          python-version-file: .python-version
       # The two libraries the gate's controls use, each to read something a
       # second way: CommonMark's own parser for the ledgers, and tinycss2 for
       # the stylesheet. They and their one dependency each are pinned by

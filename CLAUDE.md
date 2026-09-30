@@ -107,19 +107,31 @@ a figure it didn't read there.
     the contact masked (`build._Masked`), since CI's logs are public and a
     check may quote what it refused.
     - A page is held to a subset of HTML in which Python's parser and a
-      browser build the same page (`build.PARENTS`): strict nesting, each
-      element only where HTML allows it, text only where a browser draws it,
-      and no `<div/>`. No comment, processing instruction or CDATA section.
+      browser build the same page (`build.PARENTS`):
+      - strict nesting, each element only where HTML allows it;
+      - text only where a browser draws it, where whitespace is HTML's own
+        (a no-break space is text);
+      - `<html>` holding a head and then a body, and no `<div/>`;
+      - every tag written one way (`<name attr="value">`, `</name>`), and
+        every `&` a reference that ends in `;`;
+      - no comment, processing instruction or CDATA section.
+    - The gate runs only under the Python `.python-version` names, as CI
+      does, because Python's own HTML parser reads edge cases differently
+      between releases.
     - Each file is read as a reader gets it (`build.readings`):
       - character references decoded;
       - a page's text with inline tags joining it (`build.INLINE`), and each
         attribute on its own;
       - percent-encoding decoded;
       - Unicode's compatibility forms, such as a fullwidth letter or at sign;
-      - a JSON file's strings, and a PNG's text chunks.
+      - a JSON file's strings.
 
       An address in any script counts. A character a browser draws as
-      nothing is refused outright.
+      nothing is refused outright, written as itself or as a reference. A
+      PNG may hold no text chunk at all.
+    - The privacy stage also refuses an address, other than the contact or
+      one at a domain reserved for examples, in any file or commit message
+      that pushing HEAD would publish, history included.
     - A stylesheet may hold only the strings `build.CSS_STRINGS` lists, since
       `content` and list markers print strings.
     - These are stated limits; the check can't see:
@@ -150,6 +162,11 @@ a figure it didn't read there.
 16. **The spec names Wally on Home and on About; decision 16 allows the name
     on one page only,** the Preservation thread's. The local-only stage
     refuses it in any other published file.
+
+17. **Only main is ever pushed: never `git push --all`.** A parcel's branch
+    can hold what main doesn't. P2's did: its earlier commits held the
+    author address in files, and P2 was squash-merged so that main never
+    held it. The privacy stage reads what pushing HEAD publishes.
 
 ## The discipline that matters most here
 

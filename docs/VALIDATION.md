@@ -1478,3 +1478,66 @@ told not to.
 - CI runs on Linux, where the fault could not arise.
 
 `--control` caught 275 of 275.
+
+## 2026-09-30 - verifier-seam: NOT READY on c06a0ea; the subset's own gaps closed, one tag syntax, one Python
+
+verifier-seam re-checked `0176ce4..c06a0ea`. Every fault from its previous
+verdict was refused, by the rule meant for it. It then broke the subset
+itself, and each break is closed here:
+
+- **A `<title>` inside SVG `<text>`,** empty, split the name and an address.
+  A browser draws the text whole, while the check read a break. An SVG
+  title now stands only in `<svg>`, `<g>` or a shape.
+- **A no-break space after the charset `<meta>`.** Python's `strip()` calls
+  it whitespace; HTML doesn't. In a browser it closes the head, and the
+  policy and title land in the body. The parsers now use HTML's own
+  whitespace (`build.HTML_SPACE`), and `<html>` must hold a head and then
+  a body.
+- **An override written as a character reference** (`&#x202E;`) drew the
+  name backwards. The check refused only the literal character. Characters
+  drawn as nothing are now refused after references are decoded too.
+- **An end tag holding an attribute** passed on the desktop's Python 3.12.9,
+  and CI's floating 3.12 would have refused it. Two answers:
+  - Every tag must now be written the one way the build writes them, and
+    every `&` must start a reference ending in `;`. The site's 13 pages
+    already are.
+  - The gate runs only under the Python `.python-version` names (3.12.9),
+    and CI's setup reads the same file. Measured: `python3`, which is
+    3.13.14 here, is refused before any stage runs.
+- **An address in `IEND`'s data** passed the chunk rule. Chunks the format
+  sizes must be that size. A PNG may now hold no text chunk at all:
+  verifier-seam also carried an address in a UTF-16 string inside one.
+- **Encoded addresses in printed output.** A line that names an address in
+  any reading (`&#64;`, `%40`, a fullwidth at sign) is withheld whole.
+- **Side notes:**
+  - CSS `direction` and `unicode-bidi` are refused, since they draw a word
+    backwards.
+  - The name is matched between letters, so "Wally2" and "Wally_" count.
+- **The author address in the round's ledger.** It was in three files,
+  never in this repository. The lead redacted it from two, and P4 from its
+  own. The privacy stage now refuses an address in any file or commit
+  message that pushing HEAD would publish, history included. Allowed are
+  the contact, domains and address blocks reserved for examples, and the
+  co-author trailer's address. A folding of the ledger into this file
+  would be refused.
+- **P4 found a control reading the wrong fact.** "A figure the map draws,
+  with its line under the map removed" took the first `snapshot_date` fact
+  in facts.json, which is Home's only while no page sorts before
+  `home.py`. P4's `corrections.py` does. The control now takes the id from
+  the line it removes. Two others that picked a fact the same way now take
+  theirs from the page they plant in.
+
+**Corrections to the entries above:**
+
+- "24 of the controls' `write_text` calls": that is right at the fix. At
+  `56a5b82` there were 22, as verifier-seam counted. The same round added
+  two more, all in `controls()`.
+- The entry dated 2026-09-30 lists U+FFF0 and U+E0000 among shapes that
+  "passed all 11 stages". verifier-seam measured those two at unit level
+  only.
+- The README's "Pages" and CLAUDE.md trap 14 said the subset holds pages "in
+  which this check's parser and a browser build the same page". The gaps
+  above contradicted that until now, and on the desktop's Python only
+  until the version was pinned.
+
+`--control` caught 294 of 294.
