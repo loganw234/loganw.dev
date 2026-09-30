@@ -1,0 +1,7 @@
+/* P2: the Threads section pages. Most of the look comes free from
+   site/style.css (measure, lede, h2, table, cta, map); this is only what
+   those rules do not already cover. */
+.threads-index{font-size:18px}
+.threads-index li{margin:.6em 0}
+table.credits{min-width:0;width:auto;font-size:15px}
+table.credits td:not(.p),table.credits th:not(:first-child){text-align:right;font-family:var(--mono);min-width:2.4em}

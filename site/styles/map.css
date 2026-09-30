@@ -1,0 +1,32 @@
+/* P2: the map's two layouts. Both are always drawn (mapgen.block()); only one
+   shows at a time, chosen by width, at the 600px breakpoint site/style.css
+   already uses for header/lede sizing. site/data/css_hides.json names
+   .map-wide and .map-narrow, each allowed display:none, for exactly this
+   swap - a reader at either width sees every node, every edge, and every
+   figure's source (mapgen.check_parity holds the two layouts equal). */
+.map-wide{overflow-x:auto}
+.map-wide>svg{display:block;width:100%;height:auto;min-width:820px}
+.map-narrow{display:none}
+@media (max-width:600px){
+  .map-wide{display:none}
+  .map-narrow{display:block}
+  .map-narrow>svg{display:block;width:100%;height:auto}
+}
+.map-narrow .lane{font-size:7.5px;letter-spacing:.04em}
+.map-narrow svg text{font-size:11px}
+.map-narrow .tick,.map-narrow .note{font-size:9.5px}
+/* StoryDocs' edges to what it has touched: seven from one node, so drawn
+   light - thin, low contrast, no dash of its own - next to the primary
+   grew-into/built-on/etc. relations, which keep full weight. The evidence
+   list under the map names each one; the line only needs to be legible
+   enough to trace, not to compete. */
+.map .edge.documents{stroke-width:.9;opacity:.4}
+/* A thread page's slice of the map: the rest of the map, still drawn (every
+   node and edge stays, so the parity check still holds), just pushed back.
+   opacity here never reaches zero - a near-zero value is a stated limit of
+   the numbers stage's hiding rule, not a way around it, and this is a
+   genuine "push back", not a hide: a reader can still read every dimmed
+   node and edge. */
+.map .node.dim rect{opacity:.3}
+.map .node.dim text{opacity:.32}
+.map .edge.dim{opacity:.16}

@@ -1,5 +1,5 @@
 {
- "about": "The map's one source: lanes, nodes and typed edges. An edge is a claim, so each names the file that makes it and the words that say so; the build refuses an edge whose words are gone. Positions across are dates the build reads, never typed here. lane, row and bend are layout only.",
+ "about": "The map's one source: lanes, nodes and typed edges. An edge is a claim, so each names the file that makes it and the words that say so; the build refuses an edge whose words are gone. Positions across are dates the build reads, never typed here. lane, row and bend are layout only. storydocs_projects maps a StoryDocs projects/ directory, read at its pin, to the map node(s) it documents; site/mapgen.py lists the directories actually there and refuses one this map does not name. Most map to their own name (prettycloud to PrettyCloud); 'method' needed its own manifest read (projects/method/storydocs.yaml and README.md), since the name matches no node - it turned out to be a StoryDocs paper about both HonestFramework and ParcelRound, so it maps to both.",
  "lanes": ["DETERMINISM", "FILM & PHOTOGRAPHY", "PRESERVATION"],
  "kinds": [
   ["grew-into", "grew into"],
@@ -7,7 +7,8 @@
   ["built-on", "underlies"],
   ["ports", "hosts a port of"],
   ["verified-by", "verifies"],
-  ["distilled-from", "was distilled into"]
+  ["distilled-from", "was distilled into"],
+  ["documents", "documents"]
  ],
  "nodes": [
   {"name": "PrettyCloud", "lane": 0, "row": 1},
@@ -16,6 +17,8 @@
   {"name": "cft-rebound", "lane": 0, "row": 1},
   {"name": "ParcelRound", "lane": 0, "row": 0},
   {"name": "HonestFramework", "lane": 0, "row": 3},
+  {"name": "binary-sites", "lane": 0, "row": 2},
+  {"name": "nextpnr-xilinx", "lane": 0, "row": 1, "created_api": true},
   {"name": "CanonBracketTool", "lane": 1, "row": 0},
   {"name": "Microscope-Stacker", "lane": 1, "row": 2},
   {"name": "atlas-darkroom", "lane": 1, "row": 0},
@@ -24,10 +27,21 @@
   {"name": "atlas-film", "lane": 1, "row": 2,
    "born": {"path": "README.md", "pattern": "Born (\\d{4}-\\d{2}-\\d{2}) by extraction"}},
   {"name": "Quantum-Film", "lane": 1, "row": 0},
+  {"name": "StoryDocs", "lane": 1, "row": 1},
   {"name": "Mercenaries2", "lane": 2, "row": 0,
    "note": {"path": "README.md", "pattern": "The public server at `(refesl\\.live)`", "format": "server %s"}},
   {"name": "Merc2-Mods-Exp", "lane": 2, "row": 1}
  ],
+ "storydocs_projects": {
+  "atlas-engine": {"nodes": ["atlas-engine"], "bend": -12},
+  "atlas-film": {"nodes": ["atlas-film"], "bend": 24},
+  "atlas-optical": {"nodes": ["atlas-optical"], "bend": -24},
+  "cft-fp256": {"nodes": ["cft-fp256"], "bend": 12},
+  "prettycloud": {"nodes": ["PrettyCloud"], "bend": 0},
+  "quantum-film": {"nodes": ["Quantum-Film"], "bend": -30},
+  "method": {"nodes": ["HonestFramework", "ParcelRound"], "path": "projects/method/README.md",
+             "pattern": "storydocs paper about (HonestFramework and ParcelRound)", "bend": [18, -6]}
+ },
  "families": [
   {"label": "mercs2 repositories", "lane": 2, "row": 2, "match": "(mercs2-|merc2-|wad-simulator)", "exclude": ["Merc2-Mods-Exp"]}
  ],
@@ -38,7 +52,8 @@
   {"tail": "PrettyCloud", "head": "atlas-engine", "kind": "grew-into", "bend": 0,
    "repo": "atlas-engine", "path": "README.md", "pattern": "(Sixty-eight plates in PrettyCloud)"},
   {"tail": "atlas-engine", "head": "cft-fp256", "kind": "grew-into", "bend": -16,
-   "repo": "cft-fp256", "path": "README.md", "pattern": "(The workload this tile exists to serve is\\s+\\[atlas-engine\\])"},
+   "repo": "cft-fp256", "path": "README.md",
+   "pattern": "(The workload this tile exists to serve is\\s+\\[atlas-engine\\]\\([^)]*\\))"},
   {"tail": "atlas-engine", "head": "cft-fp256", "kind": "verified-by", "bend": 16,
    "repo": "cft-fp256", "path": "README.md", "pattern": "(A GPU agrees, bit for bit, on a real workload)"},
   {"tail": "atlas-engine", "head": "atlas-darkroom", "kind": "built-on", "bend": 0,
@@ -60,6 +75,8 @@
   {"tail": "cft-fp256", "head": "HonestFramework", "kind": "distilled-from", "bend": 0,
    "repo": "HonestFramework", "path": "CASE-STUDY.md", "pattern": "^\\| `cft-fp256` \\|.*\\| (§1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests) \\|$"},
   {"tail": "Mercenaries2", "head": "Merc2-Mods-Exp", "kind": "grew-into", "bend": 0,
-   "repo": "Mercenaries2", "path": "README.md", "pattern": "(For the mods developed during this phase of the project, visit \\[Merc2-Mods-Exp\\])"}
+   "repo": "Mercenaries2", "path": "README.md", "pattern": "(For the mods developed during this phase of the project, visit \\[Merc2-Mods-Exp\\])"},
+  {"tail": "atlas-darkroom", "head": "StoryDocs", "kind": "extracted", "bend": 0,
+   "repo": "StoryDocs", "path": "README.md", "pattern": "(taken out of atlas-darkroom)"}
  ]
 }

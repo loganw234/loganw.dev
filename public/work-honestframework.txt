@@ -3,35 +3,35 @@ HonestFramework — dossier
 
 I. What it is
 
-A way to lay out a project so that an AI can write nearly all of it and no claim about it ever rests on the AI's judgement [fact 916].
+A way to lay out a project so that an AI can write nearly all of it and no claim about it ever rests on the AI's judgement [fact 1271].
 
 II. What it is not
 
-- Not a prompting guide. Nothing here depends on phrasing, model, or version. The mechanisms are files and exit codes [fact 917]
-- Not a substitute for tests. It is a set of properties your tests and build must have before their green means anything [fact 918]
-- Not free. A project built this way carries a reference implementation it could have done without, a second copy of some checks, and a ledger that only grows [fact 919]
-- Not about distrusting the agent. The agent in the case study wrote essentially all of 743,605 lines across six repositories, including every mechanism described here, and found most of the defects listed in it [fact 920]
+- Not a prompting guide. Nothing here depends on phrasing, model, or version. The mechanisms are files and exit codes [fact 1272]
+- Not a substitute for tests. It is a set of properties your tests and build must have before their green means anything [fact 1273]
+- Not free. A project built this way carries a reference implementation it could have done without, a second copy of some checks, and a ledger that only grows [fact 1274]
+- Not about distrusting the agent. The agent in the case study wrote essentially all of 743,605 lines across six repositories, including every mechanism described here, and found most of the defects listed in it [fact 1275]
 
 III. The contract
 
-That is the whole thesis in one example [fact 921]. The agent wrote every line of the fix [fact 922]. It decided nothing about whether the fix worked [fact 923].
+That is the whole thesis in one example [fact 1276]. The agent wrote every line of the fix [fact 1277]. It decided nothing about whether the fix worked [fact 1278].
 
 IV. Verified
 
-No docs/VALIDATION.md ledger: HonestFramework is a document, not a build. What it records instead is its own tools/check_claims.py [fact 924], which holds facts about itself equal on every run. Re-read here from the pin, not by running that script against a checkout:
+No docs/VALIDATION.md ledger: HonestFramework is a document, not a build. What it records instead is its own tools/check_claims.py [fact 1279], which holds facts about itself equal on every run. Re-read here from the pin, not by running that script against a checkout:
 
-- METHOD.md's numbered mechanisms: 10 [fact 914], agreeing with the word README.md states for them.
-- CASE-STUDY.md's per-repository table sums to 743,605 [fact 915] tracked lines, agreeing with the headline both documents quote.
+- METHOD.md's numbered mechanisms: 10 [fact 1269], agreeing with the word README.md states for them.
+- CASE-STUDY.md's per-repository table sums to 743,605 [fact 1270] tracked lines, agreeing with the headline both documents quote.
 
 V. Kept failures
 
-- The trap has a second floor, and I fell through it [fact 925]. atlas-optical's own gate: “The gate and the test use the computed one [fact 926].” So the rule needs its sharper form: [fact 927] a committed source figure is an external authority only if the source derived it from something other than the input you are feeding it [fact 928]. Corrected by commit 65447fd [fact 929] — this dossier's own pin.
-- This is the part I got wrong, and it is worth more than the part I got right [fact 930]. “its controls, its key and both audit reports all landed in one commit [fact 931].” “There is no state of the repository in which the controls exist without the key [fact 932] — so the blinding was never verifiable from the record. Make the blinding a property of the record, not of your working tree [fact 933] is the fix. Corrected by commit 759bb68 [fact 934].
+- The trap has a second floor, and I fell through it [fact 1280]. atlas-optical's own gate: “The gate and the test use the computed one [fact 1281].” So the rule needs its sharper form: [fact 1282] a committed source figure is an external authority only if the source derived it from something other than the input you are feeding it [fact 1283]. Corrected by commit 65447fd [fact 1284] — this dossier's own pin.
+- This is the part I got wrong, and it is worth more than the part I got right [fact 1285]. “its controls, its key and both audit reports all landed in one commit [fact 1286].” “There is no state of the repository in which the controls exist without the key [fact 1287] — so the blinding was never verifiable from the record. Make the blinding a property of the record, not of your working tree [fact 1288] is the fix. Corrected by commit 759bb68 [fact 1289].
 
 VI. Test it
 
-- python tools/check_claims.py: This repo's own gate [fact 935] — links, the mechanism count and the case-study total, all re-checked in under a second.
-- Recompute CASE-STUDY.md's per-repository table by hand: the same arithmetic 743,605 [fact 915] already shows, done again with nothing but the table.
+- python tools/check_claims.py: This repo's own gate [fact 1290] — links, the mechanism count and the case-study total, all re-checked in under a second.
+- Recompute CASE-STUDY.md's per-repository table by hand: the same arithmetic 743,605 [fact 1270] already shows, done again with nothing but the table.
 
 VII. Prove it wrong
 
@@ -44,13 +44,13 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 
 VIII. Connections
 
-- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 936]
+- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1291]
 
 IX. Provenance
 
-HonestFramework read at 65447fd [fact 937].
+HonestFramework read at 65447fd [fact 1292].
 
-- README.md [fact 938]
-- METHOD.md [fact 939]
-- CASE-STUDY.md [fact 940]
-- tools/check_claims.py [fact 941]
+- README.md [fact 1293]
+- METHOD.md [fact 1294]
+- CASE-STUDY.md [fact 1295]
+- tools/check_claims.py [fact 1296]
