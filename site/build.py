@@ -441,23 +441,33 @@ CSS_STRING = re.compile(r"\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'", re.S)
 # added `.src{display:none}` and 49 of 124 labels vanished, then
 # `.src{color:rgba(0,0,0,0)}` and all 124 did, with every stage passing. A
 # rule that hides is refused unless site/data/css_hides.json - the lead's -
-# names its selector and why. The values are read, not just the words:
-#   * display:none, visibility:hidden or collapse, content-visibility:hidden;
-#   * a zero opacity, font size or scale, in any property that sets one
-#     (opacity, font-size, the font shorthand, scale, transform, zoom, and an
-#     opacity() filter), and any of them computed with calc(), min(), max()
-#     or clamp(), which this cannot evaluate;
-#   * a colour with zero alpha - transparent, #rgba, #rrggbbaa, rgb(... / 0),
-#     rgba(..., 0), and the like - in color, fill or -webkit-text-fill-color,
-#     or fill-opacity of zero; fill:none; custom properties are followed, so
-#     var(--x) is read as every value --x is given anywhere;
-#   * clip, clip-path, mask and text-indent, other than none, auto or 0.
-# What this cannot see is stated in the README: the gates do not lay the
-# page out, so a near-zero value, text coloured like its background, text
-# placed off screen or stacked under something else would pass.
+# names its selector and the declaration it may use, with why.
+#
+# The check reads CSS text; it does not render. What it refuses is exactly
+# this list, and the README gives the same list and says that anything else
+# passes. Property names are read without a vendor prefix (-webkit-clip-path
+# is clip-path).
+#   * display:none; visibility:hidden or collapse; content-visibility:hidden.
+#   * opacity, fill-opacity, font-size, scale or zoom at zero or below, or
+#     computed with calc(), min(), max() or clamp(); a font shorthand whose
+#     size is zero or computed; a transform with scale() at zero or computed,
+#     or with matrix(); an opacity() filter at zero or below, or computed.
+#   * In color, fill and text-fill-color: the word transparent; a hex colour
+#     whose alpha is zero; a colour function whose alpha is zero or below, or
+#     computed. And fill:none.
+#   * clip, clip-path, mask and mask-image, other than none or auto; and
+#     text-indent other than zero.
+# A custom property is read as every value the stylesheet gives it: in a
+# rule, as a var() fallback, or as an @property's initial-value.
 HIDES_FILE = SITE / "data" / "css_hides.json"
-_ZERO = r"[+-]?0*\.?0+(?:e[+-]?\d+)?"
+_NUM = r"[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?"
 _MATH = re.compile(r"\b(?:calc|min|max|clamp)\s*\(", re.I)
+
+
+def _nonpositive(tok):
+    """A number token, with or without a unit, that is zero or below."""
+    m = re.fullmatch(r"(%s)(?:[a-z]+|%%)?" % _NUM, tok.strip(), re.I)
+    return bool(m) and float(m.group(1)) <= 0
 
 
 def _decls(css):
@@ -473,17 +483,42 @@ def _decls(css):
     return out
 
 
+def _var(v):
+    """The first var() in v, as (start, end, name, fallback or None), reading
+    its parentheses as nested, so a fallback like rgb(1 2 3) is whole."""
+    m = re.search(r"var\(\s*(--[\w-]+)\s*", v)
+    if not m:
+        return None
+    depth, i, comma = 1, m.end(), None
+    while i < len(v) and depth:
+        c = v[i]
+        depth += c == "("
+        depth -= c == ")"
+        if c == "," and depth == 1 and comma is None:
+            comma = i
+        i += 1
+    end = i
+    fallback = v[comma + 1:end - 1].strip() if comma is not None else None
+    return m.start(), end, m.group(1), fallback
+
+
 def _variants(v, defs, depth=0):
     """Every value v can take once each var() is replaced by any definition
     of its custom property, or by its fallback."""
-    m = re.search(r"var\(\s*(--[\w-]+)\s*(?:,\s*([^()]*))?\)", v)
-    if not m or depth > 6:
+    found = _var(v)
+    if not found or depth > 6:
         return [v]
-    subs = list(defs.get(m.group(1), [])) + ([m.group(2)] if m.group(2) else [])
+    start, end, name, fallback = found
+    subs = list(defs.get(name, [])) + ([fallback] if fallback is not None else [])
     out = []
     for s in subs or [""]:
-        out += _variants(v[:m.start()] + s + v[m.end():], defs, depth + 1)
+        out += _variants(v[:start] + s + v[end:], defs, depth + 1)
     return out
+
+
+def _alpha_hides(alpha):
+    alpha = alpha.strip()
+    return bool(_MATH.search(alpha)) or _nonpositive(alpha)
 
 
 def _zero_alpha(v):
@@ -493,15 +528,28 @@ def _zero_alpha(v):
     for h in re.findall(r"#([0-9a-f]{4}|[0-9a-f]{8})\b", v):
         if (len(h) == 4 and h[3] == "0") or (len(h) == 8 and h[6:] == "00"):
             return True
-    for fn, args in re.findall(r"\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(([^()]*)\)", v):
-        alpha = args.split("/")[1] if "/" in args else (args.split(",")[3] if args.count(",") >= 3 else None)
-        if alpha is not None and re.fullmatch(r"\s*%s%%?\s*" % _ZERO, alpha):
+    for m in re.finditer(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(", v):
+        depth, i = 1, m.end()
+        while i < len(v) and depth:
+            depth += v[i] == "("
+            depth -= v[i] == ")"
+            i += 1
+        args = v[m.end():i - 1]
+        top = re.sub(r"\([^()]*\)", lambda x: x.group(0).replace(",", " ").replace("/", " "), args)
+        if "/" in top:
+            alpha = args[top.index("/") + 1:]
+        elif top.count(",") >= 3:
+            alpha = args[[k for k, c in enumerate(top) if c == ","][2] + 1:]
+        else:
+            continue
+        if _alpha_hides(alpha):
             return True
     return False
 
 
 def _hides(prop, v):
     """Why (prop: v) hides what it styles, or None."""
+    prop = re.sub(r"^-(?:webkit|moz|ms|o)-", "", prop)
     lv = v.lower().strip()
     if prop == "display" and lv == "none":
         return "display:none"
@@ -511,47 +559,56 @@ def _hides(prop, v):
         return "content-visibility:hidden"
     if prop in ("opacity", "fill-opacity", "font-size", "scale", "zoom"):
         if _MATH.search(lv):
-            return "%s computed with a function this cannot evaluate" % prop
-        if any(re.fullmatch(r"%s(?:[a-z]+|%%)?" % _ZERO, part) for part in lv.split()):
-            return "%s of zero" % prop
+            return "%s computed with a function this does not evaluate" % prop
+        if any(_nonpositive(part) for part in lv.split()):
+            return "%s at zero or below" % prop
     if prop == "font":
-        size = re.search(r"(?:^|\s)(%s)(?:[a-z]+|%%)?(?:\s*/|\s|$)" % _ZERO, lv)
-        if size or _MATH.search(lv):
-            return "a font shorthand of zero size"
-    if prop == "transform" and (re.search(r"scale[xyz3d]*\(\s*(?:[^()]*[,\s])?%s\s*[,)]" % _ZERO, lv)
-                                or re.search(r"\bmatrix(?:3d)?\(", lv) or re.search(r"scale[xyz3d]*\([^)]*\b(?:calc|min|max|clamp)\(", lv)):
-        return "a transform that can scale to nothing"
-    if prop == "filter" and re.search(r"opacity\(\s*(?:%s%%?|[^)]*\b(?:calc|min|max|clamp)\()" % _ZERO, lv):
-        return "an opacity filter of zero"
-    if prop in ("color", "fill", "-webkit-text-fill-color") and (_zero_alpha(lv) or (prop == "fill" and lv == "none")):
+        size = re.search(r"(?:^|\s)(%s)(?:[a-z]+|%%)?(?=\s*/|\s|$)" % _NUM, lv)
+        if (size and float(size.group(1)) <= 0) or _MATH.search(lv):
+            return "a font shorthand whose size is zero or computed"
+    if prop == "transform":
+        for m in re.finditer(r"scale[xyz3d]*\(([^()]*(?:\([^()]*\)[^()]*)*)\)", lv):
+            if _MATH.search(m.group(1)) or any(_nonpositive(p) for p in re.split(r"[\s,]+", m.group(1)) if p):
+                return "a transform that scales to nothing"
+        if re.search(r"\bmatrix(?:3d)?\(", lv):
+            return "a transform with matrix()"
+    if prop == "filter":
+        for m in re.finditer(r"opacity\(([^()]*(?:\([^()]*\)[^()]*)*)\)", lv):
+            if _alpha_hides(m.group(1)):
+                return "an opacity filter at zero"
+    if prop in ("color", "fill", "text-fill-color") and (_zero_alpha(lv) or (prop == "fill" and lv == "none")):
         return "%s with no colour" % prop
-    if prop in ("clip", "clip-path", "mask", "mask-image", "-webkit-mask", "-webkit-mask-image") \
-            and lv not in ("none", "auto"):
+    if prop in ("clip", "clip-path", "mask", "mask-image") and lv not in ("none", "auto"):
         return prop
-    if prop == "text-indent" and not re.fullmatch(r"%s(?:[a-z]+|%%)?" % _ZERO, lv):
+    if prop == "text-indent" and not re.fullmatch(r"[+-]?0*\.?0+(?:[a-z]+|%)?", lv):
         return "text-indent"
     return None
 
 
 def hiding_problems(css):
+    """Every rule that hides what it styles, as the list above reads it."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
     rules = _decls(css)
     defs = {}
-    for _, pairs in rules:
+    for sel, pairs in rules:
+        prop_rule = re.fullmatch(r"@property\s+(--[\w-]+)", sel)
         for k, v in pairs:
             if k.startswith("--"):
                 defs.setdefault(k, []).append(v)
+            elif prop_rule and k == "initial-value":
+                defs.setdefault(prop_rule.group(1), []).append(v)
     out = []
     for sel, pairs in rules:
-        if sel in allowed or sel.startswith("@"):
+        if sel.startswith("@"):
             continue
+        ok = {re.sub(r"\s+", "", d.lower()) for d in allowed.get(sel, {}).get("allow", [])}
         for k, v in pairs:
-            if k.startswith("--"):
+            if k.startswith("--") or re.sub(r"\s+", "", "%s:%s" % (k, v)).lower() in ok:
                 continue
             why = next((w for w in (_hides(k, x) for x in _variants(v, defs)) if w), None)
             if why:
-                out.append("%r hides what it styles (%s: %s); a selector that may hide goes in %s, which the lead "
-                           "reviews" % (sel, k, v, HIDES_FILE.name))
+                out.append("%r hides what it styles (%s: %s); a selector that may hide goes in %s, with the "
+                           "declaration it may use, which the lead reviews" % (sel, k, v, HIDES_FILE.name))
                 break
     return out
 
@@ -1323,7 +1380,19 @@ def controls():
                                       ":root{--planted:transparent}.q{color:var(--planted)}", "'.q' hides"),
                                      ("a font size computed to zero", ".src{font-size:calc(0px)}", "'.src' hides"),
                                      ("the standalone scale property at zero", ".src{scale:0}", "'.src' hides"),
-                                     ("map text with fill none", ".map svg text{fill:none}", "hides")):
+                                     ("map text with fill none", ".map svg text{fill:none}", "hides"),
+                                     ("a custom property read past a fallback in parentheses",
+                                      ":root{--planted:transparent}.src{color:var(--planted, rgb(1 2 3))}", "'.src' hides"),
+                                     ("a registered property whose initial value is transparent",
+                                      '@property --planted{syntax:"<color>";inherits:false;initial-value:transparent}'
+                                      ".src{color:var(--planted)}", "'.src' hides"),
+                                     ("an alpha computed with calc()", ".src{color:rgb(0 0 0 / calc(0))}", "'.src' hides"),
+                                     ("a negative alpha, which a browser clamps to zero", ".src{color:rgb(0 0 0 / -1)}",
+                                      "'.src' hides"),
+                                     ("a negative opacity", ".src{opacity:-1}", "'.src' hides"),
+                                     ("a vendor-prefixed clip-path", ".src{-webkit-clip-path:inset(50%)}", "'.src' hides"),
+                                     ("an allowed selector hiding by a declaration it was not allowed",
+                                      ".map .edge{display:none}", "'.map .edge' hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))

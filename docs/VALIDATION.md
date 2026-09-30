@@ -761,3 +761,47 @@ block's end on its whole first line, and the parser now does the same.
 A control plants the empty comment.
 
 `--control` now catches 142 of 142.
+
+## 2026-09-29 - verifier-P0 on p0.2 at 1b87925: NOT READY, the README's CSS list claimed more than the check read; fixed both ways
+
+verifier-P0 re-checked `1b87925`. It watched the custom-property control
+fail on its own sabotage. The empty comments now agree with CommonMark.
+
+The README said a colour with zero alpha is refused "in any notation", and
+zero opacity "in any property that sets one". Six spellings inside those
+claims passed:
+
+- a `var()` fallback containing parentheses, which stopped the property
+  being read;
+- a property registered with `@property` and an initial value of
+  `transparent`;
+- an alpha written with `calc()`;
+- a negative alpha, and a negative opacity, both of which browsers clamp to
+  zero;
+- `-webkit-clip-path`.
+
+Two of them hid all 124 labels, and every stage passed. The verifier said
+why the rounds keep finding new spellings: the check reads CSS text, and the
+browser renders it. It suggested the README name the spellings the check
+reads, and let "anything else passes" cover the rest.
+
+**Fixed, both ways.**
+
+1. **The check.**
+   - It reads `var()` with nested parentheses.
+   - It takes an `@property`'s initial value as a definition.
+   - It refuses a computed alpha, and values below zero.
+   - It reads property names without a vendor prefix.
+
+   Seven new controls plant each spelling, plus the side note below.
+2. **The README.** It now lists exactly what the check refuses, as the
+   check's own comment does, and says anything else passes. "In any
+   notation" and "any property that sets one" are gone.
+
+**The side note.** An entry in `css_hides.json` exempted its selector from
+every hiding form, so `.map .edge{display:none}` passed. An entry now names
+the declarations it may use, and allows only those. The map's two entries
+allow `fill:none` alone. The page contract, `_common.md` and P2's brief
+say so.
+
+`--control` now catches 149 of 149.

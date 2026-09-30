@@ -24,11 +24,12 @@ allowed only through site/data/numeral_names.json, which is the lead's, and
 only if some fact's text holds it. A page module that defines NUMERAL_NAMES
 is refused.
 
-A stylesheet under site/styles/ may not hide what it styles (display:none,
-zero opacity or size, transparent text, clipping and the like), since that
-could hide a figure or its source while every page check passes. A layout
-that must hide one view for another names its selectors, and why, in
-site/data/css_hides.json, which is the lead's.
+A stylesheet under site/styles/ may not hide what it styles in any of the
+ways the README's "Styles" list gives (build.hiding_problems is the rule),
+since that could hide a figure or its source while every page check passes. A layout
+that must hide one view for another names each selector, the declaration it
+may use (display:none, say), and why, in site/data/css_hides.json, which is
+the lead's.
 
 The module also defines:
   controls() (optional) -> [(name, caught, how)]: the page's own negative

@@ -31,23 +31,34 @@ What that doesn't cover:
   is for the reader to judge.
 - **Images.** An image is checked only as the bytes its pin gives. What it
   shows is not read.
-- **Styles.** The gates read a page's HTML and its stylesheets' text, but
-  they don't lay the page out. Unless `site/data/css_hides.json` names the
-  selector, a stylesheet may not hide what it styles. The numbers stage
-  refuses these (`build.hiding_problems` has the rules):
-  - `display:none`, `visibility:hidden`, and `content-visibility:hidden`;
-  - a zero opacity, font size or scale, in any property that sets one,
-    including a zero-size `font` shorthand, `zoom` and an `opacity()`
-    filter. It also refuses any of these computed with `calc()`, `min()`,
-    `max()` or `clamp()`;
-  - a colour with zero alpha, in any notation, in `color`, `fill` or
-    `-webkit-text-fill-color`, also through a custom property. It also
-    refuses `fill:none`;
-  - `clip`, `clip-path`, `mask` and `text-indent`.
+- **Styles.** The gates read a page's HTML and its stylesheets' text. They
+  don't render the page. The numbers stage refuses exactly the declarations
+  listed below, unless `site/data/css_hides.json` names the selector and
+  that declaration. `build.hiding_problems` is the rule. Property names are
+  read without a vendor prefix.
+  - `display:none`, `visibility:hidden` or `collapse`, and
+    `content-visibility:hidden`.
+  - `opacity`, `fill-opacity`, `font-size`, `scale` or `zoom` at zero or
+    below, or computed with `calc()`, `min()`, `max()` or `clamp()`.
+  - A `font` shorthand whose size is zero or computed.
+  - A `transform` with `scale()` at zero, below zero or computed, or with
+    `matrix()`.
+  - An `opacity()` filter at zero or below.
+  - In `color`, `fill` and `text-fill-color`:
+    - the word `transparent`;
+    - a hex colour with zero alpha;
+    - a colour function whose alpha is zero, below zero, or computed.
+  - `fill:none`.
+  - `clip`, `clip-path`, `mask` and `mask-image`, other than `none` or
+    `auto`.
+  - `text-indent` other than zero.
 
-  Hiding by other means would still pass: a near-zero value, text coloured
-  like its background, or text placed off screen or stacked under something
-  else.
+  A custom property is read as every value the stylesheet gives it: in a
+  rule, as a `var()` fallback, or as an `@property`'s initial value.
+  Anything else passes, including:
+  - a near-zero value;
+  - text coloured like its background;
+  - text placed off screen, or stacked under something else.
 
 ## Does it still hold?
 
