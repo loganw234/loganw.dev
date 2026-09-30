@@ -90,7 +90,10 @@ by rebuilding, never by merging the text.
     and its own door (the Propose page's doors);
   - the Preservation page is the only place Wally appears (decision 16), and
     it credits every other contributor directly, with a link (decision 10).
-- **Open for Logan:** which thread StoryDocs belongs to.
+- **StoryDocs** goes in the Film & photography lane, where it began (decision
+  22: it came from atlas-darkroom's art books). Its edges come from its
+  `projects/` directories at its pin. Settled 2026-09-29, and P2's brief
+  carries it.
 
 ### P3: Work, five dossiers
 
