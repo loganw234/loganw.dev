@@ -11,7 +11,9 @@ deploys, once the gate passes.
 isn't.** A figure comes from one of two places:
 
 - a repository in [pins.json](pins.json), read at the commit pinned there;
-- the GitHub snapshot that pins.json names.
+- the GitHub snapshot that pins.json names;
+- for the site's own history, its own ledger,
+  [docs/VALIDATION.md](docs/VALIDATION.md), read from the commit being built.
 
 What no file can back is marked *stated*, with who said it and when.
 [public/facts.json](public/facts.json) lists every figure with where it was
@@ -28,6 +30,11 @@ What that doesn't cover:
   ("seven", "twenty"), not "one" or "first".
 - **Snapshot figures.** These are read again from the committed snapshot, not
   from GitHub today. Their label gives the snapshot's date.
+- **The site's own ledger.** This repository can't pin itself, so
+  docs/VALIDATION.md is read from the tree being built. MANIFEST hashes it,
+  so the gate fails if it changed after the build. A figure read there shows
+  that the page quotes the ledger. It doesn't show that a run went as the
+  ledger says.
 - **Paraphrases.** A paraphrase prints its source's own words beside it, and
   can't add a numeral those words don't have. Whether it keeps their meaning
   is for the reader to judge.
@@ -111,7 +118,8 @@ To check the published figures yourself, from a clone of this repository:
 LOGANW_FETCH=1 python site/build.py --verify-facts
 ```
 
-That reads every figure again: at its pin, or from the committed snapshot. It
+That reads every figure again: at its pin, from the committed snapshot, or
+from the site's own ledger in the clone. It
 fetches the public repositories it needs, and names each figure from a
 private repository, which it can't read.
 

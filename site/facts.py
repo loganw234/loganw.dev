@@ -898,3 +898,83 @@ def pin_count():
 @fact
 def snapshot_date():
     return V(snapdate(), Src("file", PINS["snapshot"], "when the snapshot was taken"), raw=snap()["taken"], num=True)
+
+
+# ---------------------------------------------------------------------------
+# The site's own record
+# ---------------------------------------------------------------------------
+# Two pages state facts about this site's own history: the corrections it has
+# made, and the rounds that built it. Their source is this repository's own
+# ledger, read from the tree being built. It is not read from a pin, since
+# this repository is not one of its own pins. The build's MANIFEST hashes the
+# file, so CI checks the published figures against the committed ledger, and
+# --verify-facts reads it again from the checkout. The ledger is append-only,
+# so a line number, once written, keeps pointing at the same entry, and a
+# link to it on main stays true.
+
+OWN = ("docs/VALIDATION.md",)
+OWN_REPO = "https://github.com/%s/loganw.dev" % OWNER
+
+
+def own_text(path):
+    if path not in OWN:
+        raise Refusal("%s is not part of this site's own record (%s)" % (path, ", ".join(OWN)))
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+def own_src(path, line, detail=""):
+    return Src("file", "this site's %s:%d" % (path, line), detail,
+               "%s/blob/main/%s#L%d" % (OWN_REPO, path, line))
+
+
+@fact
+def own_prose(path, pattern, display=None, last=False, num=False):
+    """prose(), for this site's own record: the file, the line, and the words,
+    under the same rules. The pattern must match once unless the last match
+    is asked for, and a paraphrase prints its source's words beside it."""
+    text = own_text(path)
+    ms = list(re.finditer(pattern, text, re.M))
+    if not ms:
+        raise Refusal("this site's %s: the pattern %r no longer matches" % (path, pattern))
+    if len(ms) > 1 and not last:
+        raise Refusal("this site's %s: the pattern %r matches %d times, at lines %s; make it match once, or ask "
+                      "for the last" % (path, pattern, len(ms), ", ".join(str(_line(text, m.start())) for m in ms)))
+    m = ms[-1]
+    line = _line(text, m.start(1))
+    quoted = md_plain(m.group(1))
+    if display is not None:
+        try:
+            check_display(display, quoted)
+        except Refusal as e:
+            raise Refusal("this site's %s:%d: %s" % (path, line, e))
+    return V(display if display is not None else quoted,
+             own_src(path, line, "the last of %d matches" % len(ms) if len(ms) > 1 else ""),
+             raw=quoted, num=num, said=quoted if display is not None else "")
+
+
+def own_entries(path):
+    """This site's own ledger's entries: [dict(date, title, line, start,
+    end)], every heading dated at its start (docs/VALIDATION.md writes them so),
+    read with the same heading reader as a pinned ledger. A heading that
+    is not dated at its start is refused by name."""
+    t = own_text(path)
+    heads = ledger_headings(t)
+    out = []
+    for i, (start, head, _) in enumerate(heads):
+        title, line = head[3:].strip(), _line(t, start)
+        m = re.match(r"(\d{4}-\d{2}-\d{2})\b", title)
+        if not m:
+            raise Refusal("this site's %s:%d: a heading not dated at its start: %r" % (path, line, title[:70]))
+        end = heads[i + 1][0] if i + 1 < len(heads) else len(t)
+        out.append(dict(date=m.group(1), title=title, line=line, start=start, end=end))
+    return t, out
+
+
+@fact
+def own_entry(path, line):
+    """One entry of this site's own ledger, by its heading's line: its title,
+    dated. raw is the date alone."""
+    for e in own_entries(path)[1]:
+        if e["line"] == line:
+            return V(e["title"], own_src(path, line, "the entry's own heading"), raw=e["date"])
+    raise Refusal("this site's %s has no entry heading at line %d" % (path, line))

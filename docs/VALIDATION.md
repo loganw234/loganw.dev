@@ -1129,3 +1129,38 @@ StoryDocs' pin, so each dossier missed StoryDocs.
 - The old reading, relations.json alone, is shown to miss 4 edges.
 
 `--control` caught 187 of 187.
+
+## 2026-09-29 - edff2b0 live; the site's own ledger becomes a source
+
+**Live.** The deploy of `edff2b0` passed (run 36670593449).
+
+- `BUILD` names `edff2b0`.
+- threads.html, thread-film.html, thread-preservation.html,
+  work-cft-fp256.html and facts.json answer 200 at loganw.dev.
+- The live facts.json holds no trace of Logan's own address.
+
+**Why a new source.** Two of wave 2's pages state facts about this site's
+own history: the failures its verifiers caught, and the rounds that built
+it. That history is recorded here, in this file. This repository can't be
+one of its own pins, so the file is read from the tree being built.
+
+**What holds it:**
+
+- `facts.own_prose()` and `facts.own_entry()` read this file under
+  `prose()`'s rules.
+  - A pattern must match once.
+  - A paraphrase prints its source's words beside it.
+  - Every heading must be dated at its start.
+- MANIFEST hashes this file, as it hashes pins.json and the snapshot. An
+  entry appended after the build fails the `manifest` stage until public/ is
+  rebuilt.
+- `--verify-facts` reads it again from the checkout, in CI too.
+- A figure taken from it links to its line on main. Entries are only
+  appended, so a line keeps its entry.
+
+**New controls** (7): the ledger changed after the build; a file outside
+the own record; a pattern that matches more than once, and one that matches
+nothing; a paraphrase adding a date; an entry asked for at a line with no
+heading; and a heading not dated at its start.
+
+`--control` caught 194 of 194.

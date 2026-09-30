@@ -21,7 +21,9 @@ refuses `--only` and `--skip`.
 ## The authority
 
 The source repositories are the authority, each read at the commit named in
-`pins.json`. The site never states a figure it didn't read there.
+`pins.json`. For the site's own history, the authority is its own
+`docs/VALIDATION.md`, read from the commit being built. The site never states
+a figure it didn't read there.
 
 - **Write figures through `@fact`.** A figure must come out of a function
   decorated with `@fact` (`site/facts.py`). `fig()` refuses a figure that
@@ -103,6 +105,12 @@ The source repositories are the authority, each read at the commit named in
     it names only how many it found, since CI's logs are public. Key a
     commit's author by GitHub login, or by a hash of the address, never by
     the address itself.
+
+15. **The site's own ledger is a source.** `facts.own_prose()` and
+    `facts.own_entry()` read `docs/VALIDATION.md`, and MANIFEST hashes it.
+    After appending an entry, rebuild before committing, or the `manifest`
+    stage fails. Every heading there is dated at its start. Entries are only
+    appended, because a page cites an entry by its heading's line.
 
 ## The discipline that matters most here
 

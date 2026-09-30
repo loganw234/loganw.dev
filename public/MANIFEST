@@ -1,12 +1,13 @@
-# sha256 of every file in public/ except BUILD, which the deploy replaces with the commit it was deployed from, and this file. The source lines hash what the build read besides the pinned repositories: pins.json, the snapshot, and every file under site/.
+# sha256 of every file in public/ except BUILD, which the deploy replaces with the commit it was deployed from, and this file. The source lines hash what the build read besides the pinned repositories: pins.json, the snapshot, the site's own ledger, and every file under site/.
 # pins: PrettyCloud@5161daa atlas-darkroom@c1b9b6e atlas-optical@dbccafe atlas-film@be1d674 atlas-engine@867c57a cft-fp256@77b8440 cft-rebound@039e3c3 ParcelRound@8767e23 HonestFramework@65447fd Quantum-Film@a7f02db binary-sites@dacdcb8 StoryDocs@673148c Mercenaries2@e51dcbe Merc2-Mods-Exp@0ec1db2 mercs2-lua-essentials@3430c0b Mercenaries-Fan-Build/mercs2-modkit@3a4d888 Mercenaries-Fan-Build/mercs2-qol-mods@6f1fc59 Mercenaries-Fan-Build/mercs2-wad-simulator@fdf3597 Mercenaries-Fan-Build/notes-on-the-released-game@b8c3958
 # source pins.json 8fe0df9f91211d73ff430814bc7783f2305c03c34a0a9e276f63e4e4acac131c
 # source sources/github-2026-09-29-1621.json af76b8cd18c376edd9d0edd9f0a794449659fde2fceb052a62c1cc8e78b953bb
-# source site/build.py 42ac21ac88c983f745c9b8e98afe2175290dc2b53a197f32a6aa24949c27758f
+# source docs/VALIDATION.md 076efaa4dc4d11684e0e8ebda6f9d9b6d8fc70e24b213547832ac745317489a2
+# source site/build.py 3dd8d8fb3db6fede1c2c6ffb0097a57732e94934e050a714170859a81305e5a7
 # source site/data/css_hides.json 60e3895fd454a30fa615148c3229bfd708fce4bda065f542afe1f3679a96c3d4
 # source site/data/numeral_names.json daf0c962b473bbe1254f990dab997998d6b1487e71325d80d63efddea8611cd4
 # source site/data/relations.json 939048ff2312105b5b6769c2b75e9af99734263d9739e3d94c3c3c30bd8d2560
-# source site/facts.py 932f3ae00462ecee2e11a009010af897ade68a7a709d14f930656cceab2679ee
+# source site/facts.py eb035e6aca52df46c2e6a3e037269eb28956f2dcdc108b97fdcf438899ecdb9c
 # source site/fonts/OFL-JetBrainsMono.txt b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d
 # source site/fonts/OFL-Newsreader.txt fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8
 # source site/fonts/SOURCES.txt 9e47153589fba7b85e9e9e27a71d699d982283384573f3e569945c6b90d7fad7

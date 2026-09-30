@@ -53,7 +53,7 @@ BUILD_NOTE = ("This is the committed copy of the site. The deploy replaces this 
               "deployed from, so a reader can ask which commit a live page came from.\n")
 MANIFEST_HEAD = ("# sha256 of every file in public/ except BUILD, which the deploy replaces with the commit it was "
                  "deployed from, and this file. The source lines hash what the build read besides the pinned "
-                 "repositories: pins.json, the snapshot, and every file under site/.")
+                 "repositories: pins.json, the snapshot, the site's own ledger, and every file under site/.")
 
 
 def sha256(b):
@@ -134,7 +134,7 @@ def sources():
     them that was not rebuilt into public/ fails there too."""
     site = sorted(f.relative_to(ROOT).as_posix() for f in SITE.rglob("*")
                   if f.is_file() and "__pycache__" not in f.parts)
-    return [(p, (ROOT / p).read_bytes()) for p in ["pins.json", facts.PINS["snapshot"]] + site]
+    return [(p, (ROOT / p).read_bytes()) for p in ["pins.json", facts.PINS["snapshot"]] + list(facts.OWN) + site]
 
 
 def render_all():
@@ -1487,7 +1487,10 @@ def controls():
                                  re.sub(r"(# source site/render\.py )[0-9a-f]{64}", r"\g<1>" + "0" * 64, saved_mf),
                                  "site/render.py is not the bytes"),
                                 ("site/mapgen.py added after the build",
-                                 re.sub(r"# source site/mapgen\.py [0-9a-f]{64}\n", "", saved_mf), "does not hash site/mapgen.py")):
+                                 re.sub(r"# source site/mapgen\.py [0-9a-f]{64}\n", "", saved_mf), "does not hash site/mapgen.py"),
+                                ("the site's own ledger changed after the build",
+                                 re.sub(r"(# source docs/VALIDATION\.md )[0-9a-f]{64}", r"\g<1>" + "0" * 64, saved_mf),
+                                 "docs/VALIDATION.md is not the bytes")):
             if new == saved_mf:
                 report("manifest", False, "could not plant %s" % what)
                 continue
@@ -1790,6 +1793,26 @@ def controls():
                                         "Whether atlas-film's pinned merges into its main"), "twelve")
     refused("paraphrase", "a pattern that matches more than once",
             lambda: facts.prose("cft-fp256", "README.md", r"(cft-fp256)"), "matches")
+    # The site's own record: only the files it declares, the same prose rules,
+    # and every heading dated at its start.
+    refused("own", "a file that is not part of the site's own record",
+            lambda: facts.own_text("README.md"), "not part of this site's own record")
+    refused("own", "a pattern that matches more than once in the site's own ledger",
+            lambda: facts.own_prose("docs/VALIDATION.md", r"^## (\d{4}-\d{2}-\d{2})"), "matches")
+    refused("own", "a pattern the site's own ledger does not have",
+            lambda: facts.own_prose("docs/VALIDATION.md", r"(planted words no ledger has)"), "no longer matches")
+    refused("own", "a paraphrase of the site's own ledger with a date its words do not have",
+            lambda: facts.own_prose("docs/VALIDATION.md", r"^## \d{4}-\d{2}-\d{2} - (the biography approved)$",
+                                    display="the biography, approved on 2026-09-30"), "2026-09-30")
+    refused("own", "an entry asked for at a line with no heading",
+            lambda: facts.own_entry("docs/VALIDATION.md", 2), "no entry heading at line 2")
+    saved_own = facts.own_text
+    facts.own_text = lambda path: "## 2026-01-01 - a\n\ntext\n\n## an undated heading\n"
+    try:
+        refused("own", "a heading in the site's own ledger not dated at its start",
+                lambda: facts.own_entries("docs/VALIDATION.md"), "not dated at its start")
+    finally:
+        facts.own_text = saved_own
     refused("stated", "a statement about a pin that has since moved",
             lambda: facts.stated("planted", "Logan", "2026-09-29", holds_at={"cft-fp256": "0000000"}), "restate")
     heads = facts.ledger_headings("## 2026-01-01 - a\n```\n## 2026-01-02 - fenced\n```\n## 2026-01-03 - b\n")
@@ -2022,7 +2045,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     g = ap.add_mutually_exclusive_group()
     for flag, what in (("--check", "fail if public/ differs from a fresh render"),
-                       ("--manifest", "public/ matches its MANIFEST, and so do pins.json and the snapshot"),
+                       ("--manifest", "public/ matches its MANIFEST, and so do pins.json, the snapshot and the site's own ledger"),
                        ("--verify-facts", "read every published figure again"),
                        ("--numbers", "every numeral on a page is a figure marked with its own fact"),
                        ("--links", "every relative link resolves to a published file, exactly"),
