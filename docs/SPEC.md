@@ -163,6 +163,13 @@ where they were longer.
     (5.5 is current)". Every parcel, and each parcel's own verifier, is
     dispatched on Sonnet. The verifier of the shared core, which is code,
     stays on the lead's model.
+25. **The Film & photography thread's door.** The spec gives doors for
+    Determinism and Preservation, and none for this thread. Parcel P2
+    proposed one, and Logan chose it on 2026-09-29 over reusing "the method"
+    door or leaving the page without one: "bring a process — a development
+    recipe, a claimed printing method, or a historical process's parameters —
+    and see it reproduced to the same bits, or shown where it doesn't." It is
+    printed as Logan's statement.
 
 ---
 
