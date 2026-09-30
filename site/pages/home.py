@@ -26,7 +26,7 @@ LEDGER_CAP = ("Each figure names where it was read: a repository at the commit i
 
 # Logan, 2026-09-29, correcting the lead's reading of that column: the counts
 # are honest, and they are not a measure of how much of a project an agent did.
-# His words are recorded in docs/SPEC.md (decision 23); this is their meaning.
+# Logan's words are recorded in docs/SPEC.md (decision 23); this is their meaning.
 AI_USE = "every project here was AI-driven, and the co-author line was not always added to its commits"
 
 # Drafted by the lead from the spec's own words (docs/SPEC.md, section 1: "carpenter

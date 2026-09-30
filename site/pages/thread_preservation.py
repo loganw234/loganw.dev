@@ -91,11 +91,11 @@ def all_accounts():
 
 def _logan_account(accounts):
     """Which account is Logan's own - found structurally, never by writing
-    his address in this repository: every non-noreply (plain-email)
-    account here is his, since he is the only Preservation contributor
-    without a GitHub noreply address (Austin Kregel's and Headless
-    Rebase's both are). Refuses rather than guess if that ever stops
-    holding."""
+    Logan's address in this repository: every non-noreply (plain-email)
+    account here is Logan's, since Logan is the only Preservation
+    contributor without a GitHub noreply address (Austin Kregel's and
+    Headless Rebase's both are). Refuses rather than guess if that ever
+    stops holding."""
     plain = [a for a in accounts if not a.startswith("id:")]
     if len(plain) != 1:
         raise Refusal("expected exactly one plain-email account among the Preservation contributors (Logan's "
