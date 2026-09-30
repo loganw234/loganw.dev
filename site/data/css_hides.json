@@ -1,4 +1,7 @@
 {
- "about": "Stylesheet selectors that may hide what they style (display:none and the like), each with why. The lead's file: the numbers stage refuses a hiding rule for any selector not named here, because a stylesheet could otherwise hide a figure or its source while every page check passes. A layout that swaps one view for another names both selectors here.",
- "selectors": {}
+ "about": "Stylesheet selectors that may hide what they style (display:none, fill:none and the like), each with why. The lead's file: the numbers stage refuses a hiding rule for any selector not named here, because a stylesheet could otherwise hide a figure or its source while every page check passes. A layout that swaps one view for another names both selectors here.",
+ "selectors": {
+  ".map .axis": "the map's axis: SVG paths drawn as strokes, with fill:none so they are not filled in; they hold no text",
+  ".map .edge": "the map's arrows: SVG paths drawn as strokes, with fill:none so their curves are not filled in; they hold no text"
+ }
 }

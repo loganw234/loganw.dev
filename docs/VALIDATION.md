@@ -704,3 +704,60 @@ including a `<pre>` spanning a blank line. The ledgers are unchanged at 152,
 37 and 19 entries.
 
 `--control` now catches 135 of 135.
+
+## 2026-09-29 - verifier-P0 on p0.2 at 1c1779b: NOT READY on transparent text spelled another way; fixed
+
+verifier-P0 re-checked `1c1779b`. It watched the hiding controls and the
+`<pre>` control fail on its own sabotage. One claim still went further than
+its check:
+
+- **Transparent text.** The README listed it as refused, but the check
+  matched only the word `transparent`. `.src{color:rgba(0,0,0,0)}` made all
+  124 labels transparent in the browser, and every stage passed. So did
+  `#0000`.
+- **Two more spellings.** `font-size:calc(0px)` and the standalone `scale:0`
+  also passed.
+
+**Fixed.** The hiding check now reads each declaration's value, not its
+words:
+
+- **Colour.** It reads a colour's alpha in every notation: `#rgba`,
+  `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`, `hsla()`, and the newer colour
+  functions. It checks `color`, `fill` and `-webkit-text-fill-color`, and
+  refuses `fill-opacity:0`.
+- **Custom properties.** It follows them: `var(--x)` is read as every value
+  `--x` is given anywhere in the stylesheet, fallbacks included.
+- **Zero values.** It refuses a zero, and anything computed with `calc()`,
+  `min()`, `max()` or `clamp()`, in each of these:
+  - opacity;
+  - font size;
+  - the `font` shorthand;
+  - `scale`;
+  - `zoom`;
+  - `transform`;
+  - an `opacity()` filter.
+- **Other properties.** It refuses `mask`, and `fill:none`.
+
+The site's own stylesheet uses `fill:none` on the map's axis and arrows,
+which are SVG paths drawn as strokes and hold no text. Those two selectors
+are now named in `site/data/css_hides.json`, with that reason.
+
+Six new controls plant the verifier's spellings and three more:
+
+- `rgba(0,0,0,0)`;
+- `#0000`;
+- a transparent custom property;
+- `calc(0px)`;
+- `scale:0`;
+- map text with `fill:none`.
+
+The README lists exactly what the check refuses. Near-zero values, text
+coloured like its background, and text off screen or stacked under
+something else remain the stated limit.
+
+**The side note.** An empty comment, `<!-->` or `<!--->`, is complete in
+CommonMark, but the parser had held it open. CommonMark tests an HTML
+block's end on its whole first line, and the parser now does the same.
+A control plants the empty comment.
+
+`--control` now catches 142 of 142.

@@ -629,8 +629,10 @@ def ledger_headings(t):
         elif m:
             fence, opened = m.group(1), i
         elif raw_block(s) is not None:
-            start, end = raw_block(s)
-            if not re.search(end, s[start:], re.I):
+            end = raw_block(s)[1]
+            # CommonMark tests the end condition on the whole first line, so
+            # <!--> and <!---> are complete comments (verifier-P0)
+            if not re.search(end, s, re.I):
                 html, opened = end, i
         elif re.match(r" {0,3}</?(?:%s)(?:[\s/>]|$)" % BLOCK_TAGS, s, re.I) \
                 or (not prev.strip() and re.match(r" {0,3}(?:%s)\s*$" % _OPEN_TAG, s)):

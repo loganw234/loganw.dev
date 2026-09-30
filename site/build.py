@@ -438,28 +438,121 @@ CSS_STRING = re.compile(r"\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'", re.S)
 
 # Declarations that hide an element or its text. A page's figures and their
 # sources are in its HTML, and a stylesheet could hide them there: verifier-P0
-# added `.src{display:none}` and 49 of 124 labels vanished, with every stage
-# passing. These are refused in any rule, unless site/data/css_hides.json -
-# the lead's - names the rule's selector and why it may hide. What this cannot
-# see is stated in the README: the gates do not lay the page out, so text
-# coloured like its background, or stacked under something else, would pass.
-HIDES = re.compile(
-    r"(?:^|[;{\s])(?:display\s*:\s*none|visibility\s*:\s*(?:hidden|collapse)|content-visibility\s*:\s*hidden"
-    r"|opacity\s*:\s*(?:0*\.?0+%?)\s*(?:!important)?\s*(?:;|$)|font-size\s*:\s*0*\.?0+[a-z%]*\s*(?:!important)?\s*(?:;|$)"
-    r"|(?:-webkit-text-fill-)?color\s*:\s*transparent|clip(?:-path)?\s*:|text-indent\s*:"
-    r"|transform\s*:[^;]*scale[XYZ3d]*\(\s*0*\.?0+\s*[,)]|filter\s*:[^;]*opacity\(\s*0)", re.I)
+# added `.src{display:none}` and 49 of 124 labels vanished, then
+# `.src{color:rgba(0,0,0,0)}` and all 124 did, with every stage passing. A
+# rule that hides is refused unless site/data/css_hides.json - the lead's -
+# names its selector and why. The values are read, not just the words:
+#   * display:none, visibility:hidden or collapse, content-visibility:hidden;
+#   * a zero opacity, font size or scale, in any property that sets one
+#     (opacity, font-size, the font shorthand, scale, transform, zoom, and an
+#     opacity() filter), and any of them computed with calc(), min(), max()
+#     or clamp(), which this cannot evaluate;
+#   * a colour with zero alpha - transparent, #rgba, #rrggbbaa, rgb(... / 0),
+#     rgba(..., 0), and the like - in color, fill or -webkit-text-fill-color,
+#     or fill-opacity of zero; fill:none; custom properties are followed, so
+#     var(--x) is read as every value --x is given anywhere;
+#   * clip, clip-path, mask and text-indent, other than none, auto or 0.
+# What this cannot see is stated in the README: the gates do not lay the
+# page out, so a near-zero value, text coloured like its background, text
+# placed off screen or stacked under something else would pass.
 HIDES_FILE = SITE / "data" / "css_hides.json"
+_ZERO = r"[+-]?0*\.?0+(?:e[+-]?\d+)?"
+_MATH = re.compile(r"\b(?:calc|min|max|clamp)\s*\(", re.I)
+
+
+def _decls(css):
+    """[(selector, [(property, value)])] for every rule, innermost first."""
+    out = []
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        pairs = []
+        for d in body.split(";"):
+            if ":" in d:
+                k, _, v = d.partition(":")
+                pairs.append((k.strip().lower(), re.sub(r"!\s*important", "", v, flags=re.I).strip()))
+        out.append((" ".join(sel.split()), pairs))
+    return out
+
+
+def _variants(v, defs, depth=0):
+    """Every value v can take once each var() is replaced by any definition
+    of its custom property, or by its fallback."""
+    m = re.search(r"var\(\s*(--[\w-]+)\s*(?:,\s*([^()]*))?\)", v)
+    if not m or depth > 6:
+        return [v]
+    subs = list(defs.get(m.group(1), [])) + ([m.group(2)] if m.group(2) else [])
+    out = []
+    for s in subs or [""]:
+        out += _variants(v[:m.start()] + s + v[m.end():], defs, depth + 1)
+    return out
+
+
+def _zero_alpha(v):
+    v = v.lower()
+    if "transparent" in v:
+        return True
+    for h in re.findall(r"#([0-9a-f]{4}|[0-9a-f]{8})\b", v):
+        if (len(h) == 4 and h[3] == "0") or (len(h) == 8 and h[6:] == "00"):
+            return True
+    for fn, args in re.findall(r"\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(([^()]*)\)", v):
+        alpha = args.split("/")[1] if "/" in args else (args.split(",")[3] if args.count(",") >= 3 else None)
+        if alpha is not None and re.fullmatch(r"\s*%s%%?\s*" % _ZERO, alpha):
+            return True
+    return False
+
+
+def _hides(prop, v):
+    """Why (prop: v) hides what it styles, or None."""
+    lv = v.lower().strip()
+    if prop == "display" and lv == "none":
+        return "display:none"
+    if prop == "visibility" and lv in ("hidden", "collapse"):
+        return "visibility:%s" % lv
+    if prop == "content-visibility" and lv == "hidden":
+        return "content-visibility:hidden"
+    if prop in ("opacity", "fill-opacity", "font-size", "scale", "zoom"):
+        if _MATH.search(lv):
+            return "%s computed with a function this cannot evaluate" % prop
+        if any(re.fullmatch(r"%s(?:[a-z]+|%%)?" % _ZERO, part) for part in lv.split()):
+            return "%s of zero" % prop
+    if prop == "font":
+        size = re.search(r"(?:^|\s)(%s)(?:[a-z]+|%%)?(?:\s*/|\s|$)" % _ZERO, lv)
+        if size or _MATH.search(lv):
+            return "a font shorthand of zero size"
+    if prop == "transform" and (re.search(r"scale[xyz3d]*\(\s*(?:[^()]*[,\s])?%s\s*[,)]" % _ZERO, lv)
+                                or re.search(r"\bmatrix(?:3d)?\(", lv) or re.search(r"scale[xyz3d]*\([^)]*\b(?:calc|min|max|clamp)\(", lv)):
+        return "a transform that can scale to nothing"
+    if prop == "filter" and re.search(r"opacity\(\s*(?:%s%%?|[^)]*\b(?:calc|min|max|clamp)\()" % _ZERO, lv):
+        return "an opacity filter of zero"
+    if prop in ("color", "fill", "-webkit-text-fill-color") and (_zero_alpha(lv) or (prop == "fill" and lv == "none")):
+        return "%s with no colour" % prop
+    if prop in ("clip", "clip-path", "mask", "mask-image", "-webkit-mask", "-webkit-mask-image") \
+            and lv not in ("none", "auto"):
+        return prop
+    if prop == "text-indent" and not re.fullmatch(r"%s(?:[a-z]+|%%)?" % _ZERO, lv):
+        return "text-indent"
+    return None
 
 
 def hiding_problems(css):
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
+    rules = _decls(css)
+    defs = {}
+    for _, pairs in rules:
+        for k, v in pairs:
+            if k.startswith("--"):
+                defs.setdefault(k, []).append(v)
     out = []
-    for sel, decls in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
-        sel = " ".join(sel.split())
-        m = HIDES.search(decls)
-        if m and sel not in allowed:
-            out.append("%r hides what it styles (%s); a selector that may hide goes in %s, which the lead reviews"
-                       % (sel, m.group(0).strip(" ;{"), HIDES_FILE.name))
+    for sel, pairs in rules:
+        if sel in allowed or sel.startswith("@"):
+            continue
+        for k, v in pairs:
+            if k.startswith("--"):
+                continue
+            why = next((w for w in (_hides(k, x) for x in _variants(v, defs)) if w), None)
+            if why:
+                out.append("%r hides what it styles (%s: %s); a selector that may hide goes in %s, which the lead "
+                           "reviews" % (sel, k, v, HIDES_FILE.name))
+                break
     return out
 
 
@@ -1223,7 +1316,14 @@ def controls():
                                      ("a counter style", "@counter-style x{system:cyclic;symbols:A}", "@counter-style"),
                                      ("a stylesheet hiding every source", ".src{display:none}", "'.src' hides"),
                                      ("a stylesheet hiding every figure", ".fig{visibility:hidden}", "'.fig' hides"),
-                                     ("a stylesheet shrinking the sources away", "main .src{font-size:0}", "hides")):
+                                     ("a stylesheet shrinking the sources away", "main .src{font-size:0}", "hides"),
+                                     ("sources in a colour with zero alpha", ".src{color:rgba(0,0,0,0)}", "'.src' hides"),
+                                     ("sources in a four-digit hex colour with zero alpha", ".src{color:#0000}", "'.src' hides"),
+                                     ("a transparent colour through a custom property",
+                                      ":root{--planted:transparent}.q{color:var(--planted)}", "'.q' hides"),
+                                     ("a font size computed to zero", ".src{font-size:calc(0px)}", "'.src' hides"),
+                                     ("the standalone scale property at zero", ".src{scale:0}", "'.src' hides"),
+                                     ("map text with fill none", ".map svg text{fill:none}", "hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
@@ -1404,6 +1504,8 @@ def controls():
     heads = facts.ledger_headings("## 2026-01-01 - a\n<pre>\nx\n\n## 2026-01-02 - hidden\n</pre>\n## 2026-01-03 - c\n")
     report("ledger", [h[1] for h in heads] == ["## 2026-01-01 - a", "## 2026-01-03 - c"],
            "a heading inside a <pre> that spans a blank line, which renders as text: %d read of the 2 outside it" % len(heads))
+    heads = facts.ledger_headings("## 2026-01-01 - a\n<!-->\n## 2026-01-02 - b\n")
+    report("ledger", len(heads) == 2, "an empty comment, which CommonMark closes on its own line: %d read of 2" % len(heads))
     # Every real ledger, against CommonMark's own count of its level-2
     # headings: an independent reading, where markdown-it-py is installed.
     try:
