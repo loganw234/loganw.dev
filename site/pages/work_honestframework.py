@@ -107,9 +107,8 @@ def _sections():
 
     kept_failures = S("Kept failures", [_dossier.list_([
         [prose(NAME, "METHOD.md",
-               r"### (The trap has a second floor, and I fell through it)"), ". Its own external-authority case, "
-         "atlas-optical's traced lens prescriptions, was scored against a figure a compiler derived from the same "
-         "table it was tracing rather than against the patent's own documented figure. ",
+               r"### (The trap has a second floor, and I fell through it)"), ". atlas-optical's own gate: “",
+         prose(NAME, "METHOD.md", r"(The gate and the test use the \*\*computed\*\* one)\."), ".” ",
          prose(NAME, "METHOD.md", r"\*\*(So the rule needs its sharper form:)\*\*"), " ",
          prose(NAME, "METHOD.md",
                r"\*(a committed source figure is an\s+external authority only if the source derived it from "
@@ -118,10 +117,13 @@ def _sections():
          _dossier.kept_failure(NAME, "65447fd", "§1's external-authority case: two parsers agreeing is not "
                                 "an authority"), " — this dossier's own pin."],
         [prose(NAME, "METHOD.md",
-               r"(This is the part I got wrong, and it is worth more than the part I got right)\."), ". Its "
-         "blinded-audit case study had claimed a key was withheld until grading, which no state of that "
-         "repository's history could establish, since the controls, the key and both audit reports landed in "
-         "one commit. ",
+               r"(This is the part I got wrong, and it is worth more than the part I got right)\."), ". “",
+         prose(NAME, "METHOD.md",
+               r"(its controls, its key and both audit reports all\s+landed in \*\*one commit\*\*)\.", num=True),
+         ".” “",
+         prose(NAME, "METHOD.md",
+               r"(There is no state of the repository in which the\s+controls exist without the key)"), " — so "
+         "the blinding was never verifiable from the record. ",
          prose(NAME, "METHOD.md",
                r"### (Make the blinding a property of the record, not of your working tree)"),
          " is the fix. Corrected by commit ",

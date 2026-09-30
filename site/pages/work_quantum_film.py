@@ -35,8 +35,9 @@ def _sections():
               r"exact counter-based uniforms \(SHA-256\))\.", num=True), " ",
         prose(NAME, "README.md",
               r"(It imports nothing it\s+could share with what it judges)"), "; ",
-        prose(NAME, "README.md", r"(a test holds that\s+mechanically)\."),
-        ".” The circuits, the float paths and Atlas's results are all scored against it."])])
+        prose(NAME, "README.md", r"(a test holds that\s+mechanically)\."), ".” ",
+        prose(NAME, "README.md",
+              r"(The\s+circuits, the float paths and Atlas's results are all scored against it)\."), "."])])
 
     verified = S("Verified", [
         _dossier.para(["Last verified: ", facts.last_verified(NAME), "."]),

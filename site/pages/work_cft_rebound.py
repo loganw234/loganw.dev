@@ -24,8 +24,14 @@ def _sections():
     what_it_is_not = S("What it is not", [
         _dossier.para(["The README carries no “what it is not” heading. Its nearest equivalent is “",
                        prose(NAME, "README.md", r"## (Scope: what it integrates, and what it refuses)"),
-                       "”, a refusal list rather than a limits statement: everything the port declines is "
-                       "refused by name, in code a gate walks, never silently ignored."]),
+                       "”, a refusal list rather than a limits statement. In the README's own words: “",
+                       prose(NAME, "README.md",
+                             r"(Everything below is refused, \*\*by name, with a message\*\* - never\s+silently "
+                             r"ignored, never approximated)\."), ". ",
+                       prose(NAME, "README.md",
+                             r"(The list is one table in code\s+\(`cft_support_rows`, src/cft_supported\.c\) that "
+                             r"both entry points walk,\s+and the gate walks it too and fails on any row no case "
+                             r"exercises)\."), "”"]),
         _dossier.list_([
             [prose(NAME, "README.md", r"\| the tree code \(`REB_GRAVITY_TREE`\) \| "
                                        r"(this is direct summation\. `REB_GRAVITY_COMPENSATED` is refused too: a "

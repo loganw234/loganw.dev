@@ -34,9 +34,11 @@ def _sections():
         _dossier.para(["Named levels, quoted from ", C("CONFORMANCE.md"), ": “",
                        prose(NAME, "CONFORMANCE.md", r"\*\*(Level A - IEEE 754-2019 in radix 2)\.", num=True),
                        "” is the standard itself; “",
-                       prose(NAME, "CONFORMANCE.md", r"\*\*(Level B - the cft-fp256 profile)\."),
-                       "” is that plus every choice the standard leaves open, fixed to one answer. The "
-                       "relationship runs one way, in the document's own words: “",
+                       prose(NAME, "CONFORMANCE.md", r"\*\*(Level B - the cft-fp256 profile)\."), "” is “",
+                       prose(NAME, "CONFORMANCE.md",
+                             r"(Level A, plus every choice the\s+standard leaves to the implementation fixed to "
+                             r"one answer, plus\s+operations the standard does not define)\."),
+                       ".” The relationship runs one way, in the document's own words: “",
                        prose(NAME, "CONFORMANCE.md",
                              r"(An implementation conforming to the cft-fp256 profile conforms to)\s*$"), " ",
                        prose(NAME, "CONFORMANCE.md",
@@ -79,7 +81,7 @@ def _sections():
     test_it = S("Test it", [_dossier.list_([
         [L(prose(NAME, "README.md", r"\*\*<(https://loganw234\.github\.io/cft-fp256/)>\*\*").raw,
            prose(NAME, "README.md", r"It (replays\s+the published conformance vectors in front of you)")),
-         " — a browser tab, nothing installed."],
+         " — ", prose(NAME, "README.md", r"## (Try it without installing anything)"), "."],
         [C("make golden"), ": ", prose(NAME, "README.md", r"^(The golden model's self-tests)"), " (needs only "
          "Python and, optionally, mpmath)."],
         ["the card: ", prose(NAME, "CONFORMANCE.md",

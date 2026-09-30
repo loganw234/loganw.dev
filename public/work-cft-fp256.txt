@@ -11,55 +11,55 @@ Raw fp32 and fp64 throughput [fact 299]. Every CPU and GPU on the market serves 
 
 III. The contract
 
-Named levels, quoted from CONFORMANCE.md: “Level A - IEEE 754-2019 in radix 2 [fact 302]” is the standard itself; “Level B - the cft-fp256 profile [fact 303]” is that plus every choice the standard leaves open, fixed to one answer. The relationship runs one way, in the document's own words: “An implementation conforming to the cft-fp256 profile conforms to [fact 304] IEEE 754-2019 in radix 2 for the operations the profile covers [fact 305].”
+Named levels, quoted from CONFORMANCE.md: “Level A - IEEE 754-2019 in radix 2 [fact 302]” is the standard itself; “Level B - the cft-fp256 profile [fact 303]” is “Level A, plus every choice the standard leaves to the implementation fixed to one answer, plus operations the standard does not define [fact 304].” The relationship runs one way, in the document's own words: “An implementation conforming to the cft-fp256 profile conforms to [fact 305] IEEE 754-2019 in radix 2 for the operations the profile covers [fact 306].”
 
-The README states the promise directly: “That guarantee is the product [fact 306].” The hardware only makes it faster [fact 307].
+The README states the promise directly: “That guarantee is the product [fact 307].” The hardware only makes it faster [fact 308].
 
 IV. Verified
 
-Last verified: 2026-09-29 [fact 308].
+Last verified: 2026-09-29 [fact 309].
 
-- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 309]
-- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 310]
+- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 310]
+- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 311]
 
 V. Kept failures
 
-- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 311]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 312], commit f192bf0 [fact 313].
-- a device predating a new capability flag ignored an unchecked reserved bit and read far past a one-element buffer [fact 314] — measured as a host-side segfault in the entry 2026-09-12 - a stride-0 operand, the MODE guard it needed, and a contract I misread [fact 315]. Fixed by commit 8b7dea1 [fact 316].
+- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 312]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 313], commit f192bf0 [fact 314].
+- a device predating a new capability flag ignored an unchecked reserved bit and read far past a one-element buffer [fact 315] — measured as a host-side segfault in the entry 2026-09-12 - a stride-0 operand, the MODE guard it needed, and a contract I misread [fact 316]. Fixed by commit 8b7dea1 [fact 317].
 
 VI. Test it
 
-- replays the published conformance vectors in front of you [fact 318] — a browser tab, nothing installed.
-- make golden: The golden model's self-tests [fact 319] (needs only Python and, optionally, mpmath).
-- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 320], which needs the FPGA and its toolchain.
+- replays the published conformance vectors in front of you [fact 319] — Try it without installing anything [fact 320].
+- make golden: The golden model's self-tests [fact 321] (needs only Python and, optionally, mpmath).
+- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 322], which needs the FPGA and its toolchain.
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page — not yet built, so this dossier does not link it.
 
-- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 321].” Anything less than a perfect score is a disproof.
-- make golden locally, against the same vector sets published in the repository's vectors/SHA256SUMS [fact 322].
-- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 323] records; a differing hex value is a disproof.
+- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 323].” Anything less than a perfect score is a disproof.
+- make golden locally, against the same vector sets published in the repository's vectors/SHA256SUMS [fact 324].
+- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 325] records; a differing hex value is a disproof.
 - Rebuild host/tools/mpfr_check.c and widen its sweep past the campaign's own cases: the independent oracle is only as good as the cases put to it.
 
 VIII. Connections
 
-- atlas-engine grew into cft-fp256: The workload this tile exists to serve is [atlas-engine] [fact 324]
-- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 325]
-- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 326]
-- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 327]
-- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 328]
-- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 329]
+- atlas-engine grew into cft-fp256: The workload this tile exists to serve is [atlas-engine] [fact 326]
+- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 327]
+- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 328]
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 329]
+- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 330]
+- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 331]
 
 IX. Provenance
 
-cft-fp256 read at 77b8440 [fact 330].
+cft-fp256 read at 77b8440 [fact 332].
 
-- README.md [fact 331]
-- CONFORMANCE.md [fact 332]
-- CLAUDE.md [fact 333]
-- docs/VALIDATION.md [fact 334]
+- README.md [fact 333]
+- CONFORMANCE.md [fact 334]
+- CLAUDE.md [fact 335]
+- docs/VALIDATION.md [fact 336]
 
-HonestFramework read at 65447fd [fact 335].
+HonestFramework read at 65447fd [fact 337].
 
-- CASE-STUDY.md [fact 336]
+- CASE-STUDY.md [fact 338]
