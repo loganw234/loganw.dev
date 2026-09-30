@@ -2,7 +2,7 @@
 # pins: PrettyCloud@5161daa atlas-darkroom@c1b9b6e atlas-optical@dbccafe atlas-film@be1d674 atlas-engine@867c57a cft-fp256@77b8440 cft-rebound@039e3c3 ParcelRound@8767e23 HonestFramework@65447fd Quantum-Film@a7f02db binary-sites@dacdcb8 StoryDocs@673148c Mercenaries2@e51dcbe Merc2-Mods-Exp@0ec1db2 mercs2-lua-essentials@3430c0b Mercenaries-Fan-Build/mercs2-modkit@3a4d888 Mercenaries-Fan-Build/mercs2-qol-mods@6f1fc59 Mercenaries-Fan-Build/mercs2-wad-simulator@fdf3597 Mercenaries-Fan-Build/notes-on-the-released-game@b8c3958
 # source pins.json 8fe0df9f91211d73ff430814bc7783f2305c03c34a0a9e276f63e4e4acac131c
 # source sources/github-2026-09-29-1621.json af76b8cd18c376edd9d0edd9f0a794449659fde2fceb052a62c1cc8e78b953bb
-# source docs/VALIDATION.md 5d5bd41fe4a924e52eabdb732273e5505af0d1e0bfbc464aef0f8fa1e095468a
+# source docs/VALIDATION.md b2069a52781d58211c9f476f581fe7428e3f3459a3b2b240a1a5924bff6c2c7a
 # source site/build.py e60caf95b96ccb81f2ad7d3f6de9336523f24420ed7045dfc2d525b9d09b6144
 # source site/data/css_hides.json 93d1f30c2971164099852ab6d1ab27ee055eb5d8b256b73a64d7f8e370d3b805
 # source site/data/numeral_names.json daf0c962b473bbe1254f990dab997998d6b1487e71325d80d63efddea8611cd4
@@ -22,10 +22,10 @@
 # source site/pages/__init__.py 86aae95e1b7ab9e367ed31e3242ed322e22851d8cb8bda968f4620fa4561b23b
 # source site/pages/_dossier.py 806429496e38162d915a4c2dd480b33638ac0ecf30db74e5219bca9052c4cf55
 # source site/pages/_p5.py d63d08f13fa88d49aae8c0876ff80a171729d2f4ec3ee72128428b0e4d1fa7d8
-# source site/pages/about.py 398cd305b5d4076e38dfe24cbd3029c39b3d4d8f0122e33a1a8a79aa15c3db0c
+# source site/pages/about.py f250b515615681867d1375afbd3f9ab875beddac0d240fe02b22606a3eb9ceef
 # source site/pages/corrections.py b79753cb2a888d2d8731fe6aaffd8004a42391697fff1af66439d083eefa6a40
 # source site/pages/home.py ed8b97bd4f0ea0ff8f048ac0684ceffdf19f8e3479375c931eb66e8770e24dd4
-# source site/pages/method.py f10331d05c380f82f44c4385f9e3d1149a0a99bb45ff443638349bf0beea5c4a
+# source site/pages/method.py 6d9b415b746a9b50b8093b499a8e0e7f743bbcc8dfd58bf1c30e2c13ddb0fabf
 # source site/pages/propose.py 7cb8df90e29aa2d37f8336c2630cabc1778914f4f79b7c9c285799672a8d0534
 # source site/pages/record.py 51f4dccad054c7895909841460177fb49cbc7959f21a25f572ea739598547af1
 # source site/pages/thread_determinism.py 9fe439c61ab145ec9a5df049724e53f331ec97ab6e18423dbbddefe5130f6d7c
@@ -46,7 +46,7 @@
 # source site/styles/corrections.css e174ef77fba95873647f5a93655dbd352c09afb17733e7c28ac870d92c0699c0
 # source site/styles/map.css 55b00bd6fee61d784a8691075e01b13c280235212752360c0dbcd5c49e49c1f1
 # source site/styles/threads.css 81351a89d0bd3dbbce8b5729b009869c6cb499c20bd52b0bf7124f597ee6e23a
-aa2d731bb6f91eb0e2d7f3212e553b9a0c53fa3ecd3c1a025e4296971ee4aeae  about.html
+d9b5c823474af64be3e331750f4a987c7d43be5122b61c9cbb1d07a8c3752770  about.html
 21faa7465c8fb5708bf442ba7f0948d71d66b64a948b84fd534ba47917b4966b  assets/pauli-print.png
 6d4ea89ca63f4e8c436eba06ce3e4ff01a934ca9d38bed484d6ae93bc7d356a2  assets/poisson-print.png
 97018dcf31bb20c2b2f8f88ed6188927b456646bb4bb7eab084541659d5cebc7  assets/trix-print.png

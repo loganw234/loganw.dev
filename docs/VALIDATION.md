@@ -1681,3 +1681,26 @@ form.
   after the third such overstatement.
 
 `--control` caught 314 of 314.
+
+## 2026-09-30 - every page live at 8260fa8; About had printed a pronoun for Logan that Logan never stated
+
+**Live.** verifier-seam said READY on `8260fa8`. Its punctuation faults were
+refused after a full rebuild, and the copies that still passed fell inside
+stated limits. main was pushed.
+
+- Deploy run 36701445776 passed.
+- `BUILD` names `8260fa8`, and all nine pages and facts.json answer 200.
+- The navigation links all nine pages.
+- About carries its 2 draft labels, and no "Wally".
+- The live facts.json holds no trace of the author address's domain.
+
+**A correction, found by the lead on the live page.** About's lede read
+"Logan, in his own register." Logan's pronouns have never been stated, and
+every brief said to write "Logan". Neither P5 nor verifier-P5 caught it,
+and no gate reads pronouns.
+
+- The lede now reads "In Logan's own register."
+- Two comments, in `about.py` and `method.py`, are corrected the same way.
+- Measured on the rebuilt site: no he, his, him, she or her in any
+  published page's text.
+- CLAUDE.md trap 18 records it, and the verifier template now names it.

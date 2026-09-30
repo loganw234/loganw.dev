@@ -22,8 +22,8 @@ def S(text, **kw):
 
 
 def D(text):
-    """Words drafted here from Logan's own spec, not yet his approved words
-    (decision 14's pattern): the label says so until he approves them."""
+    """Words drafted here from Logan's own spec, not yet approved by Logan
+    (decision 14's pattern): the label says so until Logan approves them."""
     return S(text, draft=True)
 
 
@@ -85,7 +85,7 @@ def game_work_block(ctx):
 
 def render_page(ctx):
     return (
-        '<div class="measure"><p class="lede">Logan, in his own register.</p></div>'
+        '<div class="measure"><p class="lede">In Logan&#x27;s own register.</p></div>'
         + register_block()
         + coauthors_block(ctx)
         + contact_block()

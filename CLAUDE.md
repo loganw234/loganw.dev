@@ -168,6 +168,12 @@ a figure it didn't read there.
     author address in files, and P2 was squash-merged so that main never
     held it. The privacy stage reads what pushing HEAD publishes.
 
+18. **Logan's pronouns haven't been stated: write "Logan", never "he" or
+    "she",** on a page, in a comment and in the ledger. Every brief said so.
+    Still, P5's About went live saying "Logan, in his own register", and no
+    verifier caught it (corrected 2026-09-30). No gate reads pronouns: a
+    verifier checks for them.
+
 ## The discipline that matters most here
 
 A number that isn't read from its source doesn't appear on the site. If you

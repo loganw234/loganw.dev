@@ -26,7 +26,7 @@ def S(text, **kw):
 
 # ---------------------------------------------------------------------------
 # I. The ratio (decision 8): Logan's own figure, not a measurement, beside
-# the one measurement on record and his word that it runs high.
+# the one measurement on record and Logan's word that it runs high.
 # ---------------------------------------------------------------------------
 
 def ratio_block():
