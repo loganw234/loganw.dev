@@ -12,8 +12,9 @@ A page module defines:
       render.fig(), and so carries its fact's id: the numbers stage refuses a
       numeral anywhere else on the page.
   ASSETS (optional): [(published path, repository, path at its pin)], copied
-      byte for byte from the pin. An asset is an image: a lower-case .png,
-      .jpg or .webp under assets/, that is what its name says by its bytes.
+      byte for byte from the pin. An asset is an image: a lower-case .png
+      under assets/, that is a PNG by its bytes. (PNG only: local-only reads
+      a PNG's text chunks, and no other image format's metadata.)
   extra_files(ctx) (optional) -> {flat .txt name: text}: a dossier's
       plain-text twin, for instance. Its figures go through render.plain(),
       which writes each as `text [fact N]`, and the numbers stage holds a

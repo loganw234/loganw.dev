@@ -38,16 +38,30 @@ What that doesn't cover:
 - **Paraphrases.** A paraphrase prints its source's own words beside it, and
   can't add a numeral those words don't have. Whether it keeps their meaning
   is for the reader to judge.
-- **Images.** An image is checked only as the bytes its pin gives. What it
-  shows is not read.
+- **Images.** An image is a PNG, checked as the bytes its pin gives, and
+  for what its text chunks say. Any chunk that could hold text no check
+  reads, such as `eXIf` or `iCCP`, is refused (`build.PNG_CHUNKS`). What
+  the image shows is not read.
+- **Pages.** Every page is held to a subset of HTML in which this check's
+  parser and a browser build the same page (`build.PARENTS`): strict
+  nesting, each element only where HTML allows it, text only where a
+  browser draws it, and no comment. No browser is run, so the subset is
+  what's held, not a rendering.
 - **Names and addresses.** No published file may hold an email address
   except `logan@loganw.dev`, and the name Wally appears only on the
   Preservation thread's page. The local-only stage reads each file as a
-  browser or a parser decodes it: character references, percent-encoding,
-  inline markup inside a word, characters drawn as nothing, a JSON file's
-  strings, and a PNG's text chunks. It doesn't render, so these pass:
+  reader gets it:
+  - character references decoded;
+  - a page's text with inline tags joining it, and each attribute on its
+    own;
+  - percent-encoding decoded;
+  - Unicode's compatibility forms, such as a fullwidth letter;
+  - a JSON file's strings, and a PNG's text chunks.
+
+  A character a browser draws as nothing is refused outright. The stage
+  doesn't render, so these pass:
   - text put together by layout alone;
-  - a name spelled with look-alike letters from another script;
+  - a name or an address in look-alike letters from another script;
   - an address spelled out for a person to reassemble.
 
   A font's compressed tables aren't read. `fonts/SOURCES.txt` holds each
@@ -93,8 +107,8 @@ What that doesn't cover:
   - a comment marker inside a string;
   - a malformed `url()`;
   - a backslash escape;
-  - a string holding a letter or a digit that `build.CSS_STRINGS` doesn't
-    list, since `content`, list markers and quotes print strings.
+  - a string that `build.CSS_STRINGS` doesn't list, since `content`, list
+    markers and quotes print strings.
 
   A control reads the published stylesheet a second time with tinycss2, a
   parser that follows the CSS specifications. It fails the gate if the two

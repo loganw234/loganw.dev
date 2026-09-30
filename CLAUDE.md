@@ -101,24 +101,33 @@ a figure it didn't read there.
     may state one, as a fact about its date.
 
 14. **No published file holds an email address,** except the site's contact,
-    `logan@loganw.dev`. The local-only stage refuses any other address, and
-    it names only how many it found, since CI's logs are public. Key a
+    `logan@loganw.dev`. The local-only stage refuses any other address. Key a
     commit's author by GitHub login, or by a hash of the address, never by
-    the address itself.
-    - It reads each file as a browser or a parser would decode it
-      (`build.readings`): character references, percent-encoding, inline
-      markup inside a word (`build.INLINE`), characters drawn as nothing
-      (soft hyphens, zero-width spaces), a JSON file's strings, and a PNG's
-      text chunks. Addresses in any script count.
-    - The build writes no HTML comment, processing instruction or CDATA
-      section, and local-only refuses each. A stylesheet may hold a string
-      with a letter or a digit in it only if `build.CSS_STRINGS` lists it,
-      since `content` and list markers print strings.
-    - What it can't see is text put together by layout alone, such as two
-      elements positioned side by side, or an address spelled out for a
-      person to reassemble ("name at example dot com"). A font's compressed
-      tables aren't read; `fonts/SOURCES.txt` holds each font to its hash.
-      These are stated limits.
+    the address itself. Everything build.py prints has every address but
+    the contact masked (`build._Masked`), since CI's logs are public and a
+    check may quote what it refused.
+    - A page is held to a subset of HTML in which Python's parser and a
+      browser build the same page (`build.PARENTS`): strict nesting, each
+      element only where HTML allows it, text only where a browser draws it,
+      and no `<div/>`. No comment, processing instruction or CDATA section.
+    - Each file is read as a reader gets it (`build.readings`):
+      - character references decoded;
+      - a page's text with inline tags joining it (`build.INLINE`), and each
+        attribute on its own;
+      - percent-encoding decoded;
+      - Unicode's compatibility forms, such as a fullwidth letter or at sign;
+      - a JSON file's strings, and a PNG's text chunks.
+
+      An address in any script counts. A character a browser draws as
+      nothing is refused outright.
+    - A stylesheet may hold only the strings `build.CSS_STRINGS` lists, since
+      `content` and list markers print strings.
+    - These are stated limits; the check can't see:
+      - text put together by layout alone;
+      - a word or an address in look-alike letters of another script;
+      - an address spelled out for a person to reassemble;
+      - a font's compressed tables. `fonts/SOURCES.txt` holds each font to
+        its hash instead.
 
 15. **The site's own ledger is a source.** `facts.own_prose()` and
     `facts.own_entry()` read `docs/VALIDATION.md`, and MANIFEST hashes it.

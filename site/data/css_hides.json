@@ -1,13 +1,13 @@
 {
- "about": "Stylesheet rules that may hide what they style, each by its selector, the declarations it may use (and no others), the elements its class may be on, and why. The lead's file: the numbers stage refuses a hiding declaration unless its selector is named here with that declaration, because a stylesheet could otherwise hide a figure or its source while every page check passes. It also refuses the selector's class on any element \"on\" does not name, since that element would be hidden with it; \"div>svg\" is a div holding one svg and nothing else. A layout that swaps one view for another names both selectors here. The check cannot tell which media query a rule sits in; the why says where each may apply, and a parcel's verifier checks it in a browser at both widths.",
+ "about": "Stylesheet rules that may hide what they style, each by its selector, the declarations it may use (and no others), the elements its class may be on, and why. The lead's file: the numbers stage refuses a hiding declaration unless its selector is named here with that declaration, because a stylesheet could otherwise hide a figure or its source while every page check passes. It also refuses the selector's class on any element \"on\" does not name, since that element would be hidden with it; \"div>svg\" is a div holding one svg and nothing else. Two selectors that swap by width name each other as \"pair\": on every page they come in pairs, and each pair draws the same figures. A layout that swaps one view for another names both selectors here. The check cannot tell which media query a rule sits in; the why says where each may apply, and a parcel's verifier checks it in a browser at both widths.",
  "selectors": {
   ".map .axis": {"allow": ["fill:none"], "on": ["path"],
                  "why": "the map's axis: SVG paths drawn as strokes, with fill:none so they are not filled in; they hold no text"},
   ".map .edge": {"allow": ["fill:none"], "on": ["path", "line"],
                  "why": "the map's arrows: SVG paths drawn as strokes, with fill:none so their curves are not filled in, and the legend's sample lines; they hold no text"},
-  ".map-wide": {"allow": ["display:none"], "on": ["div>svg"],
+  ".map-wide": {"allow": ["display:none"], "on": ["div>svg"], "pair": ".map-narrow",
                 "why": "P2, 2026-09-29: the wide map, hidden only below the 600px breakpoint, where .map-narrow is shown in its place. Both are drawn from site/data/relations.json with every node and edge, so a reader at either width sees every figure; P2's control compares the two"},
-  ".map-narrow": {"allow": ["display:none"], "on": ["div>svg"],
+  ".map-narrow": {"allow": ["display:none"], "on": ["div>svg"], "pair": ".map-wide",
                   "why": "P2, 2026-09-29: the narrow (phone) map, hidden at 600px and above, where .map-wide is shown in its place. Both are drawn from site/data/relations.json with every node and edge, so a reader at either width sees every figure; P2's control compares the two"}
  }
 }

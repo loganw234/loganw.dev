@@ -1389,3 +1389,92 @@ refuses a text source that holds a carriage return.
    now says so.
 
 `--control` caught 245 of 245.
+
+## 2026-09-30 - verifier-seam: NOT READY on 56a5b82; pages held to a subset of HTML that a browser reads the same way
+
+verifier-seam re-checked `0176ce4..56a5b82`. Every earlier finding held on
+its own faults. It then built new shapes that passed all 11 stages outside
+the stated limits:
+
+- a name or an address joined across a tag a browser drops or never draws:
+  a stray end tag, a `<td>` outside a table, a `<title>` or `<meta>` in the
+  body, and a second doctype;
+- a `>` inside an attribute, which the tag-stripping pattern misread;
+- the unassigned code points U+2065, U+FFF0 and U+E0000, which a browser
+  draws as nothing;
+- an at sign printed by CSS;
+- a second edge appended to a Connections item;
+- an annotated tag's hash, given to `own_commit`;
+- a figure drawn only in a page's own wide map;
+- every source label on Verify, wrapped in `<title>`: 0 px wide, while the
+  numbers stage still counted each as beside its figure.
+
+**One cause.** The gates read a page as Python's parser does, and a browser
+repairs a broken page another way. Answering each shape wouldn't converge.
+So pages are now held to a subset of HTML in which the two build the same
+page, as the stylesheet check refuses the shapes where two readings part.
+
+- **The subset** (`build.PARENTS`):
+  - strict nesting;
+  - each element only where HTML allows it (a `<title>` or `<meta>` only in
+    the head, a cell only in a row);
+  - text only where a browser draws it;
+  - no self-closed HTML element, and one doctype, first;
+  - no comment, processing instruction or CDATA section.
+
+  The site's own 13 pages fit it unchanged.
+- **Text is read by the parser** (`build._Text`), not a pattern. Inline
+  tags join a word, and every other tag breaks it. Each attribute's value
+  is read on its own. Then come Unicode's compatibility forms, so a
+  fullwidth letter or at sign reads as itself.
+- **A character a browser draws as nothing is refused.** That is Unicode's
+  whole Default_Ignorable_Code_Point set and every format character,
+  right-to-left overrides included, in any published text file,
+  facts.json's strings included.
+- **A stylesheet may hold only the strings `build.CSS_STRINGS` lists.**
+- **A Connections item must be exactly** its edge, its evidence's figure,
+  and that figure's source.
+- **`own_commit` refuses a hash that names a tag.**
+- **The two maps that swap by width come in pairs,** and each pair draws
+  the same figures.
+- **An image is a PNG,** whose text chunks are read. JPEG and WebP, whose
+  metadata no check read, are no longer allowed. A PNG chunk that could
+  hold text no check reads (`eXIf`, where verifier-seam put an address,
+  `iCCP`, or a private chunk) is refused, and so are bytes after `IEND`.
+  The site's prints hold only `IHDR`, `IDAT` and `IEND`.
+- **Links to a range of lines** in a Markdown file need `?plain=1` too.
+- **Masking.** Everything build.py prints has each address but the contact
+  masked. A check that quotes what it refused can't print one, and CI's
+  logs are public.
+- **Controls.** The email controls "split by a comment" and "split by an
+  SVG tspan" were caught by the raw text, which still held a whole
+  address. They now split inside the domain. verifier-seam broke the
+  comment removal and the tspan joining in a copy, and the old controls
+  still reported the fault caught.
+- **Speed.** Characters are matched with one pattern built from code
+  points, not a loop, and each file's readings are kept by its bytes.
+  Local-only takes about a second, as before.
+
+**Corrections to the entry above:**
+
+- It says an IDN domain, a non-ASCII top-level domain and an address
+  literal "each passed every stage". verifier-seam measured those three
+  at unit level only.
+- CLAUDE.md trap 14 said local-only "names only how many it found". The
+  rules that quote a stylesheet string or a comment printed what they held.
+  The output of every stage is now masked instead, and trap 14 says so.
+
+**A fault in the lead's own controls, found while writing these.** On the
+desktop, 24 of the controls' `write_text` calls wrote CRLF: Python on
+Windows turns each line feed into a carriage return and a line feed unless
+told not to.
+
+- A plant restored that way left carriage returns behind, in MANIFEST
+  among other files.
+- The five new controls that plant a character drawn as nothing, on a
+  page, were then satisfied by MANIFEST's U+000D, not by their own plant.
+- Every write now passes `newline="\n"`. Each of those controls names the
+  file and the code point it planted, and no control output holds U+000D.
+- CI runs on Linux, where the fault could not arise.
+
+`--control` caught 275 of 275.

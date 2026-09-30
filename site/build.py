@@ -26,6 +26,7 @@ Pages are found by glob in site/pages/, so adding one edits no list here.
 """
 import argparse
 import contextlib
+import functools
 import hashlib
 import html.parser
 import io
@@ -754,7 +755,8 @@ def crosscheck_css(css, reader=None):
 
 class _Holders(html.parser.HTMLParser):
     """Every element carrying one of the given classes: its tag, the tags of
-    its direct children, and whether text sits directly in it."""
+    its direct children, whether text sits directly in it, and the fact ids
+    (data-f) of every mark it holds, at any depth."""
     VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 
     def __init__(self, classes):
@@ -764,8 +766,13 @@ class _Holders(html.parser.HTMLParser):
     def _open(self, tag, attrs, closes):
         if self.stack and self.stack[-1] is not None:
             self.stack[-1]["children"].append(tag)
+        f = dict(attrs).get("data-f")
+        if f:
+            for r in self.stack:
+                if r is not None:
+                    r["marks"].add(f)
         hit = set((dict(attrs).get("class") or "").split()) & self.classes
-        rec = dict(tag=tag, classes=hit, children=[], text=False) if hit else None
+        rec = dict(tag=tag, classes=hit, children=[], text=False, marks=set()) if hit else None
         if rec:
             self.found.append(rec)
         if not closes and tag not in self.VOID:
@@ -812,6 +819,24 @@ def holder_problems(page):
                 continue
             out.append("a <%s> carries the class %r, which %s lets a stylesheet hide only on %s"
                        % (rec["tag"], cls, HIDES_FILE.name, ", ".join(sorted(forms))))
+    # Two views that swap by width come in pairs, and each pair draws the
+    # same figures, so a figure hidden at one width is shown at the other.
+    # The shape alone let a page draw a figure only in its own wide map
+    # (verifier-seam).
+    for sel, entry in sorted(allowed.items()):
+        mine, other = sel.strip().lstrip("."), (entry.get("pair") or "").strip().lstrip(".")
+        if not other or mine > other:
+            continue
+        ones = [r for r in p.found if mine in r["classes"]]
+        twos = [r for r in p.found if other in r["classes"]]
+        if len(ones) != len(twos):
+            out.append("%d .%s and %d .%s: each is shown in the other's place, so they come in pairs"
+                       % (len(ones), mine, len(twos), other))
+            continue
+        for a, b in zip(ones, twos):
+            if a["marks"] != b["marks"]:
+                out.append("a .%s and its .%s draw different figures (facts %s in one only)"
+                           % (mine, other, ", ".join(sorted(a["marks"] ^ b["marks"], key=int)[:6])))
     return out
 
 
@@ -975,12 +1000,95 @@ ALLOWED = {
 SCHEME = re.compile(r"^\s*([a-z][a-z0-9+.-]*):", re.I)
 
 
+# Where each allowed element may stand, and where text may: the subset of
+# HTML in which Python's parser and a browser build the same page. A browser
+# repairs what this subset refuses: it drops a stray end tag and a <td>
+# outside a table, moves text out of a table row and a <meta> out of the
+# body, never draws a <title> in the body, and leaves a <div/> open. This
+# check's parser does none of that, so a page outside the subset could show
+# a reader what no check read (verifier-seam joined a name across a stray
+# </li>, and put every source label on Verify inside a <title>).
+_FLOW = {"body", "main", "header", "footer", "nav", "section", "article", "div", "figure", "details", "blockquote",
+         "li", "dd", "td", "th"}
+_PHRASING = _FLOW | {"p", "h1", "h2", "h3", "h4", "dt", "figcaption", "summary", "caption", "pre", "span", "a",
+                     "code", "em", "strong", "b", "i", "small", "sub", "sup", "abbr"}
+_SHAPE_PARENTS = {"svg", "g", "marker"}
+PARENTS = {"html": {None}, "head": {"html"}, "body": {"html"}, "meta": {"head"}, "link": {"head"},
+           "title": {"head", "svg", "g", "path", "circle", "rect", "line", "text"}, "main": {"body"},
+           "summary": {"details"}, "figcaption": {"figure"}, "caption": {"table"}, "thead": {"table"},
+           "tbody": {"table"}, "tr": {"thead", "tbody"}, "td": {"tr"}, "th": {"tr"}, "li": {"ul", "ol"},
+           "dt": {"dl"}, "dd": {"dl"}, "defs": {"svg"}, "marker": {"defs"}, "g": {"svg", "g"},
+           "text": {"svg", "g"}, "tspan": {"text", "tspan"}, "path": _SHAPE_PARENTS, "line": _SHAPE_PARENTS,
+           "rect": _SHAPE_PARENTS, "circle": _SHAPE_PARENTS}
+PARENTS.update({t: _FLOW for t in ("header", "footer", "nav", "section", "article", "div", "figure", "details",
+                                    "blockquote", "p", "pre", "hr", "table", "ul", "ol", "dl", "h1", "h2", "h3", "h4")})
+PARENTS.update({t: _PHRASING for t in ("span", "a", "code", "em", "strong", "b", "i", "small", "sub", "sup",
+                                        "abbr", "br", "wbr", "img", "svg")})
+NO_TEXT = {None, "html", "head", "table", "thead", "tbody", "tr", "svg", "g", "defs", "marker", "path", "line",
+           "rect", "circle"}   # text here is moved by a browser, or never drawn
+VOID = {"br", "hr", "img", "meta", "link", "wbr"}
+SELF_CLOSING = VOID | {"path", "line", "rect", "circle"}   # SVG honours <x/>; HTML only for a void element
+if set(PARENTS) != set(ALLOWED):
+    raise Refusal("build.PARENTS and build.ALLOWED name different elements: %s"
+                  % sorted(set(PARENTS) ^ set(ALLOWED)))
+
+
 class _Tags(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.problems, self.head = [], []
+        self.stack, self.started, self.closing = [], False, False
+
+    def _enter(self, tag):
+        """The page's structure, held to PARENTS: where the element stands,
+        whether it was self-closed where a browser would leave it open, and
+        what stays open."""
+        parent = self.stack[-1] if self.stack else None
+        if tag in PARENTS and parent not in PARENTS[tag]:
+            self.problems.append("<%s> inside <%s>, where a browser builds another page than this check reads"
+                                 % (tag, parent or "nothing"))
+        if tag == "a" and "a" in self.stack:
+            self.problems.append("<a> inside <a>, which a browser closes first")
+        if self.closing and tag not in SELF_CLOSING:
+            self.problems.append("<%s/> self-closed, which a browser leaves open" % tag)
+        if not self.closing and tag not in VOID:
+            self.stack.append(tag)
+        self.started = True
+
+    def handle_startendtag(self, tag, attrs):
+        self.closing = True
+        try:
+            self.handle_starttag(tag, attrs)
+        finally:
+            self.closing = False
+
+    def handle_endtag(self, tag):
+        if self.stack and self.stack[-1] == tag:
+            self.stack.pop()
+        else:
+            self.problems.append("</%s> closes no <%s> open where it stands, and a browser would repair the page "
+                                 "another way" % (tag, tag))
+
+    def handle_data(self, data):
+        if data.strip():
+            where = self.stack[-1] if self.stack else None
+            if where in NO_TEXT:
+                self.problems.append("text directly inside <%s>, which a browser moves or doesn't draw"
+                                     % (where or "no element"))
+            self.started = True
+
+    def handle_decl(self, decl):
+        if self.started or decl.lower() != "doctype html":
+            self.problems.append("a declaration other than the one <!doctype html> a page starts with")
+        self.started = True
+
+    def close(self):
+        super().close()
+        if self.stack:
+            self.problems.append("<%s> left open at the end of the page" % "><".join(self.stack))
 
     def handle_starttag(self, tag, attrs):
+        self._enter(tag)
         a = dict(attrs)
         if dupes(attrs):
             # A browser keeps the first of two same-named attributes, and dict()
@@ -1021,29 +1129,28 @@ class _Tags(html.parser.HTMLParser):
         if tag == "svg" and a.get("xmlns", "http://www.w3.org/2000/svg") != "http://www.w3.org/2000/svg":
             self.problems.append("<svg xmlns=%r>" % a["xmlns"])
 
-    handle_startendtag = handle_starttag
-
     # The build writes no comment, no processing instruction and no CDATA
     # section. Each is refused: a browser shows none of them, so one inside a
     # word joins it back up for a reader while a check on text sees two
     # words (verifier-seam split an address with a comment), and in SVG a
-    # CDATA section is text.
+    # CDATA section is text. What they held is not printed.
     def handle_comment(self, data):
-        self.problems.append("an HTML comment, which the build never writes: %r" % data[:40])
+        self.problems.append("an HTML comment, which the build never writes")
 
     def handle_pi(self, data):
-        self.problems.append("a processing instruction, which the build never writes: %r" % data[:40])
+        self.problems.append("a processing instruction, which the build never writes")
 
     def unknown_decl(self, data):
-        self.problems.append("a declaration or CDATA section, which the build never writes: %r" % data[:40])
+        self.problems.append("a declaration or CDATA section, which the build never writes")
 
 
-# The strings a stylesheet may hold that have a letter or a digit in them: the
-# font names, the charset, a font's format, and the two theme names. Any other
-# is refused. A string can be rendered as text, by content, a list marker or
+# Every string a stylesheet may hold: the font names, the charset, a font's
+# format, the two theme names, and the navigation's middle dot. Any other is
+# refused. A string can be rendered as text, by content, a list marker or
 # quotes, so it could spell a word or a figure that no check on a page reads.
-# verifier-seam printed a name after the site's own, from two content strings.
-CSS_STRINGS = {"JetBrains Mono", "Newsreader", "Times New Roman", "dark", "light", "utf-8", "woff2"}
+# verifier-seam printed a name after the site's own from two content strings,
+# and then an address from an "@" in a string with no letter in it.
+CSS_STRINGS = {"JetBrains Mono", "Newsreader", "Times New Roman", "dark", "light", "utf-8", "woff2", chr(0xB7)}
 
 
 def css_problems(css):
@@ -1067,9 +1174,9 @@ def css_problems(css):
             out.append("a malformed url(): %r" % text[:60])
         elif kind == "string" and ("/*" in text or "*/" in text):
             out.append("a comment marker inside a string: %r" % text[:40])
-        elif kind == "string" and re.search(r"[^\W_]", text[1:-1]) and text[1:-1] not in CSS_STRINGS:
-            out.append("a string holding a letter or a digit, which a stylesheet can render as text (content, a list "
-                       "marker, quotes): %r. Only build.CSS_STRINGS may, and a url() is written unquoted" % text[:40])
+        elif kind == "string" and text[1:-1] not in CSS_STRINGS:
+            out.append("a string build.CSS_STRINGS doesn't list, which a stylesheet can render as text (content, a "
+                       "list marker, quotes); a url() is written unquoted")
     if "\\" in css:
         out.append("a backslash escape, which could spell a load")
     code, _, urls = css_parts(css)
@@ -1105,6 +1212,7 @@ def check_local_only(root=PUBLIC):
             problems += ["%s: %s" % (rel, x) for x in css_problems(f.read_text(encoding="utf-8"))]
         problems += ["%s: %s" % (rel, x) for x in type_problems(rel, f.read_bytes())]
         problems += ["%s: %s" % (rel, x) for x in email_problems(rel, f.read_bytes())]
+        problems += ["%s: %s" % (rel, x) for x in invisible_problems(rel, f.read_bytes())]
         problems += ["%s: %s" % (rel, x) for x in only_in_problems(rel, f.read_bytes())]
     if not any(r.endswith(".html") for r in published(root)):
         problems.append("no page is published")
@@ -1128,7 +1236,30 @@ def type_problems(rel, data):
         return ["a %s file, which is not a type this site publishes" % (ext or "extensionless")]
     if not data.startswith(MAGIC[ext]) or (ext == ".webp" and data[8:12] != b"WEBP"):
         return ["not a %s by its bytes" % ext]
+    if ext == ".png":
+        return png_chunk_problems(data)
     return []
+
+
+# The PNG chunks that carry no text, and the three that do, which texts_of
+# reads. Any other chunk is refused, since no check reads it: verifier-seam
+# put an address in an eXIf chunk. An ICC profile (iCCP) holds text too, and
+# so does a chunk type of anyone's own. The site's prints hold only IHDR,
+# IDAT and IEND.
+PNG_CHUNKS = {"IHDR", "PLTE", "IDAT", "IEND", "tRNS", "gAMA", "cHRM", "sRGB", "sBIT", "pHYs", "bKGD", "hIST",
+              "tIME", "tEXt", "zTXt", "iTXt"}
+
+
+def png_chunk_problems(data):
+    pos, kinds = 8, []
+    while pos + 8 <= len(data):
+        n = int.from_bytes(data[pos:pos + 4], "big")
+        kinds.append(data[pos + 4:pos + 8].decode("latin-1"))
+        pos += 12 + n
+    out = ["a PNG chunk no check reads: %s" % k for k in sorted(set(kinds) - PNG_CHUNKS)]
+    if pos != len(data) or not kinds or kinds[-1] != "IEND":
+        out.append("a PNG that does not end with its IEND chunk, so bytes after it go unread")
+    return out
 
 
 # No published file holds an email address except the site's own contact
@@ -1155,20 +1286,85 @@ BREAKING = {"html", "head", "body", "title", "meta", "link", "main", "header", "
 if set(ALLOWED) != INLINE | BREAKING or INLINE & BREAKING:
     raise Refusal("build.ALLOWED and build.INLINE/BREAKING disagree: %s; place every allowed tag in exactly one"
                   % sorted(set(ALLOWED) ^ (INLINE | BREAKING) | (INLINE & BREAKING)))
-# Code points a browser draws as nothing, besides the format characters
-# (Unicode category Cf: a soft hyphen, zero-width spaces and joiners, a
-# byte-order mark): the combining grapheme joiner, the Hangul fillers, the
-# Khmer inherent vowels, and the variation selectors. Unicode's
-# Default_Ignorable_Code_Point, as far as this site needs it.
-IGNORABLE = frozenset([0x34F, 0x115F, 0x1160, 0x17B4, 0x17B5, 0x3164, 0xFFA0] + list(range(0x180B, 0x1810))
-                      + list(range(0xFE00, 0xFE10)) + list(range(0xE0100, 0xE01F0)))
+# The code points a browser draws as nothing: Unicode's
+# Default_Ignorable_Code_Point, whole (DerivedCoreProperties.txt), unassigned
+# ones in its ranges included - verifier-seam used U+2065, U+FFF0 and
+# U+E0000, which the first, shorter list missed. With them, every format
+# character (category Cf), which takes in the right-to-left overrides that
+# draw a word backwards. The build writes none of them, and local-only
+# refuses each in a published file (invisible_problems).
+IGNORABLE_RANGES = ((0x00AD, 0x00AD), (0x034F, 0x034F), (0x061C, 0x061C), (0x115F, 0x1160), (0x17B4, 0x17B5),
+                    (0x180B, 0x180F), (0x200B, 0x200F), (0x202A, 0x202E), (0x2060, 0x206F), (0x3164, 0x3164),
+                    (0xFE00, 0xFE0F), (0xFEFF, 0xFEFF), (0xFFA0, 0xFFA0), (0xFFF0, 0xFFF8), (0x1BCA0, 0x1BCA3),
+                    (0x1D173, 0x1D17A), (0xE0000, 0xE0FFF))
+
+
+def _char_class(cps):
+    """A regex character class for a set of code points, built from the
+    numbers themselves, so no escape passes through a tool (CLAUDE.md trap 8)."""
+    runs, out = sorted(cps), []
+    for cp in runs:
+        if out and cp == out[-1][1] + 1:
+            out[-1][1] = cp
+        else:
+            out.append([cp, cp])
+    return re.compile("[%s]" % "".join(re.escape(chr(a)) if a == b else "%s-%s" % (re.escape(chr(a)), re.escape(chr(b)))
+                                       for a, b in out))
+
+
+# Every format character (Cf) is in planes 0, 1 and 14, so those are scanned.
+IGNORABLE_RE = _char_class({cp for a, b in IGNORABLE_RANGES for cp in range(a, b + 1)}
+                           | {cp for lo, hi in ((0, 0x10000), (0x10000, 0x20000), (0xE0000, 0xE1000))
+                              for cp in range(lo, hi) if unicodedata.category(chr(cp)) == "Cf"})
+CONTROL_RE = _char_class(set(range(0, 9)) | set(range(11, 32)) | set(range(0x7F, 0xA0)))   # not \n or \t
 
 
 def visible(s):
     """s without the characters a browser draws as nothing."""
-    if s.isascii():
-        return s
-    return "".join(c for c in s if ord(c) not in IGNORABLE and unicodedata.category(c) != "Cf")
+    return s if s.isascii() else IGNORABLE_RE.sub("", s)
+
+
+def invisible_problems(rel, data):
+    """A published text file holding a character a browser draws as nothing,
+    or a control character other than a line feed or a tab. The build
+    writes neither. A JSON file is read as its strings, since an escape
+    could hide one."""
+    if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
+        return []
+    t = data.decode("utf-8", "replace")
+    texts = [t]
+    if rel.endswith(".json"):
+        try:
+            texts = list(_json_strings(json.loads(t)))
+        except ValueError:
+            pass
+    found = sorted({"U+%04X" % ord(c) for s in texts for c in IGNORABLE_RE.findall(s) + CONTROL_RE.findall(s)})
+    return ["a character a browser draws as nothing, or a control character: %s" % ", ".join(found[:8])] if found else []
+
+
+class _Text(html.parser.HTMLParser):
+    """A page's text as a reader gets it, for the checks on names and
+    addresses: an inline tag joins the text either side of it, any other tag
+    breaks it, and each attribute's value is read on its own. It reads the
+    subset local-only holds a page to (PARENTS), in which this parser and a
+    browser build the same page."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts, self.attrs = [], []
+
+    def handle_starttag(self, tag, attrs):
+        if tag not in INLINE:
+            self.parts.append(" ")
+        self.attrs += [v for _, v in attrs if v]
+
+    handle_startendtag = handle_starttag
+
+    def handle_endtag(self, tag):
+        if tag not in INLINE:
+            self.parts.append(" ")
+
+    def handle_data(self, data):
+        self.parts.append(data)
 
 
 def _json_strings(o):
@@ -1186,17 +1382,19 @@ def _json_strings(o):
 def readings(rel, data):
     """Each way a reader could decode a published text file (verifier-seam
     published an address past a check that read raw bytes only):
-    - as it is;
-    - with its character references decoded;
-    - decoded, with comments and inline tags removed and every other tag
-      read as a space;
+    - as it is, and with its character references decoded;
+    - for a page, its text as a browser lays it out (_Text), and each
+      attribute's value on its own;
     - each of those percent-decoded, as a link's target is;
-    and each of those without the characters a browser draws as nothing. A
-    JSON file is read as its strings, each decoded the same way. A
-    stylesheet needs no more: local-only refuses a backslash escape in one,
-    and any string with a letter in it that build.CSS_STRINGS doesn't list.
-    What this can't see is text put together by layout alone: two elements
-    positioned side by side, say. The gates don't render (README)."""
+    and each of those without the characters a browser draws as nothing, and
+    in Unicode's compatibility form (NFKC), so that a fullwidth letter or
+    at sign reads as the one it stands for. A JSON file is read as its
+    strings, each decoded the same way. A stylesheet needs no more:
+    local-only refuses a backslash escape in one, and any string
+    build.CSS_STRINGS doesn't list. What this can't see is text put
+    together by layout alone, such as two elements positioned side by side,
+    and a word in look-alike letters of another script. The gates don't
+    render (README)."""
     t = data.decode("utf-8", "replace")
     texts = [t]
     if rel.endswith(".json"):
@@ -1204,29 +1402,35 @@ def readings(rel, data):
             texts = list(_json_strings(json.loads(t)))
         except ValueError:
             pass
-    inline = re.compile(r"</?(?:%s)\b[^>]*>" % "|".join(sorted(INLINE, key=len, reverse=True)), re.I)
+    elif rel.endswith(".html"):
+        p = _Text()
+        p.feed(t)
+        p.close()
+        # One attribute's value per line: neither an address nor a name is
+        # matched across a line break, so each is still read on its own.
+        texts += ["".join(p.parts), chr(10).join(p.attrs)]
     out = []
     for s in texts:
-        flat = re.sub(r"<[^>]*>", " ", inline.sub("", re.sub(r"<!--.*?(?:-->|$)", "", s, flags=re.S)))
-        for v in (s, html.unescape(s), html.unescape(flat)):
+        for v in (s, html.unescape(s)):
             for w in (v, urllib.parse.unquote(v)):
-                out.append(visible(w))
+                out.append(unicodedata.normalize("NFKC", visible(w)))
     return out
 
 
+@functools.lru_cache(maxsize=128)
 def texts_of(rel, data):
     """What a published file says, for the checks on what may be published:
     a text file in each of its readings(); a PNG, its text chunks, inflated.
     A font is not read: its tables are compressed, and fonts/SOURCES.txt
-    holds each font to its published hash instead. The site publishes no
-    other kind of file (ASSET_NAME allows JPEG and WebP images, whose
-    metadata is not read; none is published)."""
+    holds each font to its published hash instead. An image is a PNG
+    (ASSET_NAME), so no other format's metadata goes unread. Kept by the
+    file's bytes: the controls read the same unchanged files many times."""
     ext = posixpath.splitext(rel)[1].lower()
     if ext in TEXT_TYPES or rel in ("BUILD", "MANIFEST"):
-        return readings(rel, data)
+        return tuple(readings(rel, data))
     if ext == ".png":
-        return readings(".txt", png_text(data))
-    return []
+        return tuple(readings(".txt", png_text(data)))
+    return ()
 
 
 def email_problems(rel, data):
@@ -1251,14 +1455,14 @@ def only_in_problems(rel, data):
             for name, files in names if any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
 
 
-ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.(?:png|jpg|jpeg|webp)")
+ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.png")   # PNG only: its text chunks are read (texts_of)
 
 
 def check_asset(dest, data):
     """An asset a page copies from a pin: an image, under assets/, that is
     what its name says by its bytes."""
     if not ASSET_NAME.fullmatch(dest):
-        raise Refusal("an asset is published as %r; an asset is a lower-case .png, .jpg or .webp under assets/" % dest)
+        raise Refusal("an asset is published as %r; an asset is a lower-case .png under assets/" % dest)
     bad = type_problems(dest, data)
     if bad:
         raise Refusal("the asset %s is %s" % (dest, bad[0]))
@@ -1306,7 +1510,7 @@ def check_links(root=PUBLIC):
     for rel, u in refs:
         # GitHub opens a Markdown file's rendered view at its top and ignores
         # #L; ?plain=1 shows the line (facts.line_anchor; verifier-seam).
-        if re.match(r"https://github\.com/[^?#]+\.(?:md|markdown)#L\d+$", u, re.I):
+        if re.match(r"https://github\.com/[^?#]+\.(?:md|markdown)#L\d+(?:-L\d+)?$", u, re.I):
             problems.append("%s links to %s: GitHub opens a Markdown file at its top whatever the #L; put "
                             "?plain=1 before it" % (rel, u))
         if SCHEME.match(u) or u.startswith("//"):
@@ -1342,6 +1546,8 @@ def check_connections(root=PUBLIC):
     labels = sorted({label for _, label in kinds}, key=len, reverse=True)
     item = re.compile(r"<li><code>([^<]*)</code> (%s) <code>([^<]*)</code>: (?:(?!<li>).)*</li>"
                       % "|".join(re.escape(x) for x in labels), re.S)
+    fj = root / "facts.json"
+    recs = {r["id"]: r for r in json.loads(fj.read_text(encoding="utf-8"))["facts"]} if fj.is_file() else {}
     problems, drawn = [], set()
     for title in _EDGE_TITLE.findall(home.read_text(encoding="utf-8")):
         title = html.unescape(title)
@@ -1373,6 +1579,25 @@ def check_connections(root=PUBLIC):
         odd = [x for x in items if not item.fullmatch(x)]
         problems += ["%s's Connections has an item that is not an edge as the dossiers write one: %r"
                      % (rel, re.sub(r"<[^>]*>", "", x)[:80]) for x in odd]
+        # The whole item, not only its start: the edge, its evidence's figure
+        # and that figure's source, and nothing else (verifier-seam appended
+        # a second edge after a real item's evidence).
+        for x in items:
+            if x in odd:
+                continue
+            m = item.fullmatch(x)
+            ids = set(re.findall(r'data-f="(\d+)"', x))
+            rec = recs.get(int(ids.pop())) if len(ids) == 1 else None
+            p = _Text()
+            p.feed(x)
+            p.close()
+            got = " ".join("".join(p.parts).split())
+            want_text = None if rec is None else " ".join(("%s %s %s: %s %s" % (
+                html.unescape(m.group(1)), m.group(2), html.unescape(m.group(3)), rec["text"], facts.label(rec))).split())
+            if got != want_text:
+                odd.append(x)
+                problems.append("%s's Connections has an item that says more or less than its edge and its evidence: "
+                                "%r" % (rel, got[:80]))
         listed = {tuple(html.unescape(g) for g in item.fullmatch(x).groups()) for x in items if x not in odd}
         want = {e for e in drawn if node in (e[0], e[2])}
         problems += ["%s doesn't list the map's edge %r" % (rel, " ".join(e)) for e in sorted(want - listed)]
@@ -1756,10 +1981,10 @@ def controls():
             if new == saved_src:
                 report("manifest", False, "could not plant %s" % what)
                 continue
-            src_txt.write_text(new, encoding="utf-8")
+            src_txt.write_text(new, encoding="utf-8", newline="\n")
             found = [f for f in check_font_sources(root) if want in f]
             report("manifest", bool(found), "%s in fonts/SOURCES.txt: %s" % (what, found[0] if found else "passed"))
-        src_txt.write_text(saved_src, encoding="utf-8")
+        src_txt.write_text(saved_src, encoding="utf-8", newline="\n")
         mf = root / "MANIFEST"
         saved_mf = mf.read_text(encoding="utf-8")
         for what, new, want in (("site/render.py changed after the build",
@@ -1773,10 +1998,10 @@ def controls():
             if new == saved_mf:
                 report("manifest", False, "could not plant %s" % what)
                 continue
-            mf.write_text(new, encoding="utf-8")
+            mf.write_text(new, encoding="utf-8", newline="\n")
             found = [f for f in check_manifest(root) if want in f]
             report("manifest", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
-        mf.write_text(saved_mf, encoding="utf-8")
+        mf.write_text(saved_mf, encoding="utf-8", newline="\n")
         planted("manifest", "a byte of index.html changed", t.replace("Ledger", "Ledgeг", 1), check_manifest, "index.html")
 
         # numbers: a typed figure, a figure copied with its text changed, a
@@ -1872,10 +2097,10 @@ def controls():
                                       '.a{content:"/*"} .src{display:none} .b{content:"*/"}', "'.src' hides"),
                                      ("a hiding declaration after a form feed, which ends a string in a browser",
                                       ".src{content:'a\f;display:none;x:'\n}", "'.src' hides")):
-                css.write_text(saved_css + rule + "\n", encoding="utf-8")
+                css.write_text(saved_css + rule + "\n", encoding="utf-8", newline="\n")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
-            css.write_text(saved_css, encoding="utf-8")
+            css.write_text(saved_css, encoding="utf-8", newline="\n")
             # the scanner itself: it must read every block of the real
             # stylesheet, or a rule it lost its place in is a rule unread
             n_read = len(_decls(saved_css))
@@ -1932,10 +2157,10 @@ def controls():
                 "an email address")
         fjp = root / "facts.json"
         saved_fj = fjp.read_text(encoding="utf-8")
-        fjp.write_text(saved_fj.replace('"about": "', '"about": "planted@example.org ', 1), encoding="utf-8")
+        fjp.write_text(saved_fj.replace('"about": "', '"about": "planted@example.org ', 1), encoding="utf-8", newline="\n")
         found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
         report("local-only", bool(found), "an email address in facts.json: %s" % (found[0] if found else "passed"))
-        fjp.write_text(saved_fj, encoding="utf-8")
+        fjp.write_text(saved_fj, encoding="utf-8", newline="\n")
         # Wally on a page other than the game thread's (decision 16), in each
         # shape a page could print it.
         for what, shape in (("in a sentence", "<p>Wally made this</p>"),
@@ -1956,10 +2181,10 @@ def controls():
                     t.replace("</footer>", shape + "</footer>", 1), check_local_only, "index.html: an email address")
         for what, shape in (("percent-encoded", "planted%40example.org "),
                             ("as a JSON escape", "planted" + chr(92) + "u0040example.org ")):
-            fjp.write_text(saved_fj.replace('"about": "', '"about": "' + shape, 1), encoding="utf-8")
+            fjp.write_text(saved_fj.replace('"about": "', '"about": "' + shape, 1), encoding="utf-8", newline="\n")
             found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
             report("local-only", bool(found), "an email address in facts.json, %s: %s" % (what, found[0] if found else "passed"))
-        fjp.write_text(saved_fj, encoding="utf-8")
+        fjp.write_text(saved_fj, encoding="utf-8", newline="\n")
 
         # A dossier's Connections against the map, as published.
         dossier = root / "work-cft-rebound.html"
@@ -1970,10 +2195,13 @@ def controls():
         for what, target, new, want in (
                 ("a dossier missing one of the map's edges", dossier,
                  saved_d.replace(item.group(0), "", 1) if item else saved_d, "doesn't list the map's edge"),
+                # A copy of a real item, well formed and with its evidence,
+                # its head moved to a node the map doesn't join it to: only
+                # the rule on undrawn edges can refuse it.
                 ("a dossier listing an edge the map doesn't draw", dossier,
-                 saved_d.replace(item.group(0), item.group(0) + "<li><code>cft-rebound</code> verifies "
-                                 "<code>planted-node</code>: x</li>", 1) if item else saved_d,
-                 "lists 'cft-rebound verifies planted-node', which the map doesn't draw"),
+                 saved_d.replace(item.group(0), item.group(0) + item.group(0).replace(
+                     "<code>cft-rebound</code>", "<code>planted-node</code>", 1), 1) if item else saved_d,
+                 "lists 'cft-fp256 underlies planted-node', which the map doesn't draw"),
                 ("the map no longer drawing an edge a dossier lists", page,
                  re.sub(r'<path class="edge [^"]*"[^>]*><title>cft-fp256 underlies cft-rebound</title></path>', "", t)
                  if drawn else t, "lists 'cft-fp256 underlies cft-rebound', which the map doesn't draw")):
@@ -1991,7 +2219,11 @@ def controls():
         # way, as verifier-seam added one.
         if sec:
             end = sec.end(1)
+            first_li = saved_d.index("</li>", sec.start(1))
             for what, new, want in (
+                    ("a second edge appended after a real item's evidence",
+                     saved_d[:first_li] + " and StoryDocs documents cft-rebound too" + saved_d[first_li:],
+                     "says more or less than its edge and its evidence"),
                     ("a Connections item written another way",
                      saved_d[:end - len("</ul>")] + "<li><code>StoryDocs</code> documents <code>cft-rebound</code> "
                      "(in its projects): x</li></ul>" + saved_d[end:], "is not an edge as the dossiers write one"),
@@ -2011,10 +2243,14 @@ def controls():
                 check_links, "?plain=1")
 
         # The readings, in each shape verifier-seam used after the first fix.
-        for what, shape in (("split by a comment", "<p>some<!-- -->one@example.com</p>"),
+        # Each split falls inside the domain, before its dot, so the raw text
+        # holds no whole address and only the reading named can join it
+        # (verifier-seam: split before the at sign, "one@example.com" was
+        # still whole, and the control passed with the reading broken).
+        for what, shape in (("split by a comment", "<p>someone@exa<!-- -->mple.com</p>"),
                             ("split by a zero-width space", "<p>someone@exa&#8203;mple.com</p>"),
                             ("split by a soft hyphen", "<p>someone@exam&shy;ple.com</p>"),
-                            ("split by an SVG tspan", "<svg><text>some<tspan>one@example.com</tspan></text></svg>"),
+                            ("split by an SVG tspan", "<svg><text>someone@exa<tspan>mple.com</tspan></text></svg>"),
                             ("with a domain in another script", "<p>someone@ex%smple.com</p>" % chr(0xE4)),
                             ("with a top-level domain in another script",
                              "<p>someone@example.%s%s</p>" % (chr(0x440), chr(0x444))),
@@ -2025,9 +2261,60 @@ def controls():
         for what, shape in (("split by a comment", "<p>Wal<!-- -->ly</p>"),
                             ("split by a soft hyphen", "<p>Wal&shy;ly</p>"),
                             ("split by a zero-width space", "<p>W&#8203;ally</p>"),
-                            ("split by an SVG tspan", "<svg><text>Wal<tspan>ly</tspan></text></svg>")):
+                            ("split by an SVG tspan", "<svg><text>Wal<tspan>ly</tspan></text></svg>"),
+                            ("split by a tag whose attribute holds >", '<p><abbr title="a>b">Wal</abbr>ly</p>'),
+                            ("split by an empty end tag, which a browser drops", "<p>Wal</>ly</p>"),
+                            ("split by U+2065, an unassigned code point drawn as nothing",
+                             "<p>Wal%sly</p>" % chr(0x2065)),
+                            ("in fullwidth letters",
+                             "<p>%s</p>" % "".join(chr(c) for c in (0xFF37, 0xFF41, 0xFF4C, 0xFF4C, 0xFF59)))):
             planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
                     check_local_only, "index.html: names Wally")
+        planted("local-only", "an email address on a page, with a fullwidth at sign",
+                t.replace("</footer>", "<p>someone%sexample.com</p></footer>" % chr(0xFF20), 1), check_local_only,
+                "index.html: an email address")
+        # The HTML subset (PARENTS), in each shape a browser repairs another
+        # way than this check's parser reads it (verifier-seam).
+        for what, shape, want in (
+                ("a stray end tag", "<p>x</p></li>", "</li> closes no <li>"),
+                ("a table cell outside a table", "<p>a</p><td>b</td>", "<td> inside <footer>"),
+                ("a <title> in the body, which a browser never draws", "<title>x</title>", "<title> inside <footer>"),
+                ("a <meta> in the body", '<meta name="description" content="x">', "<meta> inside <footer>"),
+                ("a second declaration mid-page", "<!doctype x>", "a declaration other than"),
+                ("a self-closed <div/>, which a browser leaves open", "<div/>", "self-closed"),
+                ("text directly in a table row, which a browser moves out of the table",
+                 "<table><tbody><tr>x<td>y</td></tr></tbody></table>", "text directly inside <tr>"),
+                ("a link inside a link", '<p><a href="index.html">x<a href="index.html">y</a></a></p>',
+                 "<a> inside <a>"),
+                ("an element left open", "<div>", "left open")):
+            planted("local-only", what, t.replace("</footer>", shape + "</footer>", 1), check_local_only, want)
+        # A character a browser draws as nothing, refused wherever it is.
+        for what, cp in (("a soft hyphen", 0xAD), ("U+2065, unassigned", 0x2065), ("U+FFF0, unassigned", 0xFFF0),
+                         ("U+E0000, unassigned", 0xE0000), ("a right-to-left override", 0x202E)):
+            # Named by file and code point: a carriage return a restore left
+            # in MANIFEST once satisfied all five, on Windows.
+            planted("local-only", "on a page, %s" % what, t.replace("</footer>", "<p>a%sb</p></footer>" % chr(cp), 1),
+                    check_local_only, "index.html: a character a browser draws as nothing, or a control character: "
+                                      "U+%04X" % cp)
+        fjp.write_text(saved_fj.replace('"about": "', '"about": "Wal' + chr(0xAD) + 'ly ', 1), encoding="utf-8", newline="\n")
+        found = [f for f in check_local_only(root) if f.startswith("facts.json") and "draws as nothing" in f and "U+00AD" in f]
+        report("local-only", bool(found), "a soft hyphen inside a string of facts.json: %s"
+               % (found[0] if found else "passed"))
+        fjp.write_text(saved_fj, encoding="utf-8", newline="\n")
+        planted("links", "a link to a range of lines in a Markdown file without ?plain=1",
+                t.replace("</footer>", '<a href="https://github.com/x/y/blob/abc/README.md#L3-L5">x</a></footer>', 1),
+                check_links, "?plain=1")
+        # Two maps that swap by width: in pairs, drawing the same figures.
+        narrow = re.search(r'<div class="map-narrow">.*?</svg></div>', t, re.S)
+        mark_in_narrow = re.search(r' data-f="[0-9]+"', narrow.group(0)) if narrow else None
+        if narrow and mark_in_narrow:
+            planted("numbers", "a wide map with no narrow map to show in its place",
+                    t.replace(narrow.group(0), "", 1), check_numbers, "come in pairs")
+            planted("numbers", "a figure drawn in the wide map only",
+                    t.replace(narrow.group(0), narrow.group(0).replace(mark_in_narrow.group(0), "", 1), 1),
+                    check_numbers, "draw different figures")
+        else:
+            report("numbers", False, "could not plant: index.html has no narrow map with a figure in it")
         for what, shape, want in (("an HTML comment", "<p>a<!-- b -->c</p>", "an HTML comment"),
                                   ("a CDATA section in SVG text", "<svg><text>Wal<![CDATA[ly]]></text></svg>", "CDATA"),
                                   ("a processing instruction", "<?xml-stylesheet href=x?>", "a processing instruction")):
@@ -2037,11 +2324,13 @@ def controls():
         for what, rule in (("a name put together from two content strings", 'header::after{content:" / Wal" "ly"}'),
                            ("an address put together from two content strings",
                             'p::after{content:"someone@" "example.com"}'),
-                           ("a word as a list marker", 'li{list-style-type:"Wally "}')):
-            style.write_text(saved_style + rule + "\n", encoding="utf-8")
-            found = [f for f in check_local_only(root) if "a string holding a letter or a digit" in f]
+                           ("a word as a list marker", 'li{list-style-type:"Wally "}'),
+                           ("an at sign in a string with no letter in it, between two words on the page",
+                            'span.q::after{content:"@"}')):
+            style.write_text(saved_style + rule + "\n", encoding="utf-8", newline="\n")
+            found = [f for f in check_local_only(root) if "a string build.CSS_STRINGS doesn't list" in f]
             report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
-        style.write_text(saved_style, encoding="utf-8")
+        style.write_text(saved_style, encoding="utf-8", newline="\n")
         import zlib
         png = root / "assets" / "pauli-print.png"
         saved_png = png.read_bytes()
@@ -2052,6 +2341,15 @@ def controls():
                  b"zTXt" + b"Comment\0\0" + zlib.compress(b"write to someone@example.com"), "an email address"),
                 ("Wally in a PNG text chunk", b"tEXt" + b"Author\0Wally", "names Wally")):
             png.write_bytes(saved_png[:33] + (len(chunk) - 4).to_bytes(4, "big") + chunk + b"\0\0\0\0" + saved_png[33:])
+            found = [f for f in check_local_only(root) if f.startswith("assets/pauli-print.png") and want in f]
+            report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+        for what, blob, want in (
+                ("an eXIf chunk, which no check reads",
+                 saved_png[:33] + (4).to_bytes(4, "big") + b"eXIf" + b"x@y." + bytes(4) + saved_png[33:],
+                 "a PNG chunk no check reads: eXIf"),
+                ("bytes after a PNG's IEND chunk", saved_png + b"write to someone@example.com",
+                 "does not end with its IEND")):
+            png.write_bytes(blob)
             found = [f for f in check_local_only(root) if f.startswith("assets/pauli-print.png") and want in f]
             report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
         png.write_bytes(saved_png)
@@ -2109,7 +2407,7 @@ def controls():
         rec = next(r for r in data["facts"] if r["method"] == "facts.macros")
         saved = fj.read_text(encoding="utf-8")
         rec["text"] = rec["raw"] = "0.14"
-        fj.write_text(json.dumps(data), encoding="utf-8")
+        fj.write_text(json.dumps(data), encoding="utf-8", newline="\n")
         out = io.StringIO()
         try:
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
@@ -2120,15 +2418,15 @@ def controls():
             else:
                 report("facts", rc == 1 and bool(named), "fact %d planted at 0.14: %s" % (rec["id"], named[0] if named else "not named"))
         finally:
-            fj.write_text(saved, encoding="utf-8")
+            fj.write_text(saved, encoding="utf-8", newline="\n")
 
     # B. The documents: a stage count in every shape it has taken, and links in
     #    every shape Markdown has, each on a copy of a real document.
     doc = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     with tempfile.TemporaryDirectory() as d:
         copy = pathlib.Path(d) / "CLAUDE.md"
-        (pathlib.Path(d) / "README.md").write_text("# The front door\n", encoding="utf-8")
-        copy.write_text(doc, encoding="utf-8")
+        (pathlib.Path(d) / "README.md").write_text("# The front door\n", encoding="utf-8", newline="\n")
+        copy.write_text(doc, encoding="utf-8", newline="\n")
         base = [f for f in check_docs([copy]) if "does not exist" not in f]   # its links point outside the copy
         for what, plant, want in (("7 stages", "The runner has 7 stages.", "'7 stages'"),
                                   ("seven stages", "It runs seven stages.", "'seven stages'"),
@@ -2152,12 +2450,12 @@ def controls():
             if base:
                 report("docs", False, "could not plant %s: CLAUDE.md already fails: %s" % (what, base[0]))
                 continue
-            copy.write_text(doc + "\n" + plant + "\n", encoding="utf-8")
+            copy.write_text(doc + "\n" + plant + "\n", encoding="utf-8", newline="\n")
             found = [f for f in check_docs([copy]) if want in f]
             report("docs", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
         # the ledger: its links are checked, and a stage count in it is a fact about its date
         ledger = pathlib.Path(d) / "VALIDATION.md"
-        ledger.write_text("# ledger\n\nIt ran 10 stages.\n\n[x](planted.md)\n", encoding="utf-8")
+        ledger.write_text("# ledger\n\nIt ran 10 stages.\n\n[x](planted.md)\n", encoding="utf-8", newline="\n")
         found = check_docs([ledger])
         report("docs", any("planted.md" in f for f in found) and not any("stage count" in f for f in found),
                "the ledger, with a stage count and a broken link: %s" % (found or "passed"))
@@ -2253,6 +2551,13 @@ def controls():
     report("own", same is False, "a citation published at another line, the words the same: %s"
            % ("read again as different: %s" % now if same is False else "read again as the same"))
     facts.reset_log()
+    buf = io.StringIO()
+    _Masked(buf).write("refused: someone@example.com, and logan@loganw.dev" + chr(10))
+    printed = buf.getvalue()
+    report("output", "someone@example.com" not in printed and "[an address]" in printed and "logan@loganw.dev" in printed,
+           "an address in a line build.py prints: %r" % printed.strip())
+    refused("assets", "an asset published as a JPEG, whose metadata no check reads",
+            lambda: check_asset("assets/x.jpg", bytes([0xFF, 0xD8, 0xFF, 0xE0])), "lower-case .png")
     refused("own", "a commit cited by a name rather than a hash, as HEAD~1 moves with history",
             lambda: facts.own_commit("HEAD~1", "planted"), "not a commit hash")
     saved_own = facts.own_text
@@ -2288,6 +2593,8 @@ def controls():
         g("commit", "-q", "--allow-empty", "-m", "a commit only the side branch holds")
         side = g("rev-parse", "--short", "HEAD").stdout.strip()
         g("checkout", "-q", "-")
+        g("tag", "-a", "v0", "-m", "an annotated tag, planted")
+        tag_object = g("rev-parse", "v0").stdout.strip()[:7]
         shallow = pathlib.Path(d) / "shallow"
         subprocess.run(["git", "clone", "-q", "--depth", "1", pathlib.Path(d).as_uri(), str(shallow)],
                        capture_output=True)
@@ -2298,6 +2605,8 @@ def controls():
                     lambda: facts.own_commit(side, "planted"), "does not descend from it")
             refused("own", "a cited commit this site's history does not have",
                     lambda: facts.own_commit("0000000", "planted"), "has no commit 0000000")
+            refused("own", "a cited hash that names an annotated tag, printed as one hash and linked as another",
+                    lambda: facts.own_commit(tag_object, "planted"), "names a tag, not a commit")
             facts.ROOT = shallow
             try:
                 facts.own_commit(side, "planted")
@@ -2378,20 +2687,20 @@ def controls():
         g = lambda *a: subprocess.run(["git", "-C", d, "-c", "user.name=planted", "-c", "user.email=planted@invalid",
                                        *a], capture_output=True)
         g("init", "-q")
-        (pathlib.Path(d) / "notes.md").write_text("see planted-private-repo\n", encoding="utf-8")
+        (pathlib.Path(d) / "notes.md").write_text("see planted-private-repo\n", encoding="utf-8", newline="\n")
         g("add", "-A")
         g("commit", "-qm", "a note")
-        (pathlib.Path(d) / "notes.md").write_text("nothing here\n", encoding="utf-8")
+        (pathlib.Path(d) / "notes.md").write_text("nothing here\n", encoding="utf-8", newline="\n")
         g("commit", "-qam", "the note removed")
         hits = find_named(["planted-private-repo"], tracked_blobs(pathlib.Path(d)))
         report("privacy", any("in history" in h for h in hits),
                "a private name only in an earlier commit: %s" % (hits or "passed"))
         (pathlib.Path(d) / "planted-private-repo").mkdir()
-        (pathlib.Path(d) / "planted-private-repo" / "readme.md").write_text("nothing\n", encoding="utf-8")
+        (pathlib.Path(d) / "planted-private-repo" / "readme.md").write_text("nothing\n", encoding="utf-8", newline="\n")
         g("add", "-A")
         g("commit", "-qm", "a folder")
         g("tag", "-a", "v0", "-m", "the tag message names planted-private-repo")
-        (pathlib.Path(d) / "other.md").write_text("x\n", encoding="utf-8")
+        (pathlib.Path(d) / "other.md").write_text("x\n", encoding="utf-8", newline="\n")
         g("add", "-A")
         subprocess.run(["git", "-C", d, "-c", "user.name=planted-private-repo bot", "-c", "user.email=bot@invalid",
                         "commit", "-qm", "an ordinary message"], capture_output=True)
@@ -2538,7 +2847,25 @@ def controls():
     return 0 if all(results) else 1
 
 
+class _Masked:
+    """A stream that prints no email address but the site's contact. CI's
+    logs are public, and a check may quote what it refused: a stylesheet
+    string, a comment, a page's text (verifier-seam). Every line build.py
+    prints passes through here."""
+    def __init__(self, inner):
+        self.inner = inner
+
+    def write(self, s):
+        return self.inner.write(EMAIL.sub(
+            lambda m: m.group(0) if m.group(0).lower() in SITE_CONTACTS else "[an address]", s))
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+
 def main(argv=None):
+    if not isinstance(sys.stdout, _Masked):
+        sys.stdout, sys.stderr = _Masked(sys.stdout), _Masked(sys.stderr)
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     g = ap.add_mutually_exclusive_group()
     for flag, what in (("--check", "fail if public/ differs from a fresh render"),

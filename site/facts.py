@@ -1025,6 +1025,11 @@ def own_commit(sha, what):
     if r.returncode != 0:
         raise Refusal("this site's history has no commit %s" % sha)
     full = r.stdout.decode().strip()
+    kind = _git(ROOT, "--no-replace-objects", "cat-file", "-t", sha).strip()
+    if kind != "commit":
+        # An annotated tag's hash resolves to the commit it points at, so the
+        # page would print one hash and link to another (verifier-seam).
+        raise Refusal("%s names a %s, not a commit; cite the commit's own hash" % (sha, kind))
     if _git(ROOT, "--no-replace-objects", "merge-base", "--is-ancestor", full, "HEAD", ok=(0, 1)).returncode != 0:
         raise Refusal("%s is a commit here, but the commit being built does not descend from it, "
                       "so it is not on main" % sha)
