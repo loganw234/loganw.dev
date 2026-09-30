@@ -1517,9 +1517,14 @@ def only_in_problems(rel, data):
 
 
 def _folded(s):
-    """A text as the ONLY_HERE check compares it: in Unicode's compatibility
-    form, with its whitespace collapsed and in lower case."""
-    return " ".join(unicodedata.normalize("NFKC", s).split()).lower()
+    """A text as the ONLY_HERE check compares it: its letters and digits
+    alone, in order, in Unicode's compatibility form and in lower case. So
+    spacing, punctuation and case don't count: the same words with a period
+    or a comma dropped, or "wouldn't" for "wouldnt", are the same text
+    (verifier-seam passed each against a comparison of characters). A
+    declared statement is long enough that its letters don't turn up in
+    that order by chance."""
+    return "".join(c for c in unicodedata.normalize("NFKC", s).lower() if c.isalnum())
 
 
 def only_here():
@@ -1542,11 +1547,12 @@ def only_here_problems(rel, data, declared):
     holds a declared text in any of the readings the name and address
     checks use (texts_of): its text, each attribute's value (a description,
     a tooltip), references and percent-encoding decoded, and compatibility
-    forms folded. verifier-seam put the statement in a meta description and
-    a tooltip, which the first version never read. facts.json, which
-    records every statement's text, holds each by design. A restatement in
-    other words passes: the check reads the words, not their meaning (a
-    stated limit)."""
+    forms folded; compared as letters and digits alone (_folded).
+    verifier-seam put the statement in a meta description and a tooltip,
+    which the first version never read. facts.json, which records every
+    statement's text, holds each by design. A restatement in other words
+    passes: the check reads the words, not their meaning (a stated
+    limit)."""
     if rel == "facts.json" or not rel.endswith((".html", ".txt")) or not declared:
         return []
     views = [_folded(v) for v in texts_of(rel, data)]
@@ -2411,28 +2417,33 @@ def controls():
             planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
                     check_local_only, "index.html: names Wally")
         # A text a page declares ONLY_HERE, printed on another page: refused
-        # there, split by markup too, and not on the page that declares it.
-        declared = {"a statement planted to be printed once": ("planted", "method.html")}
-        copy = t.replace("</footer>", "<p>A statement <b>planted</b> to be printed once</p></footer>", 1).encode()
-        found = only_here_problems("index.html", copy, declared)
-        at_home = only_here_problems("method.html", copy, declared)
-        report("local-only", bool(found) and not at_home,
-               "a page's ONLY_HERE text on another page: %s; on its own page: %s"
-               % (found[0] if found else "passed", at_home or "passed, as it must"))
-        # ...and where verifier-seam put it: an attribute's value, which a
-        # search result, a link preview or a tooltip shows; and in fullwidth
-        # letters.
-        full = "".join(chr(ord(c) + 0xFEE0) if "a" <= c <= "z" else c for c in "a statement planted to be printed once")
+        # there, and not on the page that declares it. A stand-in declared
+        # here, with punctuation and Logan's spelling "wouldnt" in it, so
+        # the variants verifier-seam used can be planted: the declaration is
+        # folded as only_here() folds a real one.
+        stand_in = "A statement, planted to be printed once; it wouldnt pass."
+        declared = {_folded(stand_in): ("planted", "method.html")}
+        full = "".join(chr(ord(c) + 0xFEE0) if "a" <= c.lower() <= "z" else c for c in stand_in)
         meta = re.search(r'<meta name="description" content="[^"]*">', t)
-        for what, new in (("in the page's meta description",
-                           t.replace(meta.group(0), '<meta name="description" content="A statement planted to be printed '
-                                                    'once">', 1) if meta else t),
-                          ("in a tooltip", t.replace("</footer>", '<p><span title="A statement planted to be printed '
-                                                                  'once">x</span></p></footer>', 1)),
-                          ("in fullwidth letters", t.replace("</footer>", "<p>%s</p></footer>" % full, 1))):
+        for what, new in (
+                ("as it is", t.replace("</footer>", "<p>%s</p></footer>" % stand_in, 1)),
+                ("split by markup", t.replace("</footer>", "<p>A statement, <b>planted</b> to be printed once; it "
+                                                          "wouldnt pass.</p></footer>", 1)),
+                ("in the page's meta description",
+                 t.replace(meta.group(0), '<meta name="description" content="%s">' % stand_in, 1) if meta else t),
+                ("in a tooltip", t.replace("</footer>", '<p><span title="%s">x</span></p></footer>' % stand_in, 1)),
+                ("in fullwidth letters", t.replace("</footer>", "<p>%s</p></footer>" % full, 1)),
+                ("with its final period dropped", t.replace("</footer>", "<p>%s</p></footer>" % stand_in[:-1], 1)),
+                ("with its comma dropped", t.replace("</footer>", "<p>%s</p></footer>" % stand_in.replace(",", ""), 1)),
+                ("with an apostrophe its source doesn't have",
+                 t.replace("</footer>", "<p>%s</p></footer>" % stand_in.replace("wouldnt", "wouldn&#x27;t"), 1))):
             found = only_here_problems("index.html", new.encode(), declared) if new != t else []
-            report("local-only", bool(found), "a page's ONLY_HERE text %s on another page: %s"
-                   % (what, found[0] if found else ("passed" if new != t else "could not plant")))
+            # The first case also holds the other side: the same text on its
+            # own page passes.
+            at_home = only_here_problems("method.html", new.encode(), declared) if what == "as it is" else []
+            report("local-only", bool(found) and not at_home, "a page's ONLY_HERE text on another page, %s: %s%s"
+                   % (what, found[0] if found else ("passed" if new != t else "could not plant"),
+                      "; on its own page: %s" % (at_home or "passed, as it must") if what == "as it is" else ""))
         planted("local-only", "an email address on a page, with a fullwidth at sign",
                 t.replace("</footer>", "<p>someone%sexample.com</p></footer>" % chr(0xFF20), 1), check_local_only,
                 "index.html: an email address")

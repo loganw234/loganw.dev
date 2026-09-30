@@ -1631,3 +1631,53 @@ once by ONLY_HERE". Neither held for an attribute's value or a fullwidth
 copy until this entry's commit.
 
 `--control` caught 310 of 310.
+
+## 2026-09-30 - verifier-seam: NOT READY on 1142ab9; ONLY_HERE compares letters and digits, not characters
+
+verifier-seam re-checked `1142ab9`. Its earlier copies of the statement in a
+meta description, a tooltip and fullwidth letters were all refused. Then it
+changed only punctuation:
+
+- the statement without its final period, in Threads' meta description
+  (full gate);
+- the statement without its comma, on Verify (full gate);
+- "wouldn't" for Logan's "wouldnt" (unit level).
+
+Each passed. The check compared characters, punctuation included. Its
+stated limit is a restatement in other words, and these are the same
+words.
+
+**The fix.** `ONLY_HERE` now compares letters and digits alone, in order,
+folded to lower case and to Unicode's compatibility form (`build._folded`).
+Spacing, punctuation and case don't count. A declared statement is long
+enough that its letters don't turn up in that order by chance: the site's
+38 published files hold no false match.
+
+**The controls** use a stand-in text with a declaration of their own. They
+don't plant decision 9's statement: that is `statement9-once`, P5's
+control. 8 cases are each refused on Home:
+
+- as it is, which also passes on its own page;
+- split by markup;
+- in the meta description;
+- in a tooltip;
+- in fullwidth letters;
+- without its final period;
+- without its comma;
+- with an apostrophe its source doesn't have.
+
+The page contract's "refuses each on any other published page" now holds
+for the same words in any spacing, punctuation, case or compatibility
+form.
+
+**Corrections to the entry above:**
+
+- It says the fullwidth copy "passed every stage". verifier-seam measured
+  that one at unit level only.
+- It says "3 new controls plant the statement". They plant the stand-in,
+  not decision 9's statement.
+- From here on, the lead's records name the level each shape was measured
+  at: the full gate, or a unit-level call. verifier-seam asked for this
+  after the third such overstatement.
+
+`--control` caught 314 of 314.
