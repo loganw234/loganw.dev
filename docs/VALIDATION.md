@@ -1567,3 +1567,38 @@ stage. No page module can read another page, so the gate is the lead's:
   split by markup, and passed on its own.
 
 `--control` caught 304 of 304.
+
+## 2026-09-30 - wave 2 merged: P5 after one send-back; every page built; the seam's own push first
+
+**The seam, pushed first.** verifier-seam said READY on `0176ce4..07b1526`
+after five passes. main fast-forwarded to `07b1526`, and the gate passed on
+the clean tree: 11 of 11, 294 controls. The push deployed.
+
+- Run 36690194219 passed.
+- Its log says "Resolved .python-version as 3.12.9", so CI now runs the
+  desktop's Python.
+- `BUILD` named `07b1526`, and the live facts.json held no trace of the
+  author address's domain.
+
+**P5, Method and About.** verifier-P5 said NOT READY on `d445b42`, with two
+findings:
+
+- **A stale "newest entry".** Method said the ledger's newest entry recorded
+  "275 of 275". That was true when P5 wrote it, and false once this ledger
+  grew. A fact now reads the newest entry that records the controls at
+  build (`newest_control_count`). verifier-P5 grew a copy of the ledger
+  twice, and the figure followed.
+- **"The one place the site states it"** (decision 9) was held by no gate.
+  Method now declares the statement `ONLY_HERE`. verifier-P5 planted it on
+  Threads and in a dossier's text twin, and local-only refused both.
+
+P5 fixed both at `4a883e4`, where verifier-P5 said READY. P5's first commit
+had held two real mail domains in a control. P5 recommitted rather than
+merge them into history, and it disclosed that.
+
+**Every page is built.** Home, Threads (with its three threads), Work (with
+its five dossiers), Method, Record, Verify, Corrections, Propose and About.
+About's two new sentences are drafts, labelled so until Logan approves
+them.
+
+`--control` caught 307 of 307.
