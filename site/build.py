@@ -477,6 +477,10 @@ def css_tokens(css):
     space, '(' or '{', '}' or ';' inside it makes it malformed (flaw 'bad'),
     as a browser reads it - never a string (verifier-P0 hid display:none
     behind url(x.png') ). One reading, used by every check of a stylesheet."""
+    # CSS Syntax 3 first turns CR LF, CR and form feed into LF, and NUL into
+    # U+FFFD; a browser ends a string at a form feed, and so must this
+    # (verifier-P0 hid display:none behind one).
+    css = css.replace("\r\n", "\n").replace("\r", "\n").replace("\f", "\n").replace("\0", "�")
     out, i, n = [], 0, len(css)
     while i < n:
         if css.startswith("/*", i):
@@ -676,8 +680,60 @@ def _hides(prop, v):
 
 def hiding_problems(css):
     """Every rule that hides what it styles, as the list above reads it."""
+    return hiding_in(_decls(css))
+
+
+def tinycss2_blocks(css):
+    """The same [(prelude, [(property, value)])] as _decls, every block at any
+    depth, children before their parent - but read by tinycss2, a parser that
+    follows CSS Syntax 3 and CSS nesting. The controls compare the two
+    readings of the published stylesheet (verifier-P0 found four ways, one
+    after another, in which a hand-written reading and a browser's parted;
+    Logan approved installing a parser for this, 2026-09-29)."""
+    import tinycss2
+    out = []
+
+    def walk(node):
+        pre = tinycss2.serialize(node.prelude)
+        if node.type == "at-rule":
+            pre = "@%s %s" % (node.at_keyword, pre)
+        decls = []
+        for x in tinycss2.parse_blocks_contents(node.content, skip_comments=True, skip_whitespace=True):
+            if x.type == "declaration":
+                decls.append((x.lower_name, tinycss2.serialize([v for v in x.value if v.type != "comment"]).strip()))
+            elif x.type in ("qualified-rule", "at-rule") and x.content is not None:
+                walk(x)
+        out.append((" ".join(pre.split()), decls))
+
+    for r in tinycss2.parse_stylesheet(css, skip_comments=True, skip_whitespace=True):
+        if r.type in ("qualified-rule", "at-rule") and r.content is not None:
+            walk(r)
+    return out
+
+
+def crosscheck_css(css, reader=None):
+    """Where this build's reading of a stylesheet and tinycss2's part: [str].
+    Empty when every block has the same prelude and the same properties in
+    the same order, and the hiding check finds the same problems in both."""
+    mine, theirs = (reader or _decls)(css), tinycss2_blocks(css)
+    squash = lambda s: "".join(s.split())
+    out = []
+    if len(mine) != len(theirs):
+        out.append("this build reads %d blocks, and tinycss2 reads %d" % (len(mine), len(theirs)))
+    for (p1, d1), (p2, d2) in zip(mine, theirs):
+        if squash(p1) != squash(p2) or [k for k, _ in d1] != [k for k, _ in d2]:
+            out.append("the block %r reads as %r here and as %r in tinycss2"
+                       % (p2, [k for k, _ in d1], [k for k, _ in d2]))
+            break
+    if hiding_in(mine) != hiding_in(theirs):
+        out.append("the hiding check finds %r here and %r in tinycss2's reading"
+                   % (hiding_in(mine)[:1], hiding_in(theirs)[:1]))
+    return out
+
+
+def hiding_in(rules):
+    """The hiding check over one reading of a stylesheet's blocks."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
-    rules = _decls(css)
     defs = {}
     for sel, pairs in rules:
         prop_rule = re.fullmatch(r"@property\s+(--[\w-]+)", sel)
@@ -886,12 +942,17 @@ class _Tags(html.parser.HTMLParser):
 def css_problems(css):
     """A stylesheet's loads. Comments go first, then anything that could spell
     a load in another case or through an escape is refused outright. So are
-    the shapes where a reading of the text and a browser's can part, which
-    every check of a stylesheet here relies on not meeting: a string left
-    open at the end of its line, a comment left open, a comment marker inside
-    a string, and a malformed url() - one whose unquoted address holds a
-    quote, a space, '(', '{', '}' or ';'."""
+    the shapes this build knows of in which a reading of the text and a
+    browser's can part: a control character other than a line feed or a tab
+    (a form feed ends a string in a browser), a string left open at the end
+    of its line, a comment left open, a comment marker inside a string, and a
+    malformed url() - one whose unquoted address holds a quote, a space, '(',
+    '{', '}' or ';'. Shapes this build does not know of are what the controls'
+    cross-check holds: the published stylesheet read again by tinycss2."""
     out = []
+    ctl = sorted({"U+%04X" % ord(c) for c in css if (ord(c) < 32 and c not in "\n\t") or ord(c) == 127})
+    if ctl:
+        out.append("a control character other than a line feed or a tab: %s" % ", ".join(ctl))
     for kind, text, flaw in css_tokens(css):
         if flaw == "open":
             out.append("a %s left open: %r" % (kind, text[:40]))
@@ -1509,7 +1570,9 @@ def controls():
                                      ("a hiding declaration after a quote inside an unquoted url()",
                                       ".src{background:url(assets/pauli-print.png');display:none}\n}", "'.src' hides"),
                                      ("a hiding rule between comment markers held in strings",
-                                      '.a{content:"/*"} .src{display:none} .b{content:"*/"}', "'.src' hides")):
+                                      '.a{content:"/*"} .src{display:none} .b{content:"*/"}', "'.src' hides"),
+                                     ("a hiding declaration after a form feed, which ends a string in a browser",
+                                      ".src{content:'a\f;display:none;x:'\n}", "'.src' hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
@@ -1519,6 +1582,22 @@ def controls():
             n_read = len(_decls(saved_css))
             n_open = sum(1 for kind, text, _ in css_tokens(saved_css) if kind == "char" and text == "{")
             report("numbers", n_read == n_open, "the stylesheet's %d blocks, each read: %d" % (n_open, n_read))
+            # the reading itself, against tinycss2's, on the published
+            # stylesheet; and the comparison watched failing on a reader that
+            # sees only innermost blocks, as this build's first one did
+            try:
+                found = crosscheck_css(saved_css)
+                report("numbers", not found, "the stylesheet read by this build and by tinycss2: %s"
+                       % (found[0] if found else "the same %d blocks, the same properties, the same verdicts"
+                          % len(_decls(saved_css))))
+                naive = lambda s: [(" ".join(p.split()), [(d.split(":", 1)[0].strip().lower(), d.split(":", 1)[1].strip())
+                                                          for d in body.split(";") if ":" in d])
+                                   for p, body in re.findall(r"([^{}]+)\{([^{}]*)\}", s)]
+                found = crosscheck_css(".src{display:none;.x{color:red}}", reader=naive)
+                report("numbers", bool(found), "a reader that misses a declaration beside a nested rule, against "
+                       "tinycss2: %s" % (found[0] if found else "passed"))
+            except ImportError:
+                skip("numbers", "tinycss2 is not installed here, so the stylesheet is not read a second way")
             # a string left open ends at its line, as a browser ends it, so a
             # stray quote cannot swallow the rules after it
             found = hiding_problems(saved_css + "\n.planted{content:'open}\n.src{display:none}\n")
@@ -1574,7 +1653,8 @@ def controls():
                           ("a semicolon inside an unquoted url()", ".x{background:url(a;b)}"),
                           ("a comment marker inside a string", '.a{content:"/*"}'),
                           ("a string left open", ".a{content:'open\n}"),
-                          ("a comment left open", ".a{color:red} /* never closed")):
+                          ("a comment left open", ".a{color:red} /* never closed"),
+                          ("a form feed", ".a{content:'x\fy'}")):
             found = css_problems(css)
             report("local-only", bool(found), "%s in CSS: %s" % (what, found[0] if found else "passed"))
 

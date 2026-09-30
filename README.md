@@ -53,18 +53,28 @@ What that doesn't cover:
     `auto`.
   - `text-indent` other than zero.
 
-  Every block is read, at any depth: rules nested in rules, and at-rules
-  such as `@media`, `@supports` and `@scope`. Comments, strings and `url()`
-  are cut as CSS cuts them. Local-only refuses any shape in which a reading
-  of the text and a browser's could still part:
+  How the stylesheets are read:
+  - Every block is read, at any depth: rules nested in rules, and at-rules
+    such as `@media`, `@supports` and `@scope`. A nested block is named by
+    its own prelude, so an entry in `css_hides.json`, which names a flat
+    selector, never allows one.
+  - Comments, strings and `url()` are cut as CSS cuts them, line endings and
+    form feeds included.
+  - A custom property is read as every value the stylesheet gives it: in a
+    rule, as a `var()` fallback, or as an `@property`'s initial value.
+
+  Local-only refuses the shapes this build knows of in which a reading of
+  the text and a browser's could part:
+  - a control character other than a line feed or a tab;
   - a string or a comment left open;
   - a comment marker inside a string;
   - a malformed `url()`;
-  - a backslash escape. A nested block is named by its
-  own prelude, so an entry in `css_hides.json`, which names a flat
-  selector, never allows one. A custom property is read as every value the
-  stylesheet gives it: in a rule, as a `var()` fallback, or as an
-  `@property`'s initial value.
+  - a backslash escape.
+
+  A control reads the published stylesheet a second time with tinycss2, a
+  parser that follows the CSS specifications. It fails the gate if the two
+  readings differ in any block, property or hiding verdict.
+
   Anything else passes, including:
   - a near-zero value;
   - text coloured like its background;
@@ -83,11 +93,15 @@ ones included, and it has Logan's GitHub login.
 On any other machine, leave out `--require-all`. A stage or a figure that
 needs something the machine can't read is then skipped by name, never passed.
 
-The site needs only Python's standard library, except in one of the gate's
-controls. That control reads each ledger a second way, with CommonMark's own
-parser. Install it, pinned by hash, with
-`python -m pip install --require-hashes --no-deps -r verify/requirements.txt`,
-or the control is skipped by name.
+The site needs only Python's standard library, except in two of the gate's
+controls:
+- one reads each ledger a second way, with CommonMark's own parser
+  (markdown-it-py);
+- the other reads the published stylesheet a second way (tinycss2).
+
+Install both, pinned by hash, with
+`python -m pip install --require-hashes --no-deps -r verify/requirements.txt`.
+Otherwise each control is skipped by name.
 
 To check the published figures yourself, from a clone of this repository:
 

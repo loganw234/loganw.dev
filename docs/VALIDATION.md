@@ -911,3 +911,51 @@ block count now reads the tokens. The README's "Styles" item says how
 stylesheets are read.
 
 `--control` now catches 164 of 164.
+
+## 2026-09-29 - verifier-P0 on p0.2 at b40598b: NOT READY on a form feed in a string; fixed, with a tinycss2 cross-check
+
+verifier-P0 re-checked `b40598b`.
+
+**Closed.** Last round's `url()` plant is refused. The verifier stopped
+`css_tokens` recognising `url(`, and three controls named the change.
+
+**The gap.** CSS Syntax 3 turns carriage returns and form feeds into line
+feeds before it reads anything, so a browser ends a string at a form feed.
+The tokenizer ended a string only at a line feed. The plant was
+`.src{content:'a<FF>;display:none;x:'` followed by a newline and `}`. It
+passed every stage, and in Chrome it hid 49 labels. Carriage returns never
+reached the tokenizer, since the build reads files as text, but form feeds
+did.
+
+The verifier also noted that each of the last five rounds found one more
+place where a hand-written reading and a browser's part. A cross-check
+against a real CSS parser would end that, and it needed Logan's approval
+for the dependency.
+
+**Logan, in chat:** "Installing something for a cross check is fine".
+
+**Fixed:**
+
+- `css_tokens` now does what CSS Syntax 3 does first: CR LF, CR and form
+  feed become line feeds, and NUL becomes U+FFFD.
+- Local-only refuses any control character in a stylesheet other than a line
+  feed or a tab.
+- **The cross-check.** A control reads the published stylesheet a second
+  time with tinycss2, which follows CSS Syntax 3 and CSS nesting. It fails
+  the gate if the two readings differ in the number of blocks, any block's
+  prelude or properties, or the hiding check's verdicts.
+  - On the real stylesheet the two readings agree: 88 blocks.
+  - Every plant from the last five rounds reads the same in both.
+  - A second control shows the comparison bites. A reader that sees only
+    innermost blocks, as this build's first one did, is named: it reads 1
+    block where tinycss2 reads 2.
+- **The claim.** The docstring and the README now say local-only refuses
+  "the shapes this build knows of", and that the cross-check holds the rest.
+  "Any shape" is gone.
+- **Pins.** `verify/requirements.txt` pins tinycss2 1.5.1 and webencodings
+  0.5.1 by PyPI's published sha256, next to markdown-it-py and mdurl. All
+  four were matched by a hash-checked download. They are the versions this
+  desktop already had installed, so nothing was installed here. CI installs
+  from the file.
+
+`--control` now catches 168 of 168.
