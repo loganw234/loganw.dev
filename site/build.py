@@ -471,16 +471,46 @@ def _nonpositive(tok):
 
 
 def _decls(css):
-    """[(selector, [(property, value)])] for every rule, innermost first."""
-    out = []
-    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+    """[(prelude, [(property, value)])] for every block, at any depth: the
+    declarations directly inside it, beside any block nested in it. With CSS
+    nesting, `.src{display:none; .x{...}}` and `.src{@media all{display:none}}`
+    both apply display:none to .src, and verifier-P0 hid 49 labels with the
+    second while a reader of innermost rules alone passed it. Quoted strings
+    are kept whole, so a brace or a semicolon inside one is not structure."""
+    stack, out, seg, i = [["", []]], [], [], 0
+    while i < len(css):
+        c = css[i]
+        if c in "\"'":
+            # a string ends at its closing quote, or - left open - at the end
+            # of its line, where CSS ends a bad string
+            j = i + 1
+            while j < len(css) and css[j] != c and css[j] != "\n":
+                j += 2 if css[j] == "\\" else 1
+            seg.append(css[i:j + 1])
+            i = j + 1
+            continue
+        if c == "{":
+            stack.append(["".join(seg).strip(), []])
+            seg = []
+        elif c in ";}":
+            d = "".join(seg).strip()
+            if d:
+                stack[-1][1].append(d)
+            seg = []
+            if c == "}" and len(stack) > 1:
+                out.append(tuple(stack.pop()))
+        else:
+            seg.append(c)
+        i += 1
+    rules = []
+    for prelude, parts in out:
         pairs = []
-        for d in body.split(";"):
+        for d in parts:
             if ":" in d:
                 k, _, v = d.partition(":")
                 pairs.append((k.strip().lower(), re.sub(r"!\s*important", "", v, flags=re.I).strip()))
-        out.append((" ".join(sel.split()), pairs))
-    return out
+        rules.append((" ".join(prelude.split()), pairs))
+    return rules
 
 
 def _var(v):
@@ -588,7 +618,8 @@ def _hides(prop, v):
 def hiding_problems(css):
     """Every rule that hides what it styles, as the list above reads it."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
-    rules = _decls(css)
+    # comments first: an apostrophe in one would read as a string's start
+    rules = _decls(re.sub(r"/\*.*?\*/", "", css, flags=re.S))
     defs = {}
     for sel, pairs in rules:
         prop_rule = re.fullmatch(r"@property\s+(--[\w-]+)", sel)
@@ -599,8 +630,10 @@ def hiding_problems(css):
                 defs.setdefault(prop_rule.group(1), []).append(v)
     out = []
     for sel, pairs in rules:
-        if sel.startswith("@"):
-            continue
+        # Every block is read, at-rules too: @media, @supports, @scope and the
+        # rest hold declarations that apply (verifier-P0). A nested block is
+        # named by its own prelude, and css_hides.json names flat selectors,
+        # so a nested hiding rule is refused however it is allowed flat.
         ok = {re.sub(r"\s+", "", d.lower()) for d in allowed.get(sel, {}).get("allow", [])}
         for k, v in pairs:
             if k.startswith("--") or re.sub(r"\s+", "", "%s:%s" % (k, v)).lower() in ok:
@@ -1392,11 +1425,33 @@ def controls():
                                      ("a negative opacity", ".src{opacity:-1}", "'.src' hides"),
                                      ("a vendor-prefixed clip-path", ".src{-webkit-clip-path:inset(50%)}", "'.src' hides"),
                                      ("an allowed selector hiding by a declaration it was not allowed",
-                                      ".map .edge{display:none}", "'.map .edge' hides")):
+                                      ".map .edge{display:none}", "'.map .edge' hides"),
+                                     ("a hiding rule nested in @media inside a style rule",
+                                      ".src{@media all{display:none}}", "'@media all' hides"),
+                                     ("a hiding rule in @scope", "@scope (.src){display:none}", "'@scope (.src)' hides"),
+                                     ("a hiding rule nested in @supports",
+                                      ".src{@supports (display:block){display:none}}", "hides"),
+                                     ("a hiding declaration beside a nested rule",
+                                      ".src{display:none;.x{color:red}}", "'.src' hides"),
+                                     ("a keyframe that fades to nothing", "@keyframes planted{to{opacity:0}}",
+                                      "'to' hides"),
+                                     ("an allowed declaration, nested under its parent",
+                                      ".map{.edge{fill:none}}", "'.edge' hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
             css.write_text(saved_css, encoding="utf-8")
+            # the scanner itself: it must read every block of the real
+            # stylesheet, or a rule it lost its place in is a rule unread
+            plain = re.sub(r"/\*.*?\*/", "", saved_css, flags=re.S)
+            n_read, n_open = len(_decls(plain)), plain.count("{") - sum(s.count("{") for s in CSS_STRING.findall(plain))
+            report("numbers", n_read == n_open, "the stylesheet's %d blocks, each read: %d" % (n_open, n_read))
+            # a string left open ends at its line, as a browser ends it, so a
+            # stray quote cannot swallow the rules after it
+            found = hiding_problems(saved_css + "\n.planted{content:'open}\n.src{display:none}\n")
+            report("numbers", any("(display: none)" in f for f in found),
+                   "a hiding rule after a string left open (which, as in a browser, also swallows the brace that "
+                   "would close its block): %s" % (found[0] if found else "passed"))
 
         # links: a missing page, and shapes a server would not serve as a file
         for bad in ("nowhere.html", "style.css/", "index.html/.", "INDEX.HTML", "./index.html", "index.html#no-such-id"):

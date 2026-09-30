@@ -53,8 +53,12 @@ What that doesn't cover:
     `auto`.
   - `text-indent` other than zero.
 
-  A custom property is read as every value the stylesheet gives it: in a
-  rule, as a `var()` fallback, or as an `@property`'s initial value.
+  Every block is read, at any depth: rules nested in rules, and at-rules
+  such as `@media`, `@supports` and `@scope`. A nested block is named by its
+  own prelude, so an entry in `css_hides.json`, which names a flat
+  selector, never allows one. A custom property is read as every value the
+  stylesheet gives it: in a rule, as a `var()` fallback, or as an
+  `@property`'s initial value.
   Anything else passes, including:
   - a near-zero value;
   - text coloured like its background;

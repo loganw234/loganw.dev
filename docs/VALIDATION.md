@@ -805,3 +805,50 @@ allow `fill:none` alone. The page contract, `_common.md` and P2's brief
 say so.
 
 `--control` now catches 149 of 149.
+
+## 2026-09-29 - verifier-P0 on p0.2 at 72f8525: NOT READY on nested and at-rule blocks; fixed
+
+verifier-P0 re-checked `72f8525`.
+
+**Closed.** All six spellings from its last round are refused, and so is
+`display:var(--d)` with `--d:none`. The allowlist is scoped per
+declaration: `.map .edge{display:none}` is refused. When it sabotaged the
+check back to whole-selector exemptions, the control named it.
+
+**Still open.** The check skipped every block whose prelude starts with
+`@`. With CSS nesting, an at-rule inside a style rule holds declarations
+that apply to the parent. These passed every stage:
+
+- `.src{@media all{display:none}}`
+- `@scope (.src){display:none}`
+- `.src{@supports (display:block){display:none}}`
+
+In Chrome, each of the first two hid 49 of the 124 labels.
+
+**Found while fixing it.** The lead found a sibling: the old block reader
+matched only innermost blocks, so in `.src{display:none; .x{...}}` the
+declaration beside the nested rule was never read.
+
+**Fixed.**
+
+- A brace-depth scanner replaces the old regex. It reads the declarations
+  directly inside every block, at any depth, at-rules included, and keeps
+  quoted strings whole.
+- A string left open ends at its line, as a browser ends it, so a stray
+  quote can't swallow the rules after it.
+- A nested block is named by its own prelude, so `css_hides.json`, which
+  names flat selectors, never allows one.
+
+**New controls, each caught:**
+
+- the verifier's three blocks;
+- a declaration beside a nested rule;
+- a keyframe that fades to nothing;
+- an allowed declaration nested under its parent;
+- a hiding rule after a string left open;
+- the scanner reading all 88 blocks of the real stylesheet, one per opening
+  brace outside a string.
+
+The README's "Styles" item says every block is read.
+
+`--control` now catches 157 of 157.
