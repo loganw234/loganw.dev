@@ -1813,6 +1813,37 @@ def controls():
                 lambda: facts.own_entries("docs/VALIDATION.md"), "not dated at its start")
     finally:
         facts.own_text = saved_own
+    # A commit of the site's own that a page cites: on the history being
+    # built, in a repository planted for the purpose, so CI runs it too.
+    with tempfile.TemporaryDirectory() as d:
+        g = lambda *a: subprocess.run(["git", "-C", d, "-c", "user.name=planted", "-c", "user.email=planted@invalid",
+                                       *a], capture_output=True, text=True)
+        g("init", "-q")
+        g("commit", "-q", "--allow-empty", "-m", "main's commit")
+        g("checkout", "-q", "-b", "side")
+        g("commit", "-q", "--allow-empty", "-m", "a commit only the side branch holds")
+        side = g("rev-parse", "--short", "HEAD").stdout.strip()
+        g("checkout", "-q", "-")
+        shallow = pathlib.Path(d) / "shallow"
+        subprocess.run(["git", "clone", "-q", "--depth", "1", pathlib.Path(d).as_uri(), str(shallow)],
+                       capture_output=True)
+        saved_root = facts.ROOT
+        try:
+            facts.ROOT = pathlib.Path(d)
+            refused("own", "a cited commit only a side branch holds, as a squashed parcel's are",
+                    lambda: facts.own_commit(side, "planted"), "does not descend from it")
+            refused("own", "a cited commit this site's history does not have",
+                    lambda: facts.own_commit("0000000", "planted"), "has no commit 0000000")
+            facts.ROOT = shallow
+            try:
+                facts.own_commit(side, "planted")
+                report("own", False, "a cited commit read from a shallow checkout passed")
+            except Unavailable as e:
+                report("own", "shallow" in str(e), "a cited commit read from a shallow checkout: %s" % e)
+            except Refusal as e:
+                report("own", False, "a shallow checkout was refused, but not as shallow: %s" % e)
+        finally:
+            facts.ROOT = saved_root
     refused("stated", "a statement about a pin that has since moved",
             lambda: facts.stated("planted", "Logan", "2026-09-29", holds_at={"cft-fp256": "0000000"}), "restate")
     heads = facts.ledger_headings("## 2026-01-01 - a\n```\n## 2026-01-02 - fenced\n```\n## 2026-01-03 - b\n")

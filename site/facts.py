@@ -978,3 +978,23 @@ def own_entry(path, line):
         if e["line"] == line:
             return V(e["title"], own_src(path, line, "the entry's own heading"), raw=e["date"])
     raise Refusal("this site's %s has no entry heading at line %d" % (path, line))
+
+
+@fact
+def own_commit(sha, what):
+    """A commit in this site's own history, by its hash: one the commit being
+    built descends from, so GitHub has it once this build is on main. A
+    commit that only a local branch holds, such as a squashed parcel's, is
+    refused. A shallow checkout can't show either, and is skipped by name."""
+    if _git(ROOT, "rev-parse", "--is-shallow-repository").strip() == "true":
+        raise Unavailable("this checkout is shallow, so this site's own history can't be read; "
+                          "fetch it whole (fetch-depth: 0)")
+    r = _git(ROOT, "rev-parse", "--verify", "-q", sha + "^{commit}", ok=(0, 1))
+    if r.returncode != 0:
+        raise Refusal("this site's history has no commit %s" % sha)
+    full = r.stdout.decode().strip()
+    if _git(ROOT, "merge-base", "--is-ancestor", full, "HEAD", ok=(0, 1)).returncode != 0:
+        raise Refusal("%s is a commit here, but the commit being built does not descend from it, "
+                      "so it is not on main" % sha)
+    return V(sha, Src("git", "this site's commit %s" % sha, what, "%s/commit/%s" % (OWN_REPO, full)),
+             raw=sha, num=True)

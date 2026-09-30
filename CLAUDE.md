@@ -110,7 +110,10 @@ a figure it didn't read there.
     `facts.own_entry()` read `docs/VALIDATION.md`, and MANIFEST hashes it.
     After appending an entry, rebuild before committing, or the `manifest`
     stage fails. Every heading there is dated at its start. Entries are only
-    appended, because a page cites an entry by its heading's line.
+    appended, because a page cites an entry by its heading's line. A commit
+    of the site's own that a page cites goes through `facts.own_commit()`,
+    which refuses one that main doesn't hold. A squashed parcel's commits
+    are like that.
 
 ## The discipline that matters most here
 

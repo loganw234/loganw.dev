@@ -1164,3 +1164,54 @@ nothing; a paraphrase adding a date; an entry asked for at a line with no
 heading; and a heading not dated at its start.
 
 `--control` caught 194 of 194.
+
+## 2026-09-29 - wave 1's verifier findings, folded from the round ledger; a cited commit must be on main
+
+**Where this comes from.** Each verifier kept its own file in the round's
+ledger, which sits outside this repository and is archived at the round's
+end. What follows is what each found before its parcel merged, and where the
+fix reached main. The verifiers measured it; the lead read their files.
+
+**verifier-P1** (Record and Verify):
+
+- On `d474080`, it found that the Record's link to each entry, the one a
+  reader clicks, was checked by nothing. A link one line off passed every
+  stage. Fixed at `5128ce6`: the link and its check now read one href, and
+  the check compares it with a fresh read of the ledger.
+- On `d474080`, verify.html stated details of cft-fp256's contract in its
+  own words, outside any quote. Fixed at `5128ce6`, by quoting.
+- On `5128ce6`, one more such sentence remained, in check 3. Fixed at
+  `1e21d8e`, where verifier-P1 said READY.
+
+**verifier-P2** (the map on phones, and the Threads):
+
+- On `137157f`, it found that the `credits-grouping` control never exercised
+  case-folding. A one-token change to `account_of` passed that control and
+  broke the page. P2 added a `credits-case-fold` control, which the verifier
+  watched fail on its own fault, and it said READY at `bdbac1f`.
+- P2 was squash-merged, so `bdbac1f` is not on main. Its fix reached main
+  in `6c163dd`.
+
+**verifier-P3** (Work):
+
+- On `9260b4f`, which carried the lead's two planted faults, it reported
+  both, and nothing else in P3's work. The lead's control on the verifier
+  caught 2 of 2.
+- The lead then asked P3 to quote one sentence the verifier had judged
+  borderline, and to look for others like it. P3 quoted five, at `729461d`,
+  where verifier-P3 said READY.
+
+**A cited commit must be on main.** A page that cites a commit of this
+site's own, as the fix for a finding, goes through `facts.own_commit`. It
+refuses a commit that the commit being built doesn't descend from, such as
+`bdbac1f`, which GitHub doesn't have. CI's checkout now fetches the whole
+history, since a shallow one can't show descent; a shallow checkout is
+skipped by name.
+
+- New controls (3): a commit only a side branch holds; a commit the history
+  lacks; and a shallow checkout.
+- The workflow's comment said the gate used one library. Its controls use
+  two, markdown-it-py and tinycss2, each with one dependency, and the
+  comment now says so.
+
+`--control` caught 197 of 197.
