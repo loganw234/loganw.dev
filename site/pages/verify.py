@@ -23,9 +23,11 @@ PAGE = {"file": "verify.html", "nav": "Verify",
 def _lede():
     P = facts.prose
     return render([
-        "cft-fp256's contract is that any conforming implementation - a different chip, a different process, "
-        "a different language - must still be ",
-        P("cft-fp256", "CONFORMANCE.md", r"and still be (interchangeable with them bit for bit)"),
+        "cft-fp256's contract: an ",
+        P("cft-fp256", "CONFORMANCE.md",
+          r"(implementation can be built and proven without this repository's RTL\s+or library - a different "
+          r"chip, a different process, a different\s+language - and still be interchangeable with them bit "
+          r"for bit)"),
         ". The checks below are how a reader confirms that directly, without taking this site's word for it, "
         "cheapest first.",
     ])
@@ -39,9 +41,7 @@ def checks():
     items.append([
         L(url.raw, "cft-fp256's own conformance replay"), ", in the browser. Cost: a browser tab, nothing "
         "installed. It ",
-        P("cft-fp256", "README.md", r"It (replays\s+the published conformance vectors in front of you)"), ". ",
-        "A pass shows the published WebAssembly build agrees with the committed conformance vectors, live; it "
-        "says nothing about the native library, the RTL, or a device - those are the checks below.",
+        P("cft-fp256", "README.md", r"It (replays\s+the published conformance vectors in front of you)"), ".",
     ])
 
     items.append([
@@ -51,10 +51,9 @@ def checks():
         P("cft-fp256", "docs/VERIFICATION.md",
           r"(Its pytest suite\s+checks the model against its own invariants and against mpmath and\s+"
           r"MPFR where they can arbitrate)"),
-        ". That is the authority every other stage here is held to, and ",
+        ". ",
         P("cft-fp256", "docs/VERIFICATION.md", r"(Nothing below re-litigates a value it\s+has decided)"),
-        " - a pass here says the definition of correct is internally consistent, not that the library, the "
-        "RTL or a device agrees with it.",
+        ".",
     ])
 
     items.append([

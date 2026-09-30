@@ -10,8 +10,13 @@ later is picked up without an edit here.
 The trap: a silently dropped entry, or a link pointing at the wrong line.
 Both are held by a live check, not only by a comment: verify_row_count and
 verify_entry_link run on every row this page builds, and controls() proves
-each one bites by planting the fault it exists to catch.
+each one bites by planting the fault it exists to catch. verify_entry_link
+reads the href this page actually renders for a row's title (the one a
+reader clicks) - not a line number fed back to itself - so it catches a
+fault anywhere in how that href gets built, not only a hand-edited call.
 """
+import re
+
 import facts
 from facts import V, Src, fact
 from render import L, esc, render
@@ -25,14 +30,19 @@ LEDGER_PATH = "docs/VALIDATION.md"
 # plain function, not a @fact, so it is never assumed fresh - briefs/P1.md).
 # cft-fp256's ledger alone is past 15,000 lines, and this page calls entries()
 # several times per row (the date fact, the title fact, the link check), so a
-# per-(name, path) cache of its result - never of its own parsing, no second
-# parser - keeps one build from re-scanning the same pinned, immutable text
-# hundreds of times. Pin.git memoises for the same reason (CLAUDE.md, trap 2).
+# cache of its result - never of its own parsing, no second parser - keeps
+# one build from re-scanning the same pinned, immutable text hundreds of
+# times. Pin.git memoises for the same reason (CLAUDE.md, trap 2).
+#
+# Keyed by the pin's own commit, not just (name, path): build.py's
+# stale-pin control moves a pin within a single process (the lead's note,
+# verifier-P1's re-check), and a key of (name, path) alone would go on
+# serving a moved pin's old entries() result for the rest of that run.
 _ENTRIES_CACHE = {}
 
 
 def _entries(name, path):
-    key = (name, path)
+    key = (name, facts.pin(name).full, path)
     if key not in _ENTRIES_CACHE:
         _ENTRIES_CACHE[key] = facts.entries(name, path)
     return _ENTRIES_CACHE[key]
@@ -67,15 +77,24 @@ def verify_row_count(name, path, n_rows):
                             % (name, len(ents), n_rows))
 
 
-def verify_entry_link(name, path, index, line):
+_LINE_HREF = re.compile(r"#L(\d+)$")
+
+
+def verify_entry_link(name, path, index, href):
     """The trap: a link off by a line, which sends a reader to the wrong
-    heading. A row's #L<line> must be its own entry's heading line, read
-    fresh from entries(), or this refuses by name."""
+    heading. Takes the href this page actually renders for a row's title -
+    the one a reader clicks - not a line number handed back to itself, so a
+    fault anywhere in how that href gets built is caught, not only a
+    hand-edited call site. A private repository's href is empty; there is
+    no rendered link to check, so this passes it through."""
+    if not href:
+        return
     _, ents = _entries(name, path)
     want = ents[index]["line"]
-    if line != want:
-        raise facts.Refusal("record: %s entry %d links to %s#L%d, and entries() puts its heading at line %d"
-                            % (name, index, path, line, want))
+    m = _LINE_HREF.search(href)
+    if not m or int(m.group(1)) != want:
+        raise facts.Refusal("record: %s entry %d's rendered link is %r, and entries() puts its heading at "
+                            "line %d" % (name, index, href, want))
 
 
 @fact
@@ -122,11 +141,14 @@ def ledger_total(names, path):
 
 
 def _row(name, path, index, e):
-    p = facts.pin(name)
     date_v = ledger_date(name, path, index)
     title_v = ledger_title(name, path, index)
-    verify_entry_link(name, path, index, e["line"])
-    href = p.href(path, e["line"]) if not p.private else ""
+    # The same href the citation carries (ledger_title's own logged source),
+    # not a second, separately computed one: the link a reader clicks and
+    # the one the check reads are now one value, not two that merely agree
+    # today.
+    href = title_v.src.href
+    verify_entry_link(name, path, index, href)
     entry = L(href, title_v) if href else title_v
     return ('<tr><td class="d">%s</td><td class="p">%s</td><td>%s</td></tr>'
             % (render(date_v), esc(name), render(entry)))
@@ -196,18 +218,33 @@ def controls():
         caught = name in msg and str(len(ents)) in msg and str(short) in msg
         out.append(("row-count", caught, msg))
 
+    # Planted in the rendering path itself - Pin.href, which ledger_title's
+    # own p.src(...) call goes through - not by calling verify_entry_link
+    # with a hand-fed line. This is the same route the verifier used to
+    # find the original defect (a title link built from its own separately
+    # computed href), so the control now proves the fix, not just the
+    # guard's arithmetic.
     name = "cft-fp256"
     _, ents = facts.entries(name, path)
     real_line = ents[0]["line"]
-    bad_line = real_line + 1
+    original_href = facts.Pin.href
+
+    def _off_by_one(self, path="", line=0, _orig=original_href):
+        return _orig(self, path, line + 1 if line else line)
+
+    facts.Pin.href = _off_by_one
     try:
-        verify_entry_link(name, path, 0, bad_line)
+        bad_href = ledger_title(name, path, 0).src.href
+    finally:
+        facts.Pin.href = original_href
+    try:
+        verify_entry_link(name, path, 0, bad_href)
         out.append(("link-line", False,
-                    "verify_entry_link did not refuse link line %d against entry 0's real line %d"
-                    % (bad_line, real_line)))
+                    "verify_entry_link did not refuse %r, planted one line off entry 0's real line %d via "
+                    "Pin.href" % (bad_href, real_line)))
     except facts.Refusal as e:
         msg = str(e)
-        caught = name in msg and str(bad_line) in msg and str(real_line) in msg
+        caught = name in msg and bad_href in msg and str(real_line) in msg
         out.append(("link-line", caught, msg))
 
     return out

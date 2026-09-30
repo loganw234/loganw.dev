@@ -11220,19 +11220,19 @@
     "name": "cft-fp256",
     "num": false,
     "path": "CONFORMANCE.md",
-    "pattern": "and still be (interchangeable with them bit for bit)"
+    "pattern": "(implementation can be built and proven without this repository's RTL\\s+or library - a different chip, a different process, a different\\s+language - and still be interchangeable with them bit for bit)"
    },
    "detail": "",
-   "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/CONFORMANCE.md#L9",
+   "href": "https://github.com/loganw234/cft-fp256/blob/77b8440937a8f0376986c173f09fcc52a04185ad/CONFORMANCE.md#L7",
    "id": 627,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "interchangeable with them bit for bit",
+   "raw": "implementation can be built and proven without this repository's RTL or library - a different chip, a different process, a different language - and still be interchangeable with them bit for bit",
    "said": "",
-   "text": "interchangeable with them bit for bit",
-   "where": "cft-fp256 77b8440 CONFORMANCE.md:9"
+   "text": "implementation can be built and proven without this repository's RTL or library - a different chip, a different process, a different language - and still be interchangeable with them bit for bit",
+   "where": "cft-fp256 77b8440 CONFORMANCE.md:7"
   },
   {
    "args": {
