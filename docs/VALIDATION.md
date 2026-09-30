@@ -1215,3 +1215,23 @@ skipped by name.
   comment now says so.
 
 `--control` caught 197 of 197.
+
+## 2026-09-29 - Wally only on the game thread's page: decision 16 becomes a gate, before wave 2
+
+**Why now.** Decision 16 says Wally appears only on the game thread's page.
+The spec itself names Wally twice more: on Home, and in About's register. P5
+writes About, and nothing yet refused the name there.
+
+**What holds it.** The local-only stage refuses the name in every published
+text file except `thread-preservation.html` and `facts.json` (`build.ONLY_IN`).
+facts.json records the text of every figure and statement, so the
+Preservation page's own statement of the name is there too.
+
+- It reads each file with character references decoded, and a second time
+  with its tags stripped as well, so an entity, an attribute or markup
+  inside the word doesn't hide it.
+- It matches the whole word, in any case.
+- 5 new controls plant the name on Home: in a sentence, in lower case,
+  split by markup, as a character reference, and in an attribute.
+
+`--control` caught 202 of 202.

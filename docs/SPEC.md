@@ -127,7 +127,9 @@ where they were longer.
 15. **The first version** gives full dossiers to cft-fp256, Quantum-Film,
     cft-rebound, and the two methods (HonestFramework and ParcelRound).
 16. **Wally** is Logan's Discord username. It appears only on the game
-    thread's page.
+    thread's page. The local-only stage refuses it in any other published
+    file (`build.ONLY_IN`), since the spec itself also names it on Home and
+    on About.
 17. **Project order** (Logan's account): PrettyCloud was the first project and
     grew into the Atlas family, then cft-fp256, then the projects built on it.
     The earliest projects, CanonBracketTool and Microscope-Stacker, were "my

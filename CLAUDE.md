@@ -115,6 +115,10 @@ a figure it didn't read there.
     which refuses one that main doesn't hold. A squashed parcel's commits
     are like that.
 
+16. **The spec names Wally on Home and on About; decision 16 allows the name
+    on one page only,** the Preservation thread's. The local-only stage
+    refuses it in any other published file.
+
 ## The discipline that matters most here
 
 A number that isn't read from its source doesn't appear on the site. If you

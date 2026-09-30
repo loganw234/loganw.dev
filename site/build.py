@@ -995,6 +995,7 @@ def check_local_only(root=PUBLIC):
             problems += ["%s: %s" % (rel, x) for x in css_problems(f.read_text(encoding="utf-8"))]
         problems += ["%s: %s" % (rel, x) for x in type_problems(rel, f.read_bytes())]
         problems += ["%s: %s" % (rel, x) for x in email_problems(rel, f.read_bytes())]
+        problems += ["%s: %s" % (rel, x) for x in only_in_problems(rel, f.read_bytes())]
     if not any(r.endswith(".html") for r in published(root)):
         problems.append("no page is published")
     return problems
@@ -1034,6 +1035,25 @@ def email_problems(rel, data):
     found = sorted({m.group(0).lower() for m in EMAIL.finditer(data.decode("utf-8", "replace"))} - SITE_CONTACTS)
     return ["an email address (%d found); only the site's contact, %s, may be published"
             % (len(found), ", ".join(sorted(SITE_CONTACTS)))] if found else []
+
+
+# Decision 16: Wally, Logan's Discord username, appears only on the game
+# thread's page. A name here may be published only in the files listed with
+# it; facts.json, which records the text of every figure and statement, holds
+# that page's statement of it. A page is read twice, as it is with character
+# references decoded, and with its tags stripped too, so neither an entity,
+# an attribute nor markup inside the word hides it.
+ONLY_IN = {"Wally": ("thread-preservation.html", "facts.json")}
+
+
+def only_in_problems(rel, data):
+    if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
+        return []
+    t = data.decode("utf-8", "replace")
+    views = (html.unescape(t), html.unescape(re.sub(r"<[^>]*>", "", t)))
+    return ["names %s, which may be published only in %s" % (name, ", ".join(files))
+            for name, files in sorted(ONLY_IN.items())
+            if rel not in files and any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.(?:png|jpg|jpeg|webp)")
@@ -1657,6 +1677,15 @@ def controls():
         found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
         report("local-only", bool(found), "an email address in facts.json: %s" % (found[0] if found else "passed"))
         fjp.write_text(saved_fj, encoding="utf-8")
+        # Wally on a page other than the game thread's (decision 16), in each
+        # shape a page could print it.
+        for what, shape in (("in a sentence", "<p>Wally made this</p>"),
+                            ("in lower case", "<p>ask wally</p>"),
+                            ("split by markup", "<p>Wal<b>ly</b> made this</p>"),
+                            ("as a character reference", "<p>&#87;ally made this</p>"),
+                            ("in an attribute", '<p title="by Wally">made</p>')):
+            planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
+                    check_local_only, "index.html: names Wally")
         planted("local-only", "a preview card's text in a meta tag",
                 t.replace("</head>", '<meta name="twitter:description" content="3397 tests"></head>', 1),
                 check_local_only, "twitter:description")
@@ -2080,7 +2109,8 @@ def main(argv=None):
                        ("--verify-facts", "read every published figure again"),
                        ("--numbers", "every numeral on a page is a figure marked with its own fact"),
                        ("--links", "every relative link resolves to a published file, exactly"),
-                       ("--local-only", "only allowed tags and attributes; nothing loads from another host"),
+                       ("--local-only", "only allowed tags and attributes; nothing loads from another host; no email "
+                                         "address but the contact; Wally only on the game thread's page"),
                        ("--docs", "the documents' links resolve, and none states the stage count"),
                        ("--privacy", "no tracked file names a private repository the site does not read"),
                        ("--github", "every pin is a commit GitHub has now, as the snapshot recorded"),
