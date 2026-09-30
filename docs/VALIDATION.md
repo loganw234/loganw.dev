@@ -852,3 +852,62 @@ declaration beside the nested rule was never read.
 The README's "Styles" item says every block is read.
 
 `--control` now catches 157 of 157.
+
+## 2026-09-29 - verifier-P0 on p0.2 at d1b34d1: NOT READY on a quote inside an unquoted url(); fixed by one CSS tokenizer for every check
+
+verifier-P0's run was cut short by a dropped connection, then resumed from
+the same copy.
+
+**Closed.** At `d1b34d1` its three at-rule forms are refused, and so is the
+lead's sibling, a declaration beside a nested rule. It sabotaged the
+reading of at-rule blocks, and the controls named the change. The
+block-count control caught its first plant.
+
+**The gap.** The two-line file
+
+    .src{background:url(assets/pauli-print.png');display:none}
+    }
+
+passed every stage.
+
+- A browser reads the quote as a malformed URL that ends at the `)`, so
+  `display:none` applies. In Chrome it hid 49 labels.
+- The scanner read the quote as the start of a string running to the end of
+  the line, so it never saw `display:none`.
+- The stray `}` on the next line kept the block count even, so the
+  block-count control passed too.
+
+**Fixed.** Stylesheets are now cut into tokens once, the way CSS Syntax 3
+cuts them, by `build.css_tokens`:
+
+- a comment runs to `*/`;
+- a string runs to its closing quote or, if left open, to the end of its
+  line;
+- an unquoted `url(` runs to its first `)`, and is malformed if it holds a
+  quote, a space, `(`, `{`, `}` or `;`.
+
+Every stylesheet check reads through it:
+
+- the hiding check's block scanner;
+- the numbers stage's strings and counters;
+- local-only's loads;
+- the links check's `url()`s.
+
+No check strips comments with a regex any more. While fixing this, the lead
+found that such a regex spans from a `/*` inside one string to a `*/` inside
+another, deleting the rule between them before the check sees it.
+
+Local-only also refuses every shape in which a reading of the text and a
+browser's could still part:
+
+- a string or a comment left open;
+- a comment marker inside a string;
+- a malformed `url()`;
+- a backslash escape, which it already refused.
+
+**Controls.** Seven new ones: the verifier's plant, the comment-marker
+trick, a semicolon inside an unquoted `url()`, and each refused shape. The
+block count now reads the tokens. The README's "Styles" item says how
+stylesheets are read.
+
+`--control` now catches 164 of 164.

@@ -434,7 +434,6 @@ def _loose_problems(where, text, tick, names, allowed):
     return out
 
 
-CSS_STRING = re.compile(r"\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'", re.S)
 
 # Declarations that hide an element or its text. A page's figures and their
 # sources are in its HTML, and a stylesheet could hide them there: verifier-P0
@@ -470,38 +469,98 @@ def _nonpositive(tok):
     return bool(m) and float(m.group(1)) <= 0
 
 
+def css_tokens(css):
+    """A stylesheet as CSS Syntax 3 cuts it, as far as this site needs:
+    [(kind, text, flaw)], where kind is 'comment', 'string', 'url' or 'char'.
+    A string ends at its closing quote or, left open, at the end of its line
+    (flaw 'open'); an unquoted url( runs to its first ')', and a quote,
+    space, '(' or '{', '}' or ';' inside it makes it malformed (flaw 'bad'),
+    as a browser reads it - never a string (verifier-P0 hid display:none
+    behind url(x.png') ). One reading, used by every check of a stylesheet."""
+    out, i, n = [], 0, len(css)
+    while i < n:
+        if css.startswith("/*", i):
+            j = css.find("*/", i + 2)
+            j = n if j < 0 else j + 2
+            out.append(("comment", css[i:j], "" if css.endswith("*/", 0, j) and j - i >= 4 else "open"))
+            i = j
+        elif css[i] in "\"'":
+            q, j = css[i], i + 1
+            while j < n and css[j] != q and css[j] != "\n":
+                j += 2 if css[j] == "\\" else 1
+            closed = j < n and css[j] == q
+            out.append(("string", css[i:j + 1 if closed else j], "" if closed else "open"))
+            i = j + 1 if closed else j
+        elif css[i:i + 4].lower() == "url(" and (i == 0 or not re.match(r"[\w-]", css[i - 1])):
+            k = i + 4
+            while k < n and css[k] in " \t\n":
+                k += 1
+            if k < n and css[k] in "\"'":
+                out.append(("char", css[i:k], ""))       # url( with a string: the string comes next
+                i = k
+                continue
+            j = css.find(")", k)
+            j = n if j < 0 else j + 1
+            body = css[k:j - 1].rstrip(" \t\n")
+            out.append(("url", css[i:j], "bad" if re.search(r"[\"'(\s{};]", body) else ""))
+            i = j
+        else:
+            out.append(("char", css[i], ""))
+            i += 1
+    return out
+
+
+def css_parts(css):
+    """-> (code, strings, urls): the stylesheet with its comments dropped and
+    each string emptied to "", so a pattern searched in code never matches
+    inside a string or a comment; every string's contents; and every url()'s
+    address, quoted or not. Every check of a stylesheet reads it through
+    this, so none can be misled by a comment marker a regex would see and
+    CSS would not (verifier-P0)."""
+    code, strings, urls, pending = [], [], [], False
+    for kind, text, _ in css_tokens(css):
+        if kind == "comment":
+            code.append(" ")
+        elif kind == "string":
+            body = text[1:-1] if len(text) > 1 and text[-1] == text[0] else text[1:]
+            strings.append(body)
+            code.append('""')
+            if pending:
+                urls.append(body)
+        elif kind == "url":
+            urls.append(text[4:-1].strip() if text.endswith(")") else text[4:].strip())
+            code.append("url()")
+        else:
+            code.append(text)
+        pending = kind == "char" and text.lower().replace(" ", "").endswith("url(")
+    return "".join(code), strings, urls
+
+
 def _decls(css):
     """[(prelude, [(property, value)])] for every block, at any depth: the
     declarations directly inside it, beside any block nested in it. With CSS
     nesting, `.src{display:none; .x{...}}` and `.src{@media all{display:none}}`
     both apply display:none to .src, and verifier-P0 hid 49 labels with the
-    second while a reader of innermost rules alone passed it. Quoted strings
-    are kept whole, so a brace or a semicolon inside one is not structure."""
-    stack, out, seg, i = [["", []]], [], [], 0
-    while i < len(css):
-        c = css[i]
-        if c in "\"'":
-            # a string ends at its closing quote, or - left open - at the end
-            # of its line, where CSS ends a bad string
-            j = i + 1
-            while j < len(css) and css[j] != c and css[j] != "\n":
-                j += 2 if css[j] == "\\" else 1
-            seg.append(css[i:j + 1])
-            i = j + 1
+    second while a reader of innermost rules alone passed it. Built on
+    css_tokens, so a brace or a semicolon inside a string or a url() is not
+    structure, and comments are dropped as CSS drops them."""
+    stack, out, seg = [["", []]], [], []
+    for kind, text, _ in css_tokens(css):
+        if kind == "comment":
             continue
-        if c == "{":
+        if kind != "char" or text not in "{};":
+            seg.append(text)
+            continue
+        if text == "{":
             stack.append(["".join(seg).strip(), []])
             seg = []
-        elif c in ";}":
-            d = "".join(seg).strip()
-            if d:
-                stack[-1][1].append(d)
-            seg = []
-            if c == "}" and len(stack) > 1:
-                out.append(tuple(stack.pop()))
-        else:
-            seg.append(c)
-        i += 1
+            continue
+        d = "".join(seg).strip()
+        if d:
+            stack[-1][1].append(d)
+        seg = []
+        if text == "}" and len(stack) > 1:
+            out.append(tuple(stack.pop()))
     rules = []
     for prelude, parts in out:
         pairs = []
@@ -618,8 +677,7 @@ def _hides(prop, v):
 def hiding_problems(css):
     """Every rule that hides what it styles, as the list above reads it."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
-    # comments first: an apostrophe in one would read as a string's start
-    rules = _decls(re.sub(r"/\*.*?\*/", "", css, flags=re.S))
+    rules = _decls(css)
     defs = {}
     for sel, pairs in rules:
         prop_rule = re.fullmatch(r"@property\s+(--[\w-]+)", sel)
@@ -726,15 +784,15 @@ def check_numbers(root=PUBLIC, names=None):
             # Text a reader sees and no page holds: a numeral typed there would
             # pass every check on the HTML (generated content, 45b8d01; quotes
             # and list markers, verifier-P0 on bc2ffbc).
-            css = re.sub(r"/\*.*?\*/", "", (root / rel).read_text(encoding="utf-8"), flags=re.S)
-            css = re.sub(r'^@charset "utf-8";', "", css)
-            for m in re.finditer(r"content\s*:\s*([^;}]*)", css, re.I):
+            css = re.sub(r'^@charset "utf-8";', "", (root / rel).read_text(encoding="utf-8"))
+            code, strings, _ = css_parts(css)
+            for m in re.finditer(r"content\s*:\s*([^;}]*)", code, re.I):
                 if re.search(r"\b(?:counters?|attr)\s*\(", m.group(1), re.I):
                     problems.append("%s: generated content %r prints what no fact holds" % (rel, m.group(1).strip()))
-            for m in re.finditer(r"@counter-style|counter-(?:reset|set|increment)\s*:", css, re.I):
+            for m in re.finditer(r"@counter-style|counter-(?:reset|set|increment)\s*:", code, re.I):
                 problems.append("%s: %s can print a number no fact holds" % (rel, m.group(0).rstrip(": ")))
-            for m in CSS_STRING.finditer(css):
-                problems += _loose_problems("%s string" % rel, m.group(0)[1:-1], False, names, allowed)
+            for s in strings:
+                problems += _loose_problems("%s string" % rel, s, False, names, allowed)
             problems += ["%s: %s" % (rel, x) for x in hiding_problems(css)]
         elif rel.endswith(".txt") and not rel.startswith("fonts/"):
             t = (root / rel).read_text(encoding="utf-8")
@@ -827,16 +885,28 @@ class _Tags(html.parser.HTMLParser):
 
 def css_problems(css):
     """A stylesheet's loads. Comments go first, then anything that could spell
-    a load in another case or through an escape is refused outright."""
+    a load in another case or through an escape is refused outright. So are
+    the shapes where a reading of the text and a browser's can part, which
+    every check of a stylesheet here relies on not meeting: a string left
+    open at the end of its line, a comment left open, a comment marker inside
+    a string, and a malformed url() - one whose unquoted address holds a
+    quote, a space, '(', '{', '}' or ';'."""
     out = []
-    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    for kind, text, flaw in css_tokens(css):
+        if flaw == "open":
+            out.append("a %s left open: %r" % (kind, text[:40]))
+        elif kind == "url" and flaw == "bad":
+            out.append("a malformed url(): %r" % text[:60])
+        elif kind == "string" and ("/*" in text or "*/" in text):
+            out.append("a comment marker inside a string: %r" % text[:40])
     if "\\" in css:
         out.append("a backslash escape, which could spell a load")
+    code, _, urls = css_parts(css)
     for pat, what in ((r"@import", "@import"), (r"image-set\(", "image-set()"), (r"(?<![\w-])src\(", "src()"),
                       (r"expression\(", "expression()"), (r"-moz-binding", "-moz-binding"), (r"behavior\s*:", "behavior")):
-        if re.search(pat, css, re.I):
+        if re.search(pat, code, re.I):
             out.append("uses %s" % what)
-    for u in re.findall(r"url\(\s*['\"]?([^'\")]*)", css, re.I):
+    for u in urls:
         if (SCHEME.match(u) and not u.lower().startswith("data:")) or u.startswith("//"):
             out.append("url(%s) loads from another host" % u)
     return out
@@ -939,8 +1009,7 @@ def check_links(root=PUBLIC):
             ids[rel] = p.ids
             refs += [(rel, u) for u in p.refs]
         elif rel.endswith(".css"):
-            css = re.sub(r"/\*.*?\*/", "", (root / rel).read_text(encoding="utf-8"), flags=re.S)
-            refs += [(rel, u) for u in re.findall(r"url\(\s*['\"]?([^'\")]*)", css, re.I)]
+            refs += [(rel, u) for u in css_parts((root / rel).read_text(encoding="utf-8"))[2]]
     for rel, u in refs:
         if SCHEME.match(u) or u.startswith("//"):
             continue
@@ -1436,15 +1505,19 @@ def controls():
                                      ("a keyframe that fades to nothing", "@keyframes planted{to{opacity:0}}",
                                       "'to' hides"),
                                      ("an allowed declaration, nested under its parent",
-                                      ".map{.edge{fill:none}}", "'.edge' hides")):
+                                      ".map{.edge{fill:none}}", "'.edge' hides"),
+                                     ("a hiding declaration after a quote inside an unquoted url()",
+                                      ".src{background:url(assets/pauli-print.png');display:none}\n}", "'.src' hides"),
+                                     ("a hiding rule between comment markers held in strings",
+                                      '.a{content:"/*"} .src{display:none} .b{content:"*/"}', "'.src' hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
             css.write_text(saved_css, encoding="utf-8")
             # the scanner itself: it must read every block of the real
             # stylesheet, or a rule it lost its place in is a rule unread
-            plain = re.sub(r"/\*.*?\*/", "", saved_css, flags=re.S)
-            n_read, n_open = len(_decls(plain)), plain.count("{") - sum(s.count("{") for s in CSS_STRING.findall(plain))
+            n_read = len(_decls(saved_css))
+            n_open = sum(1 for kind, text, _ in css_tokens(saved_css) if kind == "char" and text == "{")
             report("numbers", n_read == n_open, "the stylesheet's %d blocks, each read: %d" % (n_open, n_read))
             # a string left open ends at its line, as a browser ends it, so a
             # stray quote cannot swallow the rules after it
@@ -1496,7 +1569,12 @@ def controls():
         for what, css in (("URL( in capitals", "a{background:URL(https://x.invalid/a.png)}"),
                           ("@IMPORT", "@IMPORT 'https://x.invalid/a.css';"),
                           ("image-set", 'a{background:image-set("https://x.invalid/a.png" 1x)}'),
-                          ("an escaped url", "a{background:u\\72l(https://x.invalid/a.png)}")):
+                          ("an escaped url", "a{background:u\\72l(https://x.invalid/a.png)}"),
+                          ("a quote inside an unquoted url()", ".src{background:url(assets/pauli-print.png');color:red}"),
+                          ("a semicolon inside an unquoted url()", ".x{background:url(a;b)}"),
+                          ("a comment marker inside a string", '.a{content:"/*"}'),
+                          ("a string left open", ".a{content:'open\n}"),
+                          ("a comment left open", ".a{color:red} /* never closed")):
             found = css_problems(css)
             report("local-only", bool(found), "%s in CSS: %s" % (what, found[0] if found else "passed"))
 
