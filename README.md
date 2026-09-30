@@ -31,6 +31,12 @@ What that doesn't cover:
   is for the reader to judge.
 - **Images.** An image is checked only as the bytes its pin gives. What it
   shows is not read.
+- **Styles.** The gates read a page's HTML and its stylesheets' text, but
+  they don't lay the page out. A stylesheet may not hide what it styles:
+  `display:none`, zero opacity or size, transparent text, clipping and the
+  like are refused, unless `site/data/css_hides.json` names the selector.
+  Hiding by other means would still pass, such as text coloured like its
+  background, or text stacked under something else.
 
 ## Does it still hold?
 

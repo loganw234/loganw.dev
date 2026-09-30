@@ -1,0 +1,4 @@
+{
+ "about": "Stylesheet selectors that may hide what they style (display:none and the like), each with why. The lead's file: the numbers stage refuses a hiding rule for any selector not named here, because a stylesheet could otherwise hide a figure or its source while every page check passes. A layout that swaps one view for another names both selectors here.",
+ "selectors": {}
+}

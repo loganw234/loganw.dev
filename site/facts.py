@@ -566,19 +566,39 @@ _OPEN_TAG = (r"<[A-Za-z][A-Za-z0-9-]*(?:\s+[A-Za-z_:][\w.:-]*(?:\s*=\s*(?:[^\s\"
              r"\s*/?>|</[A-Za-z][A-Za-z0-9-]*\s*>")
 
 
+def raw_block(s):
+    """CommonMark's HTML blocks of types 1 to 5, which end at a marker rather
+    than at a blank line: (where the marker may start, the marker as a
+    pattern), or None for a line that starts no such block."""
+    m = re.match(r" {0,3}<(pre|script|style|textarea)(?=[\s>]|$)", s, re.I)
+    if m:
+        return m.end(), r"</(?:pre|script|style|textarea)>"
+    for start, end in ((r" {0,3}<!--", r"-->"), (r" {0,3}<\?", r"\?>"), (r" {0,3}<![A-Za-z]", r">"),
+                       (r" {0,3}<!\[CDATA\[", r"\]\]>")):
+        m = re.match(start, s)
+        if m:
+            return m.end(), end
+    return None
+
+
 def ledger_headings(t):
     """A ledger's level-2 headings: [(offset, '## title', the line as
     written)]. A heading may be indented up to three spaces, or have a tab
     after its marks, as CommonMark allows.
 
     Not headings, as in CommonMark: a line inside a fenced code block, and a
-    line inside an HTML block - a comment from <!-- to -->, or a block-level
-    tag's block, up to the next blank line. verifier-P0 built a heading inside
-    a fence that the first parser counted, and one inside a comment.
+    line inside an HTML block. An HTML block ends where CommonMark ends it:
+      * <pre>, <script>, <style> or <textarea> at the line holding their
+        closing tag;
+      * a comment at -->, <?...?> at ?>, <!...> at >, and <![CDATA[ at ]]>;
+      * a block-level tag's block, or a lone tag's, at the next blank line.
+    verifier-P0 built a heading inside a fence that the first parser counted,
+    one inside a comment, and one inside a <pre> that spans a blank line.
 
     Refused, because each renders as a level-2 heading this parser does not
     read, and would drop an entry without a word:
-      * a fence or a comment still open at the end of the file;
+      * a fence or an HTML block still open at the end of the file, where it
+        would swallow every heading after it;
       * a setext heading: a line underlined with dashes, even a single one;
       * a heading inside a quote or a list item, however they nest;
       * an HTML <h2>, anywhere outside a code span.
@@ -604,13 +624,14 @@ def ledger_headings(t):
         elif html is not None:
             if re.search(r"<h2\b", s, re.I):
                 raise Refusal("line %d has an HTML heading inside an HTML block, which this parser does not read" % i)
-            if (html == "-->" and "-->" in s) or (html == "" and not s.strip()):
+            if (html == "" and not s.strip()) or (html and re.search(html, s, re.I)):
                 html = None
         elif m:
             fence, opened = m.group(1), i
-        elif re.match(r" {0,3}<!--", s):
-            if "-->" not in s[s.index("<!--") + 4:]:
-                html, opened = "-->", i
+        elif raw_block(s) is not None:
+            start, end = raw_block(s)
+            if not re.search(end, s[start:], re.I):
+                html, opened = end, i
         elif re.match(r" {0,3}</?(?:%s)(?:[\s/>]|$)" % BLOCK_TAGS, s, re.I) \
                 or (not prev.strip() and re.match(r" {0,3}(?:%s)\s*$" % _OPEN_TAG, s)):
             html = "" if s.strip() else None
@@ -631,8 +652,8 @@ def ledger_headings(t):
     if fence is not None:
         raise Refusal("the code fence opened at line %d is never closed, so every heading after it would be "
                       "dropped" % opened)
-    if html == "-->":
-        raise Refusal("the HTML comment opened at line %d is never closed, so every heading after it would be "
+    if html:
+        raise Refusal("the HTML block opened at line %d is never closed, so every heading after it would be "
                       "dropped" % opened)
     return out
 

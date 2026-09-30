@@ -654,3 +654,53 @@ It also noted that CI pinned markdown-it-py by version only, not by hash.
    matched against a hash-checked download.
 
 `--control` now catches 131 of 131.
+
+## 2026-09-29 - verifier-P0 on p0.2 at e6ce3d3: NOT READY on one gap, a stylesheet hiding the sources; fixed
+
+verifier-P0 re-checked `e6ce3d3`: 11 of 11 passed, and controls caught 131.
+It closed all three overclaims from its previous report, each by watching
+the matching control fail on its own sabotage. Its line-and-title
+cross-check caught a parser that put every heading one line off, while the
+counts all still matched.
+
+**The gap.** One file under `site/styles/` holding `.src{display:none}`
+passed every stage. In the browser, 49 of the 124 labels vanished. The gates
+read the HTML, and nothing read what a stylesheet hides.
+
+**Fixed:**
+
+- The numbers stage refuses any stylesheet rule that hides what it styles,
+  unless `site/data/css_hides.json` (the lead's, empty today) names its
+  selector. The hiding forms it refuses:
+  - `display:none`;
+  - `visibility:hidden` or `collapse`, and `content-visibility:hidden`;
+  - zero opacity, zero font size, and a zero scale;
+  - transparent text;
+  - `clip` and `clip-path`;
+  - `text-indent`;
+  - an opacity filter.
+- Three controls plant `.src{display:none}`, `.fig{visibility:hidden}` and
+  `main .src{font-size:0}`.
+- The README states what remains: the gates don't lay the page out, so
+  text coloured like its background, or stacked under something else,
+  would pass.
+- The page contract, `_common.md` and P2's brief say how to ask for a
+  hiding selector. P2's phone layout will need one, and its hidden view may
+  hold no figure the shown one lacks.
+
+**The side note.** The parser's docstring said a block-level HTML block runs
+to the next blank line, and that isn't true of `<pre>`, `<script>`,
+`<style>` or `<textarea>`. The parser now follows CommonMark's HTML block
+types 1 to 5, each ending at its own marker:
+
+- the closing tag;
+- `-->`;
+- `?>`;
+- `>`;
+- `]]>`.
+
+It refuses any of them left open. Seven shapes agree with markdown-it-py,
+including a `<pre>` spanning a blank line. The ledgers are unchanged at 152,
+37 and 19 entries.
+
+`--control` now catches 135 of 135.

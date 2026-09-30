@@ -436,6 +436,32 @@ def _loose_problems(where, text, tick, names, allowed):
 
 CSS_STRING = re.compile(r"\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'", re.S)
 
+# Declarations that hide an element or its text. A page's figures and their
+# sources are in its HTML, and a stylesheet could hide them there: verifier-P0
+# added `.src{display:none}` and 49 of 124 labels vanished, with every stage
+# passing. These are refused in any rule, unless site/data/css_hides.json -
+# the lead's - names the rule's selector and why it may hide. What this cannot
+# see is stated in the README: the gates do not lay the page out, so text
+# coloured like its background, or stacked under something else, would pass.
+HIDES = re.compile(
+    r"(?:^|[;{\s])(?:display\s*:\s*none|visibility\s*:\s*(?:hidden|collapse)|content-visibility\s*:\s*hidden"
+    r"|opacity\s*:\s*(?:0*\.?0+%?)\s*(?:!important)?\s*(?:;|$)|font-size\s*:\s*0*\.?0+[a-z%]*\s*(?:!important)?\s*(?:;|$)"
+    r"|(?:-webkit-text-fill-)?color\s*:\s*transparent|clip(?:-path)?\s*:|text-indent\s*:"
+    r"|transform\s*:[^;]*scale[XYZ3d]*\(\s*0*\.?0+\s*[,)]|filter\s*:[^;]*opacity\(\s*0)", re.I)
+HIDES_FILE = SITE / "data" / "css_hides.json"
+
+
+def hiding_problems(css):
+    allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
+    out = []
+    for sel, decls in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        sel = " ".join(sel.split())
+        m = HIDES.search(decls)
+        if m and sel not in allowed:
+            out.append("%r hides what it styles (%s); a selector that may hide goes in %s, which the lead reviews"
+                       % (sel, m.group(0).strip(" ;{"), HIDES_FILE.name))
+    return out
+
 
 def check_numbers(root=PUBLIC, names=None):
     """Every numeral a page prints sits inside a mark (data-f) for a fact whose
@@ -526,6 +552,7 @@ def check_numbers(root=PUBLIC, names=None):
                 problems.append("%s: %s can print a number no fact holds" % (rel, m.group(0).rstrip(": ")))
             for m in CSS_STRING.finditer(css):
                 problems += _loose_problems("%s string" % rel, m.group(0)[1:-1], False, names, allowed)
+            problems += ["%s: %s" % (rel, x) for x in hiding_problems(css)]
         elif rel.endswith(".txt") and not rel.startswith("fonts/"):
             t = (root / rel).read_text(encoding="utf-8")
             cut, last = [], 0
@@ -1193,7 +1220,10 @@ def controls():
                                       "'3397'"),
                                      ("a figure as a list marker", 'li{list-style-type:"3397 "}', "'3397'"),
                                      ("a counter set to a figure", "ol{counter-reset:list-item 3396}", "counter-reset"),
-                                     ("a counter style", "@counter-style x{system:cyclic;symbols:A}", "@counter-style")):
+                                     ("a counter style", "@counter-style x{system:cyclic;symbols:A}", "@counter-style"),
+                                     ("a stylesheet hiding every source", ".src{display:none}", "'.src' hides"),
+                                     ("a stylesheet hiding every figure", ".fig{visibility:hidden}", "'.fig' hides"),
+                                     ("a stylesheet shrinking the sources away", "main .src{font-size:0}", "hides")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
@@ -1371,6 +1401,9 @@ def controls():
     heads = facts.ledger_headings("## 2026-01-01 - a\n<!--\n## 2026-01-02 - hidden\n-->\n## 2026-01-03 - c\n")
     report("ledger", [h[1] for h in heads] == ["## 2026-01-01 - a", "## 2026-01-03 - c"],
            "a heading inside an HTML comment, which renders as nothing: %d read of the 2 outside it" % len(heads))
+    heads = facts.ledger_headings("## 2026-01-01 - a\n<pre>\nx\n\n## 2026-01-02 - hidden\n</pre>\n## 2026-01-03 - c\n")
+    report("ledger", [h[1] for h in heads] == ["## 2026-01-01 - a", "## 2026-01-03 - c"],
+           "a heading inside a <pre> that spans a blank line, which renders as text: %d read of the 2 outside it" % len(heads))
     # Every real ledger, against CommonMark's own count of its level-2
     # headings: an independent reading, where markdown-it-py is installed.
     try:
