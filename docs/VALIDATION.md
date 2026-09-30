@@ -1043,3 +1043,27 @@ advises against a takeover.
   records first.
 - loganw.dev still resolves to 15.197.148.33 and 3.33.130.190, not to
   GitHub.
+
+## 2026-09-29 - live at https://loganw.dev
+
+Logan updated the DNS and turned on HTTPS: "I enabled HTTPS already, site is
+live and working at loganw.dev". Measured from the desktop:
+
+- **DNS.** Cox's, Google's and Cloudflare's resolvers give loganw.dev
+  GitHub Pages' four A records. `www` is a CNAME to loganw234.github.io.
+  There are no AAAA records, so there is no IPv6, which is optional.
+- **Pages settings.** cname `loganw.dev`, `https_enforced` true, and a
+  certificate `approved` for loganw.dev and www.loganw.dev.
+- **The site.**
+  - `https://loganw.dev/` answers 200, and its index.html is byte-identical
+    to `public/`.
+  - `BUILD` reads "Deployed from 86d31be3df3d1e6bdb50c74c15c53f35b0932f60",
+    from the second push's run, `36660975285`, which passed.
+  - `http://loganw.dev/`, `https://www.loganw.dev/` and
+    `https://loganw234.github.io/loganw.dev/` each answer 301 to
+    `https://loganw.dev/`.
+- **The desktop's cache.** This desktop's own DNS cache still held the
+  domain's old address, 15.197.148.33, which fails the TLS handshake. So
+  these checks pinned curl to 185.199.108.153 with `--resolve`. The public
+  resolvers above all have the new records, and the stale entry is this
+  machine's alone.
