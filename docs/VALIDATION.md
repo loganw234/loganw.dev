@@ -376,3 +376,45 @@ to verifier-P0:
 
 Both are planted in `--control` and caught, which makes 69 of 69. The page
 itself still passes: 270 marks, and no numeral outside one.
+
+## 2026-09-29 - P0.2: verifier-P0's first five findings on bc2ffbc, fixed while it finishes
+
+verifier-P0's re-check logged five ways past the new gates at 17:15:17, each
+passing all 10 stages. It also found CLAUDE.md trap 9 false. These fixes are
+on branch `p0.2`, cut from `bc2ffbc`, so that `p0.1` stays still while it
+works.
+
+- **Duplicate attributes.** A browser keeps the first of two same-named
+  attributes, and the checks' `dict()` kept the last. So a page ran under a
+  policy the check never read. Both local-only and numbers now refuse a
+  repeated attribute, and numbers reads every alt, title and aria-label
+  value.
+- **Stylesheet text.** Every string in a stylesheet is now held to the
+  numbers rule, which covers `quotes`, `list-style-type` and generated
+  content. `counter-reset`, `counter-set`, `counter-increment` and
+  `@counter-style` are refused, since they print numbers without a string.
+- **Number words in a paraphrase.** A display may not add a number word its
+  source lacks, as it already could not add a digit.
+- **Allowed names.** A page module can no longer allow names; one that
+  defines `NUMERAL_NAMES` is refused. Allowed names live in
+  `site/data/numeral_names.json`, which is the lead's. Each must appear in
+  some fact's text, and the numbers stage prints each one it allowed.
+- **Published types.** An asset must be a `.png`, `.jpg` or `.webp` under
+  `assets/`, and must be that type by its bytes. local-only refuses any
+  published file that is not a page, text, JSON, image or font of its
+  claimed type, apart from BUILD and MANIFEST.
+- **CLAUDE.md trap 9**, rewritten: no page reads the organisation's pins
+  yet, so nothing needs the fetch.
+
+Three more, found by the lead reading its own gates:
+
+- A `<meta name="twitter:description">` would put a card's text before
+  readers unchecked. Only the site's own four meta tags are allowed now.
+- `fonts/SOURCES.txt` publishes typed sizes, hashes and a total. The
+  manifest stage now checks each against the fonts' bytes.
+- The privacy stage reads a name wrapped at one of its own hyphens as one
+  word.
+
+Each is planted in `--control` and caught, 87 of 87.
+`bash verify/run.sh --require-all` on this tree passed 10 of 10, with
+nothing skipped.

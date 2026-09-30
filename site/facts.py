@@ -399,9 +399,12 @@ def _line(text, pos):
 
 
 def check_display(display, quoted):
-    """A paraphrase may not bring a numeral its source's words do not have:
-    'merged into main on 2026-09-27' for 'whether it merges' is refused."""
+    """A paraphrase may not bring a numeral or a number word its source's words
+    do not have: 'merged into main on 2026-09-27' for 'whether it merges' is
+    refused, and so is 'left open for twelve days' (verifier-P0, bc2ffbc)."""
+    words = [w.lower() for w in NUMBER_WORDS.findall(quoted)]
     extra = [n for n in numerals(display) if n not in numerals(quoted)]
+    extra += [w for w in NUMBER_WORDS.findall(display) if w.lower() not in words]
     if extra:
         raise Refusal("the display %r has %s, which the words it paraphrases (%r) do not"
                       % (display, ", ".join(extra), quoted))

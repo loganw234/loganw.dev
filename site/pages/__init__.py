@@ -12,14 +12,19 @@ A page module defines:
       render.fig(), and so carries its fact's id: the numbers stage refuses a
       numeral anywhere else on the page.
   ASSETS (optional): [(published path, repository, path at its pin)], copied
-      byte for byte from the pin.
+      byte for byte from the pin. An asset is an image: a lower-case .png,
+      .jpg or .webp under assets/, that is what its name says by its bytes.
   extra_files(ctx) (optional) -> {flat .txt name: text}: a dossier's
       plain-text twin, for instance. Its figures go through render.plain(),
       which writes each as `text [fact N]`, and the numbers stage holds a
       text file to the same rule as a page.
-  NUMERAL_NAMES (optional): names that have a numeral in them and are not
-      figures, such as "Mercenaries 2". The numbers stage allows exactly these
-      phrases, and prints how many it allowed.
+
+A name with a numeral in it that is not a figure, such as "Mercenaries 2", is
+allowed only through site/data/numeral_names.json, which is the lead's, and
+only if some fact's text holds it. A page module that defines NUMERAL_NAMES
+is refused.
+
+The module also defines:
   controls() (optional) -> [(name, caught, how)]: the page's own negative
       controls, run by `build.py --control`. Each plants a fault the page's
       own checks must catch; caught is True only when the check said no. A

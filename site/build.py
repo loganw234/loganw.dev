@@ -96,6 +96,10 @@ def validate(mods):
         if len(heads) != 1:
             raise Refusal("navigation entry %r has %d pages marked as its own page (index: True); it needs exactly one"
                           % (label, len(heads)))
+    for m in mods:
+        if hasattr(m, "NUMERAL_NAMES"):
+            raise Refusal("%s allows names of its own; a name with a numeral goes in site/data/numeral_names.json, "
+                          "which the lead reviews" % m.__name__)
 
 
 def collect_extras(m, ctx, text):
@@ -143,7 +147,11 @@ def render_all():
         body = m.render_page(ctx)
         text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"])
         for dest, repo, path in getattr(m, "ASSETS", []):
-            binary[dest] = facts.pin(repo).show(path, binary=True)
+            data = facts.pin(repo).show(path, binary=True)
+            check_asset(dest, data)
+            if dest in binary:
+                raise Refusal("%s publishes %s, which another page already publishes" % (m.__name__, dest))
+            binary[dest] = data
         collect_extras(m, ctx, text)
     # One stylesheet per parcel under site/styles/, found by glob, so no two
     # parcels edit the same file (ParcelRound section 2: aim for a glob). It is
@@ -257,6 +265,36 @@ def check_manifest(root=PUBLIC):
             problems.append("MANIFEST does not hash %s, which the build reads" % path)
         elif sha256((ROOT / path).read_bytes()) != srcs[path]:
             problems.append("%s is not the bytes the build read" % path)
+    return problems + check_font_sources(root)
+
+
+def check_font_sources(root=PUBLIC):
+    """fonts/SOURCES.txt is published with figures in it - each file's size
+    and sha256, and the total of the eight - which the numbers stage does not
+    read, since no fact holds them. They are checked here instead, against the
+    files in site/fonts/ that the build copies."""
+    f = root / "fonts" / "SOURCES.txt"
+    if not f.is_file():
+        return ["fonts/SOURCES.txt is missing"]
+    problems, total, n = [], 0, 0
+    t = f.read_text(encoding="utf-8")
+    for name, size, h in re.findall(r"^(\S+)\s+(\d+) bytes\s+sha256 ([0-9a-f]{64})$", t, re.M):
+        src = SITE / "fonts" / name
+        if not src.is_file():
+            problems.append("fonts/SOURCES.txt lists %s, which site/fonts/ does not have" % name)
+            continue
+        b = src.read_bytes()
+        if len(b) != int(size) or sha256(b) != h:
+            problems.append("fonts/SOURCES.txt's size or sha256 for %s is not the file's" % name)
+        if name.endswith(".woff2") or name.startswith("OFL"):
+            total, n = total + len(b), n + 1
+    m = re.search(r"all (\w+) files, ([\d,]+) bytes", t)
+    words = {"eight": 8}
+    if not m or words.get(m.group(1), -1) != n or int(m.group(2).replace(",", "")) != total:
+        problems.append("fonts/SOURCES.txt's total is not the %d files' %d bytes" % (n, total))
+    for g in sorted((SITE / "fonts").iterdir()):
+        if (g.suffix == ".woff2" or g.name.startswith("OFL")) and not re.search(r"^%s\s" % re.escape(g.name), t, re.M):
+            problems.append("site/fonts/%s is published and fonts/SOURCES.txt does not list it" % g.name)
     return problems
 
 
@@ -274,16 +312,22 @@ class _Marks(html.parser.HTMLParser):
     def _mark(self):
         return next((n for n in reversed(self.stack) if n["f"] is not None), None)
 
-    def _attrs(self, tag, a):
-        for k in ("alt", "title", "aria-label"):
-            if a.get(k):
-                self.attr_text.append("%s %s=%r" % (tag, k, a[k]))
+    def _attrs(self, tag, attrs):
+        # Every value, not a dict's last one: a browser keeps the first of two
+        # same-named attributes, and dict() keeps the last (verifier-P0 hid
+        # "3397 prints" in the first of two alt attributes).
+        for k, v in attrs:
+            if k in ("alt", "title", "aria-label") and v:
+                self.attr_text.append("%s %s=%r" % (tag, k, v))
+        a = dict(attrs)
         if tag == "meta" and a.get("name") == "description":
             self.attr_text.append("meta description %r" % a.get("content", ""))
+        if dupes(attrs):
+            self.problems.append("<%s> repeats %s" % (tag, ", ".join(dupes(attrs))))
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
-        self._attrs(tag, a)
+        self._attrs(tag, attrs)
         if tag in VOID:
             return
         cls, f = (a.get("class") or "").split(), a.get("data-f")
@@ -296,7 +340,7 @@ class _Marks(html.parser.HTMLParser):
         self.stack.append(dict(tag=tag, cls=cls, f=f, buf=[], href=None))
 
     def handle_startendtag(self, tag, attrs):
-        self._attrs(tag, dict(attrs))
+        self._attrs(tag, attrs)
 
     def handle_endtag(self, tag):
         if tag in VOID:
@@ -320,17 +364,30 @@ class _Marks(html.parser.HTMLParser):
             self.loose.append((data, tick))
 
 
+def dupes(attrs):
+    names = [k for k, _ in attrs]
+    return sorted({k for k in names if names.count(k) > 1})
+
+
+NAMES_FILE = SITE / "data" / "numeral_names.json"
+
+
 def numeral_names():
-    return sorted({n for m in page_modules.discover() for n in getattr(m, "NUMERAL_NAMES", [])}, key=len, reverse=True)
+    """{name: why}: names with a numeral in them that are not figures. One
+    file, the lead's, so an allowance is a reviewed change and not a line in a
+    page module (verifier-P0 allowed "4096 tests" from a page). Each name must
+    also appear in some fact's text, so no name is invented here."""
+    return json.loads(NAMES_FILE.read_text(encoding="utf-8"))["names"] if NAMES_FILE.is_file() else {}
 
 
 def _loose_problems(where, text, tick, names, allowed):
     out = []
     if tick and TICK.fullmatch(text.strip()):
         return out
-    for n in names:
-        allowed[0] += text.count(n)
-        text = text.replace(n, " ")
+    for n in sorted(names, key=len, reverse=True):
+        if n in text:
+            allowed[n] = allowed.get(n, 0) + text.count(n)
+            text = text.replace(n, " ")
     for n in facts.numerals(text):
         out.append("%s: %r is a numeral outside any figure's mark, in %r" % (where, n, " ".join(text.split())[:80]))
     for w in facts.NUMBER_WORDS.findall(text):
@@ -338,20 +395,34 @@ def _loose_problems(where, text, tick, names, allowed):
     return out
 
 
-def check_numbers(root=PUBLIC):
+CSS_STRING = re.compile(r"\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'", re.S)
+
+
+def check_numbers(root=PUBLIC, names=None):
     """Every numeral a page prints sits inside a mark (data-f) for a fact whose
     text is exactly the mark's text; every source label is its own fact's
     label; and a text file writes each figure as `text [fact N]`. So a figure
     typed as a plain string, or copied with its text changed, fails. A number
-    written in words is caught only for the words facts.NUMBER_WORDS lists."""
+    written in words is caught only for the words facts.NUMBER_WORDS lists.
+    A stylesheet can print text too - generated content, quotes, list
+    markers, counters - so every string in one is held to the same rule, and
+    counters, which print numbers without a string, are refused. The text
+    files under fonts/ are not read here: the licences are published as
+    given, and the figures in SOURCES.txt are checked by --manifest against
+    the fonts' own bytes."""
     fj = root / "facts.json"
     if not fj.is_file():
-        return ["facts.json is missing"], 0
-    by_id = {r["id"]: r for r in json.loads(fj.read_text(encoding="utf-8"))["facts"]}
-    names, allowed, problems, n_marks = numeral_names(), [0], [], 0
+        return ["facts.json is missing"], None
+    recs = json.loads(fj.read_text(encoding="utf-8"))["facts"]
+    by_id = {r["id"]: r for r in recs}
+    names = numeral_names() if names is None else names
+    allowed, problems, n_marks = {}, [], 0
+    for n in sorted(names):
+        if not any(n in r["text"] or n in r["raw"] for r in recs):
+            problems.append("%s allows %r, and no fact's text holds it" % (NAMES_FILE.name, n))
     files = published(root)
     if not any(f.endswith(".html") for f in files):
-        return ["no page is published"], 0
+        return ["no page is published"], None
     for rel in files:
         if rel.endswith(".html"):
             p = _Marks()
@@ -381,13 +452,18 @@ def check_numbers(root=PUBLIC):
             for t in p.attr_text:
                 problems += _loose_problems(rel, t, False, names, allowed)
         elif rel.endswith(".css"):
-            # Generated content is text a reader sees and no page holds: a
-            # numeral typed there would pass every check on the HTML.
+            # Text a reader sees and no page holds: a numeral typed there would
+            # pass every check on the HTML (generated content, 45b8d01; quotes
+            # and list markers, verifier-P0 on bc2ffbc).
             css = re.sub(r"/\*.*?\*/", "", (root / rel).read_text(encoding="utf-8"), flags=re.S)
+            css = re.sub(r'^@charset "utf-8";', "", css)
             for m in re.finditer(r"content\s*:\s*([^;}]*)", css, re.I):
                 if re.search(r"\b(?:counters?|attr)\s*\(", m.group(1), re.I):
                     problems.append("%s: generated content %r prints what no fact holds" % (rel, m.group(1).strip()))
-                problems += _loose_problems("%s generated content" % rel, m.group(1), False, names, allowed)
+            for m in re.finditer(r"@counter-style|counter-(?:reset|set|increment)\s*:", css, re.I):
+                problems.append("%s: %s can print a number no fact holds" % (rel, m.group(0).rstrip(": ")))
+            for m in CSS_STRING.finditer(css):
+                problems += _loose_problems("%s string" % rel, m.group(0)[1:-1], False, names, allowed)
         elif rel.endswith(".txt") and not rel.startswith("fonts/"):
             t = (root / rel).read_text(encoding="utf-8")
             cut, last = [], 0
@@ -401,7 +477,7 @@ def check_numbers(root=PUBLIC):
                 last = m.end()
             cut.append(t[last:])
             problems += _loose_problems(rel, " ".join(cut), False, names, allowed)
-    return problems, (n_marks, allowed[0], len(files))
+    return problems, (n_marks, allowed, len(files))
 
 
 ALLOWED = {
@@ -435,6 +511,12 @@ class _Tags(html.parser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if dupes(attrs):
+            # A browser keeps the first of two same-named attributes, and dict()
+            # the last: a page with two content= on its policy ran under the
+            # first while this check read the second (verifier-P0, bc2ffbc).
+            self.problems.append("<%s> repeats %s, which a browser and this check would read differently"
+                                 % (tag, ", ".join(dupes(attrs))))
         if tag == "meta" or tag == "link" or tag == "title":
             self.head.append((tag, a))
         if tag not in ALLOWED:
@@ -456,6 +538,13 @@ class _Tags(html.parser.HTMLParser):
         if tag == "meta" and "http-equiv" in a and (a["http-equiv"] != "Content-Security-Policy" or a.get("content") != render.CSP):
             self.problems.append("<meta http-equiv=%r content=%r> is not the site's Content-Security-Policy"
                                  % (a["http-equiv"], a.get("content")))
+        elif tag == "meta" and "http-equiv" not in a and a != {"charset": "utf-8"} \
+                and a.get("name") not in ("viewport", "description"):
+            # Only the four this site writes: a preview card's text (a
+            # twitter:description, say) is text a reader sees that no check reads.
+            self.problems.append("<meta %s> is not one of the site's own" % " ".join("%s=%r" % kv for kv in attrs))
+        if tag == "meta" and a.get("name") == "viewport" and a.get("content") != "width=device-width,initial-scale=1":
+            self.problems.append("<meta name=viewport content=%r> is not the site's" % a.get("content"))
         if tag == "path" and "marker-end" in a and not re.fullmatch(r"url\(#[\w-]+\)", a["marker-end"]):
             self.problems.append("<path marker-end=%r> is not a reference within the page" % a["marker-end"])
         if tag == "svg" and a.get("xmlns", "http://www.w3.org/2000/svg") != "http://www.w3.org/2000/svg":
@@ -501,9 +590,43 @@ def check_local_only(root=PUBLIC):
                 problems.append("%s: the Content-Security-Policy is not the first element after the charset" % rel)
         elif rel.endswith(".css"):
             problems += ["%s: %s" % (rel, x) for x in css_problems(f.read_text(encoding="utf-8"))]
+        problems += ["%s: %s" % (rel, x) for x in type_problems(rel, f.read_bytes())]
     if not any(r.endswith(".html") for r in published(root)):
         problems.append("no page is published")
     return problems
+
+
+# What may be published, by name: the page and text types these checks read,
+# the images and fonts they vouch for by their bytes, and BUILD and MANIFEST.
+# Anything else - .htm, .svg, .js, .xml - is a document or a script no check
+# reads, served by its extension (verifier-P0 published a .htm through ASSETS).
+MAGIC = {".png": b"\x89PNG\r\n\x1a\n", ".jpg": b"\xff\xd8\xff", ".jpeg": b"\xff\xd8\xff", ".webp": b"RIFF",
+         ".woff2": b"wOF2"}
+TEXT_TYPES = {".html", ".css", ".txt", ".json"}
+
+
+def type_problems(rel, data):
+    ext = posixpath.splitext(rel)[1].lower()
+    if rel in ("BUILD", "MANIFEST") or ext in TEXT_TYPES:
+        return []
+    if ext not in MAGIC:
+        return ["a %s file, which is not a type this site publishes" % (ext or "extensionless")]
+    if not data.startswith(MAGIC[ext]) or (ext == ".webp" and data[8:12] != b"WEBP"):
+        return ["not a %s by its bytes" % ext]
+    return []
+
+
+ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.(?:png|jpg|jpeg|webp)")
+
+
+def check_asset(dest, data):
+    """An asset a page copies from a pin: an image, under assets/, that is
+    what its name says by its bytes."""
+    if not ASSET_NAME.fullmatch(dest):
+        raise Refusal("an asset is published as %r; an asset is a lower-case .png, .jpg or .webp under assets/" % dest)
+    bad = type_problems(dest, data)
+    if bad:
+        raise Refusal("the asset %s is %s" % (dest, bad[0]))
 
 
 class _Refs(html.parser.HTMLParser):
@@ -512,12 +635,11 @@ class _Refs(html.parser.HTMLParser):
         self.refs, self.ids = [], set()
 
     def handle_starttag(self, tag, attrs):
-        a = dict(attrs)
-        if a.get("id"):
-            self.ids.add(a["id"])
-        for k in ("href", "src"):
-            if a.get(k) is not None:
-                self.refs.append(a[k])
+        for k, v in attrs:
+            if k == "id" and v:
+                self.ids.add(v)
+            if k in ("href", "src") and v is not None:
+                self.refs.append(v)
 
     handle_startendtag = handle_starttag
 
@@ -668,8 +790,11 @@ def find_named(names, texts):
     pats = [re.compile(r"(?<![\w.-])%s(?![\w-])" % re.escape(n), re.I) for n in names]
     hits = []
     for where, t in texts:
-        for i, line in enumerate(t.splitlines(), 1):
-            if any(p.search(line) for p in pats):
+        lines = t.splitlines()
+        for i, line in enumerate(lines, 1):
+            # a name wrapped at one of its own hyphens is read as one word
+            joined = line + lines[i].lstrip() if line.endswith("-") and i < len(lines) else line
+            if any(p.search(joined) for p in pats):
                 hits.append("%s:%d" % (where, i))
     return hits
 
@@ -796,6 +921,18 @@ def controls():
         page.unlink()
         found = check_manifest(root)
         report("manifest", any("index.html" in f for f in found), "index.html deleted: %s" % (found[0] if found else "passed"))
+        src_txt = root / "fonts" / "SOURCES.txt"
+        saved_src = src_txt.read_text(encoding="utf-8")
+        for what, new, want in (("a font size changed", re.sub(r"(newsreader-normal-latin\.woff2\s+)\d+", r"\g<1>132001",
+                                                               saved_src, count=1), "newsreader-normal-latin.woff2"),
+                                ("the fonts' total changed", saved_src.replace("512,869", "512,870", 1), "total")):
+            if new == saved_src:
+                report("manifest", False, "could not plant %s" % what)
+                continue
+            src_txt.write_text(new, encoding="utf-8")
+            found = [f for f in check_font_sources(root) if want in f]
+            report("manifest", bool(found), "%s in fonts/SOURCES.txt: %s" % (what, found[0] if found else "passed"))
+        src_txt.write_text(saved_src, encoding="utf-8")
         planted("manifest", "a byte of index.html changed", t.replace("Ledger", "Ledgeг", 1), check_manifest, "index.html")
 
         # numbers: a typed figure, a figure copied with its text changed, a
@@ -824,10 +961,20 @@ def controls():
             planted("numbers", "a date in an HTML element classed as a tick",
                     t.replace("</footer>", '<p>shipped <span class="tick">Sep 2026</span></p></footer>', 1),
                     check_numbers, "'2026'")
+            planted("numbers", "a figure in the first of two alt attributes",
+                    t.replace('alt="The Pauli print"', 'alt="3397 prints" alt=""', 1), check_numbers, "'3397'")
+            planted("numbers", "a name allowed with no fact behind it",
+                    t.replace("</footer>", "<p>after 4096 tests</p></footer>", 1),
+                    lambda r: check_numbers(r, names={"4096 tests": "planted"}), "no fact's text holds it")
             css = root / "style.css"
             saved_css = css.read_text(encoding="utf-8")
             for what, rule, want in (("a figure in CSS generated content", '.stamp::after{content:" 3397 tests"}', "'3397'"),
-                                     ("a counter in CSS generated content", "li::after{content:counter(list-item)}", "counter")):
+                                     ("a counter in CSS generated content", "li::after{content:counter(list-item)}", "counter"),
+                                     ("a figure in CSS quotes", '.stamp::after{content:open-quote}.stamp{quotes:" | 3397 tests" ""}',
+                                      "'3397'"),
+                                     ("a figure as a list marker", 'li{list-style-type:"3397 "}', "'3397'"),
+                                     ("a counter set to a figure", "ol{counter-reset:list-item 3396}", "counter-reset"),
+                                     ("a counter style", "@counter-style x{system:cyclic;symbols:A}", "@counter-style")):
                 css.write_text(saved_css + rule + "\n", encoding="utf-8")
                 found = [f for f in check_numbers(root)[0] if want in f]
                 report("numbers", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
@@ -852,6 +999,27 @@ def controls():
         planted("local-only", "no Content-Security-Policy",
                 re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>', "", t, count=1), check_local_only,
                 "Content-Security-Policy")
+        planted("local-only", "a second content= on the policy, which a browser reads first",
+                t.replace('<meta http-equiv="Content-Security-Policy" content=',
+                          '<meta http-equiv="Content-Security-Policy" content="default-src * data:" content=', 1),
+                check_local_only, "repeats content")
+        planted("local-only", "a preview card's text in a meta tag",
+                t.replace("</head>", '<meta name="twitter:description" content="3397 tests"></head>', 1),
+                check_local_only, "twitter:description")
+        planted("local-only", "a second src on an image",
+                t.replace('<img src="assets/pauli-print.png"',
+                          '<img src="https://x.invalid/pixel.png" src="assets/pauli-print.png"', 1),
+                check_local_only, "repeats src")
+        for name, blob, want in (("remote.htm", b"<script>1</script>", "not a type"),
+                                 ("assets/fake.png", b"<!doctype html><script>1</script>", "by its bytes")):
+            (root / name).parent.mkdir(parents=True, exist_ok=True)
+            (root / name).write_bytes(blob)
+            found = [f for f in check_local_only(root) if name in f and want in f]
+            report("local-only", bool(found), "a published %s: %s" % (name, found[0] if found else "passed"))
+            (root / name).unlink()
+        for what, dest, blob in (("an asset published as .htm", "remote.htm", b"<script>1</script>"),
+                                 ("an asset whose bytes are not its type", "assets/x.png", b"<script>1</script>")):
+            refused("assets", what, lambda dest=dest, blob=blob: check_asset(dest, blob))
         for what, css in (("URL( in capitals", "a{background:URL(https://x.invalid/a.png)}"),
                           ("@IMPORT", "@IMPORT 'https://x.invalid/a.css';"),
                           ("image-set", 'a{background:image-set("https://x.invalid/a.png" 1x)}'),
@@ -914,6 +1082,9 @@ def controls():
     for what, mods in (("a nested page", [fake("work/x.html", "Work")]),
                        ("two section pages", [fake("threads.html", "Threads", True), fake("thread-a.html", "Threads", True)])):
         refused("seam", what, lambda mods=mods: validate(mods))
+    m = fake("x.html", "Work")
+    m.NUMERAL_NAMES = ["4096 tests"]
+    refused("seam", "a page module allowing names of its own", lambda m=m: validate([m]), "numeral_names.json")
     for bad in ("work/x.txt", "X.TXT", "index.html"):
         m = fake("x.html", "Work")
         m.extra_files = lambda ctx, bad=bad: {bad: "planted"}
@@ -944,6 +1115,9 @@ def controls():
     refused("paraphrase", "a display with a date its source does not have",
             lambda: facts.check_display("merged into main on 2026-09-27", "Whether atlas-film's pinned merges into its main"),
             "2026-09-27")
+    refused("paraphrase", "a display with a number word its source does not have",
+            lambda: facts.check_display("its merge left open for twelve days",
+                                        "Whether atlas-film's pinned merges into its main"), "twelve")
     refused("paraphrase", "a pattern that matches more than once",
             lambda: facts.prose("cft-fp256", "README.md", r"(cft-fp256)"), "matches")
     refused("stated", "a statement about a pin that has since moved",
@@ -959,6 +1133,8 @@ def controls():
         refused("unlogged", "a figure with %s" % what, lambda bad=bad: render.fig(bad))
     hits = find_named(["planted-private-repo"], [("planted.md", "see\nplanted-private-repo for more")])
     report("privacy", hits == ["planted.md:2"], "a private name in a tracked file: %s" % (hits or "passed"))
+    hits = find_named(["planted-private-repo"], [("planted.md", "see planted-private-\nrepo for more")])
+    report("privacy", hits == ["planted.md:1"], "a private name wrapped at its hyphen: %s" % (hits or "passed"))
 
     # D. Faults that need every pinned clone: a stale page, a stale pin, and
     #    each page's own controls.
@@ -1042,9 +1218,10 @@ def main(argv=None):
             return problems_out("manifest", check_manifest(), " in %d published files" % len(published(PUBLIC)))
         if a.numbers:
             problems, counts = check_numbers()
-            n, allowed, files = counts if counts else (0, 0, 0)
-            return problems_out("numbers", problems, "; %d marks tied to their own facts in %d files, %d numerals "
-                                "allowed as part of a name" % (n, files, allowed))
+            n, allowed, files = counts if counts else (0, {}, 0)
+            return problems_out("numbers", problems, "; %d marks tied to their own facts in %d files; allowed as "
+                                "part of a name: %s" % (n, files, ", ".join("%r %d time(s)" % kv for kv in
+                                                                           sorted(allowed.items())) or "none"))
         if a.links:
             return problems_out("links", check_links(), " in %d published files" % len(published(PUBLIC)))
         if a.local_only:

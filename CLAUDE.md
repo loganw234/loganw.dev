@@ -72,11 +72,13 @@ The source repositories are the authority, each read at the commit named in
    with the Write or Edit tool, and check any regular expression that
    depends on an escape.
 9. **A pin with no `dir` is read only from the site's own clone** under
-   `.cache/repos/`. The Mercenaries-Fan-Build organisation's repositories are
-   pinned at GitHub's main. Logan's clones of them were behind that, and one
-   carried a commit GitHub never had. A fresh clone of this repository needs
-   `LOGANW_FETCH=1` once for those pins; until then, `build` skips by name.
-   Never fetch into Logan's own clones.
+   `.cache/repos/`, fetched with `LOGANW_FETCH=1`. The Mercenaries-Fan-Build
+   organisation's repositories are pinned at GitHub's main. Logan's clones of
+   them were behind that, and one carried a commit GitHub never had.
+   - At P0.1 no page reads those pins; their commits come from pins.json and
+     the snapshot. So nothing needs the fetch yet. P2's credits will, and
+     from then on a clone without the fetch skips `build` by name.
+   - Never fetch into Logan's own clones.
 10. **Moving a pin means taking a new snapshot.** The build refuses a pin that
     the snapshot didn't look up, and a pin that GitHub doesn't have.
     atlas-darkroom was pinned at a commit that existed only in Logan's clone.
