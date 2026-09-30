@@ -1541,3 +1541,29 @@ itself, and each break is closed here:
   until the version was pinned.
 
 `--control` caught 294 of 294.
+
+## 2026-09-30 - P4 merged; a page may keep a text to itself (ONLY_HERE)
+
+**P4 merged.** verifier-P4 said READY on P4's own `4d11e60`. The lead's
+control on the verifier caught 2 of 2: a misquoted rule of engagement, and
+an unsourced sentence on Propose. The merge takes `4d11e60`, never the
+commit that carried the plants. Not pushed.
+
+**Why ONLY_HERE.** verifier-P5 found that "the one place the site states
+it", on Method, was held by no gate. P5's control rendered Method and
+About only, and a copy of decision 9's statement on Home passed every
+stage. No page module can read another page, so the gate is the lead's:
+
+- A page may declare `ONLY_HERE = [text, ...]`: texts that only it may
+  print.
+- local-only refuses each such text on any other published page or text
+  file. It reads a page's text as the parser gives it, with whitespace
+  collapsed and in lower case, so markup or line breaks inside it don't
+  hide it.
+- facts.json, which records every statement's text, holds each by design.
+- A restatement in other words passes. That limit is stated in the page
+  contract.
+- 1 new control, with a planted declaration: refused on another page,
+  split by markup, and passed on its own.
+
+`--control` caught 304 of 304.
