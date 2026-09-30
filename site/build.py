@@ -994,6 +994,7 @@ def check_local_only(root=PUBLIC):
         elif rel.endswith(".css"):
             problems += ["%s: %s" % (rel, x) for x in css_problems(f.read_text(encoding="utf-8"))]
         problems += ["%s: %s" % (rel, x) for x in type_problems(rel, f.read_bytes())]
+        problems += ["%s: %s" % (rel, x) for x in email_problems(rel, f.read_bytes())]
     if not any(r.endswith(".html") for r in published(root)):
         problems.append("no page is published")
     return problems
@@ -1017,6 +1018,22 @@ def type_problems(rel, data):
     if not data.startswith(MAGIC[ext]) or (ext == ".webp" and data[8:12] != b"WEBP"):
         return ["not a %s by its bytes" % ext]
     return []
+
+
+# No published file holds an email address except the site's own contact
+# (decision 14). A commit's author email is in its repository's history, but
+# the site is a new and more prominent place to publish it: parcel P2's first
+# credits keyed an account by its address, in facts.json's arguments.
+SITE_CONTACTS = {"logan@loganw.dev"}
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+
+
+def email_problems(rel, data):
+    if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
+        return []
+    found = sorted({m.group(0).lower() for m in EMAIL.finditer(data.decode("utf-8", "replace"))} - SITE_CONTACTS)
+    return ["an email address (%d found); only the site's contact, %s, may be published"
+            % (len(found), ", ".join(sorted(SITE_CONTACTS)))] if found else []
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.(?:png|jpg|jpeg|webp)")
@@ -1628,6 +1645,15 @@ def controls():
                 t.replace('<meta http-equiv="Content-Security-Policy" content=',
                           '<meta http-equiv="Content-Security-Policy" content="default-src * data:" content=', 1),
                 check_local_only, "repeats content")
+        planted("local-only", "an email address on a page",
+                t.replace("</footer>", "<p>write to someone@example.com</p></footer>", 1), check_local_only,
+                "an email address")
+        fjp = root / "facts.json"
+        saved_fj = fjp.read_text(encoding="utf-8")
+        fjp.write_text(saved_fj.replace('"about": "', '"about": "planted@example.org ', 1), encoding="utf-8")
+        found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
+        report("local-only", bool(found), "an email address in facts.json: %s" % (found[0] if found else "passed"))
+        fjp.write_text(saved_fj, encoding="utf-8")
         planted("local-only", "a preview card's text in a meta tag",
                 t.replace("</head>", '<meta name="twitter:description" content="3397 tests"></head>', 1),
                 check_local_only, "twitter:description")

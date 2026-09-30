@@ -98,6 +98,12 @@ The source repositories are the authority, each read at the commit named in
     in the number words it lists; `build.STAGE_COUNT` is the rule. The ledger
     may state one, as a fact about its date.
 
+14. **No published file holds an email address,** except the site's contact,
+    `logan@loganw.dev`. The local-only stage refuses any other address, and
+    it names only how many it found, since CI's logs are public. Key a
+    commit's author by GitHub login, or by a hash of the address, never by
+    the address itself.
+
 ## The discipline that matters most here
 
 A number that isn't read from its source doesn't appear on the site. If you

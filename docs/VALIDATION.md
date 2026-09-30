@@ -1067,3 +1067,32 @@ live and working at loganw.dev". Measured from the desktop:
   these checks pinned curl to 185.199.108.153 with `--resolve`. The public
   resolvers above all have the new records, and the stale entry is this
   machine's alone.
+
+## 2026-09-29 - P1 and P3 merged and live; no email address may be published
+
+**Merged and live:**
+
+- **P1**, Record and Verify, merged as `2c5faa2`. verifier-P1 said READY at
+  `1e21d8e`, after three rounds.
+- **P3**, Work and the five dossiers, merged as `ff23593`. verifier-P3 said
+  READY at `729461d`. The lead's control on that verifier caught 2 of 2
+  planted faults.
+- Both deploys passed. `BUILD` read each merge commit, and the new pages
+  answer 200 at loganw.dev.
+
+**Found in P2's work, before any merge.** P2's credits keyed an account by
+its commit email. As a result, facts.json on P2's branch held Logan's own
+address, in 4 facts' arguments. The pages themselves print no address.
+
+**The new rule.** No published file may hold an email address except the
+site's contact, `logan@loganw.dev` (decision 14).
+
+- The local-only stage now refuses any other address in any text file it
+  publishes: pages, text twins, facts.json, the stylesheet, BUILD and
+  MANIFEST.
+- It reports only how many addresses it found, because CI's logs for a
+  public repository are public.
+- Two controls plant an address, one in a page and one in facts.json, and
+  both are caught.
+- Main's published files hold none today. P2 must meet the rule before its
+  merge.
