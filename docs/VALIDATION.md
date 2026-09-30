@@ -1235,3 +1235,63 @@ Preservation page's own statement of the name is there too.
   split by markup, as a character reference, and in an attribute.
 
 `--control` caught 202 of 202.
+
+## 2026-09-29 - verifier-seam's early findings on the lead's seam, fixed; two corrections
+
+verifier-seam is checking the lead's own commits since `ed990fb`. Before
+its verdict, it wrote four findings on shared code into the round's ledger.
+Each is fixed here, with a control, for its re-check.
+
+**The email gate read raw bytes only.** A page carried a made-up address in
+each of these shapes, and every stage passed:
+
+- as `&#64;`;
+- as `%40`, in a `mailto:` link and in a GitHub link;
+- split by `<wbr>`;
+- URL-quoted in facts.json's arguments.
+
+A browser decodes each to the address. The gate now reads every published
+text file in each of the ways `build.readings` gives: as it is, with
+character references decoded, with inline tags removed and other tags read
+as spaces, each of those percent-decoded, and a JSON file as its strings.
+The Wally gate reads the same way. 7 new controls plant an address in these
+shapes, on a page and in facts.json. An address spelled out for a person to
+reassemble is not recognised, which CLAUDE.md states as a limit.
+
+**The Connections control compared two functions, not the pages.** It held
+`_dossier.edges_for()` to `mapgen.all_edges()`. An edge dropped where a
+dossier renders it, or where the map draws it, passed every stage. The
+`links` stage now reads the published pages: each dossier's Connections
+must be exactly the edges the map on Home draws touching its project. 3 new
+controls: a dossier missing an edge, a dossier listing an edge the map
+doesn't draw, and the map no longer drawing an edge a dossier lists.
+
+**The site's own ledger, cited by position.**
+
+- `own_entry(path, line)` returned whatever entry was at that line, so an
+  entry inserted above a cited one made it return another entry, silently.
+  It now takes the heading's whole text, which must match exactly one
+  entry.
+- `own_prose(..., last=True)` moved its citation to a later entry that
+  repeated the words. `own_prose` no longer takes `last=`: a second match
+  refuses by name.
+- `--verify-facts` compared a figure's text alone, so a citation that had
+  moved to another line read again as the same. It now compares everything
+  the record says about where the figure was read. On this tree, 1512
+  figures read again as the same.
+- 3 new controls: a heading two entries share; an entry inserted above a
+  cited one; and a citation published at another line, with the same
+  words. The control that asked for an entry at a line with no heading now
+  asks for a heading the ledger lacks.
+
+**Two corrections to the lead's records:**
+
+- The entry "P2 merged (squashed), live…" says "each dossier missed
+  StoryDocs". That is false for cft-rebound, for which StoryDocs has no
+  `projects/` directory: it had no edge to miss. Four of the five missed
+  StoryDocs' edges. `mapgen.all_edges`'s docstring said the same, and is
+  corrected.
+- The README said a figure comes "from one of two places" over three
+  bullets. It now says "one of these places".
+
+`--control` caught 215 of 215.

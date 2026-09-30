@@ -183,7 +183,10 @@ def label(rec):
 
 
 def rederive(rec):
-    """Run a logged fact again and say whether it gives the same figure.
+    """Run a logged fact again and say whether it gives the same figure, read
+    at the same place: its text, and everything its record says about where
+    it was read. A citation that moved to another line is a difference
+    (verifier-seam: comparing the text alone called it the same).
     -> (ok, text): ok is True, False, or None when the source is unavailable."""
     mod, _, name = rec["method"].rpartition(".")
     if rec["method"] not in REGISTRY:
@@ -198,8 +201,11 @@ def rederive(rec):
         return None, str(e)
     finally:
         _recording[0] = True
-    same = v.text == rec["text"] and v.raw == rec["raw"]
-    return same, v.text
+    now = record(v, rec["method"], rec["args"])
+    diff = sorted(k for k in now if k != "id" and now[k] != rec.get(k))
+    if diff == ["text"] or not diff:
+        return not diff, v.text
+    return False, "%s (and its %s changed)" % (v.text, ", ".join(k for k in diff if k != "text"))
 
 
 # ---------------------------------------------------------------------------
@@ -908,9 +914,12 @@ def snapshot_date():
 # ledger, read from the tree being built. It is not read from a pin, since
 # this repository is not one of its own pins. The build's MANIFEST hashes the
 # file, so CI checks the published figures against the committed ledger, and
-# --verify-facts reads it again from the checkout. The ledger is append-only,
-# so a line number, once written, keeps pointing at the same entry, and a
-# link to it on main stays true.
+# --verify-facts reads it again from the checkout. A figure is found by its
+# words or its entry's heading, never by a line number, and cited at the line
+# it has in the tree being built. Any change to the ledger forces a rebuild,
+# so a published link names the line the text had on main when the site was
+# deployed. If main moves on without a deploy, because a later push failed
+# its gate, a link can point a few lines off until the next deploy.
 
 OWN = ("docs/VALIDATION.md",)
 OWN_REPO = "https://github.com/%s/loganw.dev" % OWNER
@@ -928,18 +937,19 @@ def own_src(path, line, detail=""):
 
 
 @fact
-def own_prose(path, pattern, display=None, last=False, num=False):
+def own_prose(path, pattern, display=None, num=False):
     """prose(), for this site's own record: the file, the line, and the words,
-    under the same rules. The pattern must match once unless the last match
-    is asked for, and a paraphrase prints its source's words beside it."""
+    under the same rules, except that the pattern must always match once.
+    The ledger grows, so "the last match" would move to whatever a later
+    entry repeats (verifier-seam); here a second match refuses by name."""
     text = own_text(path)
     ms = list(re.finditer(pattern, text, re.M))
     if not ms:
         raise Refusal("this site's %s: the pattern %r no longer matches" % (path, pattern))
-    if len(ms) > 1 and not last:
-        raise Refusal("this site's %s: the pattern %r matches %d times, at lines %s; make it match once, or ask "
-                      "for the last" % (path, pattern, len(ms), ", ".join(str(_line(text, m.start())) for m in ms)))
-    m = ms[-1]
+    if len(ms) > 1:
+        raise Refusal("this site's %s: the pattern %r matches %d times, at lines %s; make it match once"
+                      % (path, pattern, len(ms), ", ".join(str(_line(text, m.start())) for m in ms)))
+    m = ms[0]
     line = _line(text, m.start(1))
     quoted = md_plain(m.group(1))
     if display is not None:
@@ -947,8 +957,7 @@ def own_prose(path, pattern, display=None, last=False, num=False):
             check_display(display, quoted)
         except Refusal as e:
             raise Refusal("this site's %s:%d: %s" % (path, line, e))
-    return V(display if display is not None else quoted,
-             own_src(path, line, "the last of %d matches" % len(ms) if len(ms) > 1 else ""),
+    return V(display if display is not None else quoted, own_src(path, line),
              raw=quoted, num=num, said=quoted if display is not None else "")
 
 
@@ -971,13 +980,18 @@ def own_entries(path):
 
 
 @fact
-def own_entry(path, line):
-    """One entry of this site's own ledger, by its heading's line: its title,
-    dated. raw is the date alone."""
-    for e in own_entries(path)[1]:
-        if e["line"] == line:
-            return V(e["title"], own_src(path, line, "the entry's own heading"), raw=e["date"])
-    raise Refusal("this site's %s has no entry heading at line %d" % (path, line))
+def own_entry(path, heading):
+    """One entry of this site's own ledger, found by its heading's whole text
+    (what follows "## "): its title, dated, and cited at the line where the
+    heading is now. raw is the date alone. By line, an entry inserted above
+    it made this return another entry, silently (verifier-seam); by heading,
+    it finds the same entry, or refuses by name."""
+    hits = [e for e in own_entries(path)[1] if e["title"] == heading]
+    if len(hits) != 1:
+        raise Refusal("this site's %s has %d entries headed %r; a cited entry needs exactly one"
+                      % (path, len(hits), heading))
+    e = hits[0]
+    return V(e["title"], own_src(path, e["line"], "the entry's own heading"), raw=e["date"])
 
 
 @fact

@@ -38,6 +38,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 
 SITE = pathlib.Path(__file__).resolve().parent
 ROOT = SITE.parent
@@ -1029,10 +1030,52 @@ SITE_CONTACTS = {"logan@loganw.dev"}
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 
 
+# Tags a browser lays out inside a word without breaking it. Read without
+# them, a word they split is whole again; any other tag breaks a word, and is
+# read as a space, as a browser lays it out.
+INLINE_TAGS = r"a|abbr|b|bdi|bdo|cite|code|data|dfn|em|i|kbd|mark|q|s|samp|small|span|strong|sub|sup|time|u|var|wbr"
+
+
+def _json_strings(o):
+    if isinstance(o, str):
+        yield o
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            yield k
+            yield from _json_strings(v)
+    elif isinstance(o, list):
+        for v in o:
+            yield from _json_strings(v)
+
+
+def readings(rel, data):
+    """Each way a reader could decode a published text file (verifier-seam
+    published an address past a check that read raw bytes only):
+    - as it is;
+    - with its character references decoded;
+    - decoded, with inline tags removed and every other tag read as a space;
+    - each of those percent-decoded, as a link's target is.
+    A JSON file is read as its strings, each decoded the same way. A
+    stylesheet needs no more: local-only refuses a backslash escape in one."""
+    t = data.decode("utf-8", "replace")
+    texts = [t]
+    if rel.endswith(".json"):
+        try:
+            texts = list(_json_strings(json.loads(t)))
+        except ValueError:
+            pass
+    out = []
+    for s in texts:
+        flat = re.sub(r"<[^>]*>", " ", re.sub(r"</?(?:%s)\b[^>]*>" % INLINE_TAGS, "", s, flags=re.I))
+        for v in (s, html.unescape(s), html.unescape(flat)):
+            out += [v, urllib.parse.unquote(v)]
+    return out
+
+
 def email_problems(rel, data):
     if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
         return []
-    found = sorted({m.group(0).lower() for m in EMAIL.finditer(data.decode("utf-8", "replace"))} - SITE_CONTACTS)
+    found = sorted({m.group(0).lower() for v in readings(rel, data) for m in EMAIL.finditer(v)} - SITE_CONTACTS)
     return ["an email address (%d found); only the site's contact, %s, may be published"
             % (len(found), ", ".join(sorted(SITE_CONTACTS)))] if found else []
 
@@ -1040,17 +1083,16 @@ def email_problems(rel, data):
 # Decision 16: Wally, Logan's Discord username, appears only on the game
 # thread's page. A name here may be published only in the files listed with
 # it; facts.json, which records the text of every figure and statement, holds
-# that page's statement of it. A page is read twice, as it is with character
-# references decoded, and with its tags stripped too, so neither an entity,
-# an attribute nor markup inside the word hides it.
+# that page's statement of it. A file is read in each of the ways readings()
+# gives, so neither an entity, an attribute, percent-encoding nor markup
+# inside the word hides it.
 ONLY_IN = {"Wally": ("thread-preservation.html", "facts.json")}
 
 
 def only_in_problems(rel, data):
     if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
         return []
-    t = data.decode("utf-8", "replace")
-    views = (html.unescape(t), html.unescape(re.sub(r"<[^>]*>", "", t)))
+    views = readings(rel, data)
     return ["names %s, which may be published only in %s" % (name, ", ".join(files))
             for name, files in sorted(ONLY_IN.items())
             if rel not in files and any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
@@ -1118,6 +1160,51 @@ def check_links(root=PUBLIC):
             problems.append("%s links to %s, and %s has no such id" % (rel, u, t))
     if not any(f.endswith(".html") for f in files):
         problems.append("no page is published")
+    return problems + check_connections(root)
+
+
+# The map on Home and each dossier's Connections, read as they are
+# published: a dossier lists exactly the edges the map draws that touch its
+# project. verifier-seam dropped an edge where each is rendered, and the
+# control then in place, which compared two functions, said they agreed.
+_EDGE_TITLE = re.compile(r'<path class="edge [^"]*"[^>]*><title>([^<]*)</title>')
+_CONNECTIONS = re.compile(r"<h2><small>[IVX]+</small>Connections</h2>(.*?)(?=<h2|</main>)", re.S)
+_CONNECTION = re.compile(r"<li><code>([^<]*)</code> ([^<]*?) <code>([^<]*)</code>:")
+
+
+def check_connections(root=PUBLIC):
+    home = root / "index.html"
+    if not home.is_file():
+        return []
+    kinds = json.loads((SITE / "data" / "relations.json").read_text(encoding="utf-8"))["kinds"]
+    labels = sorted({label for _, label in kinds}, key=len, reverse=True)
+    problems, drawn = [], set()
+    for title in _EDGE_TITLE.findall(home.read_text(encoding="utf-8")):
+        title = html.unescape(title)
+        for label in labels:
+            tail, sep, head = title.partition(" %s " % label)
+            if sep:
+                drawn.add((tail, label, head))
+                break
+        else:
+            problems.append("index.html draws an edge titled %r, of no kind relations.json names" % title)
+    nodes = {n for t, _, h in drawn for n in (t, h)}
+    for rel in sorted(published(root)):
+        if not (rel.startswith("work-") and rel.endswith(".html")):
+            continue
+        stem = rel[len("work-"):-len(".html")]
+        node = next((n for n in nodes if n.lower() == stem), None)
+        sec = _CONNECTIONS.search((root / rel).read_text(encoding="utf-8"))
+        if node is None:
+            problems.append("%s is a dossier for %r, which the map on index.html doesn't draw" % (rel, stem))
+            continue
+        if sec is None:
+            problems.append("%s has no Connections section" % rel)
+            continue
+        listed = {tuple(html.unescape(x) for x in m) for m in _CONNECTION.findall(sec.group(1))}
+        want = {e for e in drawn if node in (e[0], e[2])}
+        problems += ["%s doesn't list the map's edge %r" % (rel, " ".join(e)) for e in sorted(want - listed)]
+        problems += ["%s lists %r, which the map doesn't draw" % (rel, " ".join(e)) for e in sorted(listed - want)]
     return problems
 
 
@@ -1686,6 +1773,48 @@ def controls():
                             ("in an attribute", '<p title="by Wally">made</p>')):
             planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
                     check_local_only, "index.html: names Wally")
+        # An address in each shape a browser or a parser decodes, as
+        # verifier-seam published one past the first version of the gate.
+        for what, shape in (("as a character reference", "<p>write to someone&#64;example.com</p>"),
+                            ("as a named character reference", "<p>write to someone&commat;example.com</p>"),
+                            ("percent-encoded in a mailto link", '<p><a href="mailto:someone%40example.com">x</a></p>'),
+                            ("split by a word-break tag", "<p>someone@<wbr>example.com</p>"),
+                            ("split by inline markup", "<p>some<span>one</span>@example.com</p>")):
+            planted("local-only", "an email address on a page, %s" % what,
+                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, "index.html: an email address")
+        for what, shape in (("percent-encoded", "planted%40example.org "),
+                            ("as a JSON escape", "planted" + chr(92) + "u0040example.org ")):
+            fjp.write_text(saved_fj.replace('"about": "', '"about": "' + shape, 1), encoding="utf-8")
+            found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
+            report("local-only", bool(found), "an email address in facts.json, %s: %s" % (what, found[0] if found else "passed"))
+        fjp.write_text(saved_fj, encoding="utf-8")
+
+        # A dossier's Connections against the map, as published.
+        dossier = root / "work-cft-rebound.html"
+        saved_d = dossier.read_text(encoding="utf-8")
+        sec = _CONNECTIONS.search(saved_d)
+        item = re.search(r"<li><code>[^<]*</code> [^<]*? <code>[^<]*</code>:.*?</li>", sec.group(1), re.S) if sec else None
+        drawn = re.findall(r'<path class="edge [^"]*"[^>]*><title>cft-fp256 underlies cft-rebound</title></path>', t)
+        for what, target, new, want in (
+                ("a dossier missing one of the map's edges", dossier,
+                 saved_d.replace(item.group(0), "", 1) if item else saved_d, "doesn't list the map's edge"),
+                ("a dossier listing an edge the map doesn't draw", dossier,
+                 saved_d.replace(item.group(0), item.group(0) + "<li><code>cft-rebound</code> verifies "
+                                 "<code>planted-node</code>: x</li>", 1) if item else saved_d,
+                 "lists 'cft-rebound verifies planted-node', which the map doesn't draw"),
+                ("the map no longer drawing an edge a dossier lists", page,
+                 re.sub(r'<path class="edge [^"]*"[^>]*><title>cft-fp256 underlies cft-rebound</title></path>', "", t)
+                 if drawn else t, "lists 'cft-fp256 underlies cft-rebound', which the map doesn't draw")):
+            before = target.read_text(encoding="utf-8")
+            if new == before:
+                report("links", False, "could not plant %s" % what)
+                continue
+            target.write_text(new, encoding="utf-8", newline="\n")
+            try:
+                found = [f for f in check_links(root) if want in f]
+                report("links", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+            finally:
+                target.write_text(before, encoding="utf-8", newline="\n")
         planted("local-only", "a preview card's text in a meta tag",
                 t.replace("</head>", '<meta name="twitter:description" content="3397 tests"></head>', 1),
                 check_local_only, "twitter:description")
@@ -1833,15 +1962,38 @@ def controls():
     refused("own", "a paraphrase of the site's own ledger with a date its words do not have",
             lambda: facts.own_prose("docs/VALIDATION.md", r"^## \d{4}-\d{2}-\d{2} - (the biography approved)$",
                                     display="the biography, approved on 2026-09-30"), "2026-09-30")
-    refused("own", "an entry asked for at a line with no heading",
-            lambda: facts.own_entry("docs/VALIDATION.md", 2), "no entry heading at line 2")
+    refused("own", "an entry asked for by a heading the ledger doesn't have",
+            lambda: facts.own_entry("docs/VALIDATION.md", "2026-01-01 - planted"), "has 0 entries headed")
     saved_own = facts.own_text
-    facts.own_text = lambda path: "## 2026-01-01 - a\n\ntext\n\n## an undated heading\n"
     try:
+        facts.own_text = lambda path: "## 2026-01-01 - a\n\ntext\n\n## an undated heading\n"
         refused("own", "a heading in the site's own ledger not dated at its start",
                 lambda: facts.own_entries("docs/VALIDATION.md"), "not dated at its start")
+        facts.own_text = lambda path: "## 2026-01-01 - a\n\ntext\n\n## 2026-01-01 - a\n\nmore\n"
+        refused("own", "an entry cited by a heading two entries share",
+                lambda: facts.own_entry("docs/VALIDATION.md", "2026-01-01 - a"), "has 2 entries headed")
+        # An entry inserted above a cited one: by its line the fact returned
+        # the entry now there; by its heading it returns the same entry, at
+        # its new line.
+        facts.own_text = lambda path: "# L\n\n## 2026-01-01 - a\n\n## 2026-01-02 - b\n"
+        before = facts.own_entry("docs/VALIDATION.md", "2026-01-02 - b")
+        facts.own_text = lambda path: "# L\n\n## 2026-01-01 - a\n\n## 2026-01-01 - inserted\n\n## 2026-01-02 - b\n"
+        after = facts.own_entry("docs/VALIDATION.md", "2026-01-02 - b")
+        report("own", before.text == after.text and before.src.short != after.src.short,
+               "an entry inserted above a cited one: cited as %s, then as %s, the same entry %r"
+               % (before.src.short, after.src.short, after.text))
     finally:
         facts.own_text = saved_own
+    # Read again, a figure cited at another line than it was published at is
+    # a difference, even when its words are the same.
+    facts.reset_log()
+    v = facts.own_prose("docs/VALIDATION.md", r"^## \d{4}-\d{2}-\d{2} - (the biography approved)$")
+    rec = dict(facts.LOG[v.id - 1])
+    moved = dict(rec, where=rec["where"].rsplit(":", 1)[0] + ":1")
+    same, now = facts.rederive(moved)
+    report("own", same is False, "a citation published at another line, the words the same: %s"
+           % ("read again as different: %s" % now if same is False else "read again as the same"))
+    facts.reset_log()
     # A commit of the site's own that a page cites: on the history being
     # built, in a repository planted for the purpose, so CI runs it too.
     with tempfile.TemporaryDirectory() as d:
@@ -2108,7 +2260,8 @@ def main(argv=None):
                        ("--manifest", "public/ matches its MANIFEST, and so do pins.json, the snapshot and the site's own ledger"),
                        ("--verify-facts", "read every published figure again"),
                        ("--numbers", "every numeral on a page is a figure marked with its own fact"),
-                       ("--links", "every relative link resolves to a published file, exactly"),
+                       ("--links", "every relative link resolves to a published file, exactly, and each dossier's "
+                                    "Connections are the map's edges touching its project"),
                        ("--local-only", "only allowed tags and attributes; nothing loads from another host; no email "
                                          "address but the contact; Wally only on the game thread's page"),
                        ("--docs", "the documents' links resolve, and none states the stage count"),

@@ -105,15 +105,24 @@ a figure it didn't read there.
     it names only how many it found, since CI's logs are public. Key a
     commit's author by GitHub login, or by a hash of the address, never by
     the address itself.
+    - It reads each file as a browser or a parser would decode it:
+      character references, percent-encoding, markup inside a word, and a
+      JSON file's strings (`build.readings`).
+    - An address spelled out for a person to reassemble, such as "name at
+      example dot com", is not recognised. That is a stated limit.
 
 15. **The site's own ledger is a source.** `facts.own_prose()` and
     `facts.own_entry()` read `docs/VALIDATION.md`, and MANIFEST hashes it.
     After appending an entry, rebuild before committing, or the `manifest`
-    stage fails. Every heading there is dated at its start. Entries are only
-    appended, because a page cites an entry by its heading's line. A commit
-    of the site's own that a page cites goes through `facts.own_commit()`,
-    which refuses one that main doesn't hold. A squashed parcel's commits
-    are like that.
+    stage fails. Every heading there is dated at its start.
+    - An entry is cited by its heading's whole text, never by its line.
+      Found by line, an entry inserted above it returned another entry.
+    - `own_prose()` has no `last=`: the ledger grows, so a last match would
+      move to whatever a later entry repeats.
+    - An earlier entry is corrected by a later one, never edited.
+    - A commit of the site's own that a page cites goes through
+      `facts.own_commit()`, which refuses one that main doesn't hold. A
+      squashed parcel's commits are like that.
 
 16. **The spec names Wally on Home and on About; decision 16 allows the name
     on one page only,** the Preservation thread's. The local-only stage

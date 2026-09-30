@@ -169,7 +169,9 @@ def all_edges():
     relations.json's own edges, then those derived at a pin (StoryDocs'
     documents edges). One list, read by the map and by each dossier's
     Connections, so the two cannot disagree. At P2's merge the dossiers read
-    relations.json alone, and every one of them missed StoryDocs."""
+    relations.json alone, and four of the five missed StoryDocs' edges;
+    cft-rebound, for which StoryDocs has no projects/ directory, had none to
+    miss (verifier-seam)."""
     edges = []
     for e in DATA["edges"]:
         if e["kind"] not in KIND:

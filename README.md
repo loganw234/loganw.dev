@@ -8,7 +8,7 @@ Pages. After that, the github.io address redirects there. Every push to main
 deploys, once the gate passes.
 
 **Every figure on the site is read from a source, and a gate refuses one that
-isn't.** A figure comes from one of two places:
+isn't.** A figure comes from one of these places:
 
 - a repository in [pins.json](pins.json), read at the commit pinned there;
 - the GitHub snapshot that pins.json names;
