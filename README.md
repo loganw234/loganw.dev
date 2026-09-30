@@ -47,8 +47,9 @@ needs something the machine can't read is then skipped by name, never passed.
 
 The site needs only Python's standard library, except in one of the gate's
 controls. That control reads each ledger a second way, with CommonMark's own
-parser; install it with `pip install markdown-it-py==3.0.0`, or the control
-is skipped by name.
+parser. Install it, pinned by hash, with
+`python -m pip install --require-hashes --no-deps -r verify/requirements.txt`,
+or the control is skipped by name.
 
 To check the published figures yourself, from a clone of this repository:
 

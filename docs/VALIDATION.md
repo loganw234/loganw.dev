@@ -607,3 +607,50 @@ Four gaps passed every stage:
 verifiers, run on Sonnet.
 
 `--control` now catches 123 of 123.
+
+## 2026-09-29 - verifier-P0 on p0.2 at 00c847e: NOT READY on three overclaims; fixed
+
+verifier-P0 re-checked `00c847e`: 11 of 11 passed and controls caught 123.
+The four gaps from its previous report are closed; it removed each fix and
+watched the matching control name it. Three sentences still claimed more
+than their gates held:
+
+1. **The footer.** It says every figure above it names its source "beside
+   it, or ... in the list under the map". The gate only checked for a label
+   somewhere on the page, so a second, unlabelled copy of a figure passed.
+2. **The parser's docstring.** It said every other shape of level-2 heading
+   is refused. Not refused:
+   - a quote in a list item, and a list item in a quote: both dropped;
+   - a heading inside a multi-line HTML comment: read, though it never
+     renders;
+   - an `<h2>` inside another HTML block: escaped both the parser and the
+     cross-check.
+3. **Privacy.** The search didn't read commit identities (author,
+   committer, tagger), and didn't say so.
+
+It also noted that CI pinned markdown-it-py by version only, not by hash.
+
+**Fixed:**
+
+1. **The numbers stage** now holds the footer's own words. A figure outside
+   the map must have its label directly after it. A figure the map draws
+   must have its label in the list under the map. Two controls plant the
+   verifier's second copy and a missing line under the map.
+2. **The parser now follows CommonMark's HTML-block rules.**
+   - A comment runs from `<!--` to `-->`, and a block-level tag's block runs
+     to the next blank line. Neither holds a heading.
+   - It refuses an `<h2>` anywhere outside a code span, and a comment left
+     open.
+   - It refuses a heading under any nesting of quotes and list items.
+   - The cross-check now compares every level-2 heading's line and title
+     with CommonMark's, not just the count. All three ledgers are identical:
+     152, 37 and 19.
+   - The docstring now says which shapes are refused, and that the
+     cross-check holds the rest.
+3. **Privacy** now reads every author, committer and tagger, name and
+   email, and the docstring lists them.
+4. **CI** installs `markdown-it-py` and `mdurl` with `--require-hashes`
+   from `verify/requirements.txt`. The hashes are PyPI's published sha256,
+   matched against a hash-checked download.
+
+`--control` now catches 131 of 131.

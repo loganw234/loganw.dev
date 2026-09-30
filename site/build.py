@@ -328,6 +328,7 @@ class _Marks(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.stack, self.marks, self.loose, self.attr_text, self.problems = [], [], [], [], []
+        self.last = None       # the figure that just closed, until anything but its label follows it
 
     def _mark(self):
         return next((n for n in reversed(self.stack) if n["f"] is not None), None)
@@ -357,27 +358,41 @@ class _Marks(html.parser.HTMLParser):
             self.problems.append("a mark for fact %s sits inside the mark for fact %s" % (f, self._mark()["f"]))
         if tag == "a" and self._mark() is not None:
             self._mark()["href"] = a.get("href", "")
-        self.stack.append(dict(tag=tag, cls=cls, f=f, buf=[], href=None,
-                               footer=tag == "footer" or any(n["tag"] == "footer" for n in self.stack)))
+        inside = lambda t, c=None: tag == t or any(n["tag"] == t and (c is None or c in n["cls"]) for n in self.stack)
+        node = dict(tag=tag, cls=cls, f=f, buf=[], href=None, beside=False, footer=inside("footer"),
+                    svg=inside("svg"), evidence=any(n["tag"] == "details" and "evidence" in n["cls"] for n in self.stack))
+        # A label opening straight after its own figure is the label beside it.
+        if f is not None and "src" in cls and self.last is not None and self.last["f"] == f:
+            self.last["beside"] = True
+        if self._mark() is None:
+            self.last = None
+        self.stack.append(node)
 
     def handle_startendtag(self, tag, attrs):
         self._attrs(tag, attrs)
+        if self._mark() is None:
+            self.last = None
 
     def handle_endtag(self, tag):
         if tag in VOID:
             return
+        closed = None
         while self.stack:
             n = self.stack.pop()
             if n["f"] is not None:
                 self.marks.append(n)
             if n["tag"] == tag:
+                closed = n
                 break
+        if self._mark() is None:
+            self.last = closed if closed is not None and closed["f"] is not None and "src" not in closed["cls"] else None
 
     def handle_data(self, data):
         m = self._mark()
         if m is not None:
             m["buf"].append(data)
         elif data.strip():
+            self.last = None
             # A month tick on a chart's axis: SVG text of class tick, inside an
             # svg, and nothing else, however it is classed.
             tick = bool(self.stack) and self.stack[-1]["tag"] == "text" and "tick" in self.stack[-1]["cls"] \
@@ -477,15 +492,22 @@ def check_numbers(root=PUBLIC, names=None):
                                         % (rel, rec["id"], got, rec["text"]))
                     if m["tag"] == "span" and render.cls_of(rec) not in m["cls"]:
                         problems.append("%s: fact %d is marked as %r, not %r" % (rel, rec["id"], " ".join(m["cls"]), render.cls_of(rec)))
-            # Every figure above the footer has its source somewhere on the
-            # page - beside it, or in the list under the map - as the footer
-            # says. The footer's own pins and date are printed bare, and its
+            # Every figure above the footer names its source as the footer
+            # says: beside it, or - for a figure the map draws - in the list
+            # under the map. "Somewhere on the page" was the first rule, and a
+            # second, unlabelled copy of a figure passed it (verifier-P0).
+            # The footer's own pins and date are printed bare, and its
             # sentence says so.
-            labelled = {m["f"] for m in p.marks if "src" in m["cls"]}
+            in_list = {m["f"] for m in p.marks if "src" in m["cls"] and m["evidence"]}
             for m in p.marks:
                 rec = by_id.get(int(m["f"])) if m["f"].isdigit() else None
-                if rec and "src" not in m["cls"] and not m["footer"] and rec["text"] and m["f"] not in labelled:
-                    problems.append("%s: fact %s is printed above the footer, and its source is nowhere on the page"
+                if not rec or "src" in m["cls"] or m["footer"] or not rec["text"]:
+                    continue
+                if m["svg"] and m["f"] not in in_list:
+                    problems.append("%s: fact %s is drawn in the map, and the list under the map does not give "
+                                    "its source" % (rel, m["f"]))
+                elif not m["svg"] and not m["beside"]:
+                    problems.append("%s: fact %s is printed above the footer without its source beside it"
                                     % (rel, m["f"]))
             for text, tick in p.loose:
                 problems += _loose_problems(rel, text, tick, names, allowed)
@@ -829,7 +851,8 @@ def tracked_blobs(root=ROOT):
         earlier commit is found (verifier-P0);
       * every path, now and in history, since a name can be a file's name;
       * every commit message, every annotated tag's message, and every
-        branch and tag name.
+        branch and tag name;
+      * every author, committer and tagger: name and email.
     What it cannot read: text drawn as pixels, and text inside compressed
     data other than a PNG's text chunks (a font's tables, say)."""
     out, seen = [], set()
@@ -858,6 +881,8 @@ def tracked_blobs(root=ROOT):
     out.append(("paths", "\n".join(sorted(set(ls.split("\0")) | set(paths.values()))).encode()))
     for what, args in (("commit messages", ["log", "--all", "--format=%B"]),
                        ("tag messages", ["for-each-ref", "refs/tags", "--format=%(contents)"]),
+                       ("commit identities", ["log", "--all", "--format=%an%n%ae%n%cn%n%ce"]),
+                       ("tagger identities", ["for-each-ref", "refs/tags", "--format=%(taggername)%0a%(taggeremail)"]),
                        ("branch and tag names", ["for-each-ref", "--format=%(refname)"])):
         out.append((what, _git_out(root, *args)))
     return out
@@ -1133,7 +1158,14 @@ def controls():
                     t.replace("</footer>", '<span class="fig">x</span></footer>', 1), check_numbers, "no fact id")
             planted("numbers", "a figure's source label removed",
                     re.sub(r'<span class="src" data-f="%d">.*?</span>(?=</td>)' % agent["id"], "", t, count=1, flags=re.S),
-                    check_numbers, "fact %d is printed above the footer, and its source is nowhere" % agent["id"])
+                    check_numbers, "fact %d is printed above the footer without its source beside it" % agent["id"])
+            planted("numbers", "a second copy of a figure, with no label beside it",
+                    t.replace("<footer>", "<p>%s</p><footer>" % mark, 1),
+                    check_numbers, "fact %d is printed above the footer without its source beside it" % agent["id"])
+            snap_id = next(r["id"] for r in data["facts"] if r["method"] == "facts.snapshot_date")
+            planted("numbers", "a figure the map draws, with its line under the map removed",
+                    re.sub(r'<li>the line marked "snapshot": .*?</li>', "", t, count=1, flags=re.S),
+                    check_numbers, "fact %d is drawn in the map" % snap_id)
             planted("numbers", "a source label changed",
                     re.sub(r'(<span class="src" data-f="%d"> (?:<a [^>]*>)?\()' % agent["id"], r"\1planted ", t, count=1),
                     check_numbers, "fact %d's source" % agent["id"])
@@ -1330,8 +1362,15 @@ def controls():
                        ("a heading underlined with a single dash", "## 2026-01-01 - a\n\n2026-01-02 - b\n-\n"),
                        ("a heading inside a quote", "## 2026-01-01 - a\n> ## 2026-01-02 - b\n"),
                        ("a heading inside a list item", "## 2026-01-01 - a\n- ## 2026-01-02 - b\n"),
-                       ("an HTML heading", "## 2026-01-01 - a\n<h2>2026-01-02 - b</h2>\n")):
+                       ("a heading in a quote inside a list item", "## 2026-01-01 - a\n- > ## 2026-01-02 - b\n"),
+                       ("a heading in a list item inside a quote", "## 2026-01-01 - a\n> - ## 2026-01-02 - b\n"),
+                       ("an HTML heading", "## 2026-01-01 - a\n<h2>2026-01-02 - b</h2>\n"),
+                       ("an HTML heading inside another HTML block", "## 2026-01-01 - a\n<div><h2>2026-01-02</h2></div>\n"),
+                       ("an HTML comment never closed", "## 2026-01-01 - a\n<!--\n## 2026-01-02 - b\n")):
         refused("ledger", what, lambda text=text: facts.ledger_headings(text))
+    heads = facts.ledger_headings("## 2026-01-01 - a\n<!--\n## 2026-01-02 - hidden\n-->\n## 2026-01-03 - c\n")
+    report("ledger", [h[1] for h in heads] == ["## 2026-01-01 - a", "## 2026-01-03 - c"],
+           "a heading inside an HTML comment, which renders as nothing: %d read of the 2 outside it" % len(heads))
     # Every real ledger, against CommonMark's own count of its level-2
     # headings: an independent reading, where markdown-it-py is installed.
     try:
@@ -1344,9 +1383,14 @@ def controls():
             except Unavailable as e:
                 skip("ledger", "%s: %s" % (name, e))
                 continue
-            h2 = sum(1 for tok in md.parse(t) if tok.type == "heading_open" and tok.tag == "h2")
-            report("ledger", len(ents) == h2, "%s: %d entries read, and CommonMark renders %d level-2 headings"
-                   % (name, len(ents), h2))
+            toks = md.parse(t)
+            theirs = [(tok.map[0] + 1, toks[k + 1].content.strip()) for k, tok in enumerate(toks)
+                      if tok.type == "heading_open" and tok.tag == "h2"]
+            mine = [(e["line"], e["title"]) for e in ents]
+            odd = [x for x in mine if x not in theirs][:1] + [x for x in theirs if x not in mine][:1]
+            report("ledger", mine == theirs, "%s: %d entries read, and CommonMark renders %d level-2 headings%s"
+                   % (name, len(mine), len(theirs), ", each at the same line with the same title" if mine == theirs
+                      else "; they differ at %r" % odd))
     except ImportError:
         skip("ledger", "markdown-it-py is not installed here, so no ledger is read a second way")
     heads = facts.ledger_headings("## 2026-01-01 - a\n   ## 2026-01-02 - indented\n##\t2026-01-03 - a tab\n")
@@ -1386,8 +1430,13 @@ def controls():
         g("add", "-A")
         g("commit", "-qm", "a folder")
         g("tag", "-a", "v0", "-m", "the tag message names planted-private-repo")
+        (pathlib.Path(d) / "other.md").write_text("x\n", encoding="utf-8")
+        g("add", "-A")
+        subprocess.run(["git", "-C", d, "-c", "user.name=planted-private-repo bot", "-c", "user.email=bot@invalid",
+                        "commit", "-qm", "an ordinary message"], capture_output=True)
         hits = find_named(["planted-private-repo"], tracked_blobs(pathlib.Path(d)))
-        for what, want in (("as a folder's name", "paths"), ("in an annotated tag's message", "tag messages")):
+        for what, want in (("as a folder's name", "paths"), ("in an annotated tag's message", "tag messages"),
+                           ("in a commit's author name", "commit identities")):
             report("privacy", any(h.startswith(want) for h in hits), "a private name %s: %s" % (what, hits or "passed"))
     import zlib
     chunk = b"zTXt" + b"Comment\0\0" + zlib.compress(b"made in planted-private-repo")
@@ -1546,12 +1595,13 @@ def main(argv=None):
         if a.privacy:
             hits, n, blobs = check_privacy()
             hist = sum(1 for w, _ in blobs if " in history (blob " in w)
-            other = {"paths", "commit messages", "tag messages", "branch and tag names"}
+            other = {"paths", "commit messages", "tag messages", "commit identities", "tagger identities",
+                     "branch and tag names"}
             files = sum(1 for w, _ in blobs if " in history (blob " not in w and w not in other)
             return problems_out("privacy", ["%s names a private repository the site does not read" % h for h in hits],
                                 "; %d private repositories the site does not read, looked for in %d files, %d blobs "
-                                "reachable in history, every path, the commit and tag messages, and the branch and "
-                                "tag names" % (n, files, hist))
+                                "reachable in history, every path, the commit and tag messages, every author, "
+                                "committer and tagger, and the branch and tag names" % (n, files, hist))
         if a.github:
             problems, n = check_github()
             return problems_out("github", problems, "; %d pins asked of GitHub, each the commit the snapshot "

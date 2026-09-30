@@ -558,35 +558,62 @@ def last_commit(name, path):
              raw=h, num=True)
 
 
+BLOCK_TAGS = ("address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|"
+              "dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h1|h2|h3|h4|h5|h6|"
+              "head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|"
+              "param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul")
+_OPEN_TAG = (r"<[A-Za-z][A-Za-z0-9-]*(?:\s+[A-Za-z_:][\w.:-]*(?:\s*=\s*(?:[^\s\"'=<>`]+|'[^']*'|\"[^\"]*\"))?)*"
+             r"\s*/?>|</[A-Za-z][A-Za-z0-9-]*\s*>")
+
+
 def ledger_headings(t):
-    """A ledger's level-2 headings outside fenced code: [(offset, '## title',
-    the line as written)]. A heading shape inside a fence is an
-    example, not an entry (verifier-P0 built one that the first parser
-    counted). A heading may be indented up to three spaces, or have a tab
+    """A ledger's level-2 headings: [(offset, '## title', the line as
+    written)]. A heading may be indented up to three spaces, or have a tab
     after its marks, as CommonMark allows.
 
-    Every other shape that renders as a level-2 heading is refused, because
-    each would drop an entry without a word:
-      * a fence still open at the end of the file, which swallows every
-        heading after it (verifier-P0 left one open, and 1 of 3 was read);
+    Not headings, as in CommonMark: a line inside a fenced code block, and a
+    line inside an HTML block - a comment from <!-- to -->, or a block-level
+    tag's block, up to the next blank line. verifier-P0 built a heading inside
+    a fence that the first parser counted, and one inside a comment.
+
+    Refused, because each renders as a level-2 heading this parser does not
+    read, and would drop an entry without a word:
+      * a fence or a comment still open at the end of the file;
       * a setext heading: a line underlined with dashes, even a single one;
-      * a heading inside a quote or a list item;
-      * an HTML <h2> block.
-    A refusal can be too eager: a rule after an indented list line, say. It
-    is loud, and the ledger can say it another way. The desktop's controls
-    compare every ledger's entry count with CommonMark's own count of its
-    level-2 headings (markdown-it-py), where that library is installed.
+      * a heading inside a quote or a list item, however they nest;
+      * an HTML <h2>, anywhere outside a code span.
+    A refusal can be too eager - a rule after an indented list line, say. It
+    is loud, and the ledger can say it another way.
+
+    What holds the rest: the controls read every real ledger a second way,
+    with CommonMark's own parser (markdown-it-py, on the desktop and in CI),
+    and compare the line and title of every level-2 heading with this
+    parser's entries.
     """
-    out, fence, pos, prev, opened = [], None, 0, "", 0
+    out, fence, html, pos, prev, opened = [], None, None, 0, "", 0
     lines = t.splitlines(keepends=True)
     for i, line in enumerate(lines, 1):
         s = line.rstrip("\r\n")
         m = re.match(r" {0,3}(`{3,}|~{3,})", s)
-        if fence is None and m:
-            fence, opened = m.group(1), i
-        elif fence is not None:
+        code_free = re.sub(r"(`+).*?\1", "", s)
+        if html is None and fence is None and re.search(r"<h2\b", code_free, re.I):
+            raise Refusal("line %d has an HTML heading, which this parser does not read; write it as '## ...'" % i)
+        if fence is not None:
             if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and s.strip() == m.group(1):
                 fence = None
+        elif html is not None:
+            if re.search(r"<h2\b", s, re.I):
+                raise Refusal("line %d has an HTML heading inside an HTML block, which this parser does not read" % i)
+            if (html == "-->" and "-->" in s) or (html == "" and not s.strip()):
+                html = None
+        elif m:
+            fence, opened = m.group(1), i
+        elif re.match(r" {0,3}<!--", s):
+            if "-->" not in s[s.index("<!--") + 4:]:
+                html, opened = "-->", i
+        elif re.match(r" {0,3}</?(?:%s)(?:[\s/>]|$)" % BLOCK_TAGS, s, re.I) \
+                or (not prev.strip() and re.match(r" {0,3}(?:%s)\s*$" % _OPEN_TAG, s)):
+            html = "" if s.strip() else None
         else:
             h = re.match(r" {0,3}##(?!#)[ \t]+(.*?)\s*$", s)
             if h:
@@ -595,17 +622,17 @@ def ledger_headings(t):
                     and not re.match(r" {0,3}(?:#|[-*+] |\d+[.)] |\||>|-+[ \t]*$)", prev):
                 raise Refusal("line %d underlines the line above it with dashes, which makes a heading this parser "
                               "does not read; write it as '## ...', or put a blank line before the rule" % i)
-            elif re.match(r" {0,3}(?:>[ \t]?)+ {0,3}##(?!#)(?:[ \t]|$)", s) \
-                    or re.match(r" {0,3}(?:[-*+]|\d{1,9}[.)])[ \t]+##(?!#)(?:[ \t]|$)", s):
+            elif re.match(r" {0,3}(?:(?:>|[-*+]|\d{1,9}[.)])[ \t]*)+##(?!#)(?:[ \t]|$)", s):
                 raise Refusal("line %d is a heading inside a quote or a list item, which this parser does not read; "
                               "write it as '## ...' at the start of the line" % i)
-            elif re.match(r" {0,3}<h2\b", s, re.I):
-                raise Refusal("line %d is an HTML heading, which this parser does not read; write it as '## ...'" % i)
-        # a fence's own lines end a paragraph, so a rule after one is only a rule
-        prev = s if fence is None and not m else ""
+        # a fence's or an HTML block's own lines end a paragraph, so a rule after one is only a rule
+        prev = s if fence is None and html is None and not m else ""
         pos += len(line)
     if fence is not None:
         raise Refusal("the code fence opened at line %d is never closed, so every heading after it would be "
+                      "dropped" % opened)
+    if html == "-->":
+        raise Refusal("the HTML comment opened at line %d is never closed, so every heading after it would be "
                       "dropped" % opened)
     return out
 
