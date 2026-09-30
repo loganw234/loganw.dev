@@ -61,9 +61,10 @@ The source repositories are the authority, each read at the commit named in
    the one rule, and `snapshot_github.py` uses it too.
 5. **A count over a fork's history counts its parent.** nextpnr-xilinx showed
    45 of 3397. A fork gets a dash, and the reason.
-6. **Links must be relative, and name a published file exactly.** The site is
-   served at `loganw234.github.io/loganw.dev/` as well as at the root of
-   loganw.dev, so a leading `/` breaks one of the two.
+6. **Links must be relative, and name a published file exactly.** The site
+   has been served at `loganw234.github.io/loganw.dev/`, a subpath, and at
+   the root of loganw.dev. It is also previewed from local folders. A
+   leading `/` breaks every one of these except the root.
 7. **Don't hand-edit `public/`.** It is generated, and `--check` fails on
    drift. If two branches conflict in `public/`, resolve it by rebuilding,
    never by merging the text.

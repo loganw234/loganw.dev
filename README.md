@@ -1,9 +1,11 @@
 # loganw.dev
 
-Logan W.'s projects, and the record behind every figure about them. The site
-is built to be served by GitHub Pages at <https://loganw.dev> and
-<https://loganw234.github.io/loganw.dev/>. Neither address serves it until
-this repository is public and its first push has deployed.
+Logan W.'s projects, and the record behind every figure about them. GitHub
+Pages publishes the site from this repository at
+<https://loganw234.github.io/loganw.dev/>, with <https://loganw.dev> set as
+its custom domain. The domain serves the site once its DNS points to GitHub
+Pages. After that, the github.io address redirects there. Every push to main
+deploys, once the gate passes.
 
 **Every figure on the site is read from a source, and a gate refuses one that
 isn't.** A figure comes from one of two places:

@@ -995,3 +995,51 @@ tinycss2.
 **For the push.** The verifier could not test the deploy job itself: its
 four action versions, and Pages set to deploy from Actions, run only on the
 first push to main. That run is watched.
+
+## 2026-09-29 - the first push: main at 7174f67, deployed; the custom domain set
+
+**Before the push.**
+
+- Logan cleared the step: "once the verifier finishes you are clear to
+  begin".
+- main was fast-forwarded to `p0.2`, at `7174f67`.
+- `bash verify/run.sh --require-all` on main passed 11 of 11, with nothing
+  skipped.
+- The commits carry the author identity Logan's other public repositories
+  already carry.
+- Pages was enabled with Actions as its source, through
+  `gh api -X POST repos/loganw234/loganw.dev/pages -f build_type=workflow`.
+
+**The first run**, `36660606803`: every step passed.
+
+- **The gate job**, 1 min 5 s.
+  - It installed `verify/requirements.txt` with `--require-hashes`.
+  - It ran `LOGANW_FETCH=1 bash verify/run.sh`.
+  - build, privacy and github were skipped by name.
+  - facts read 153 again and skipped 19.
+  - The controls caught 165 and skipped 3.
+  - The verdict was PASS, with those skips counted. That is the same result
+    as the local CI simulation.
+- **The deploy job**, 12 s. It ran checkout v7, upload-pages-artifact v5 and
+  deploy-pages v5. This is the first time these ran; verifier-P0 could not
+  test them.
+
+**Live**, at `https://loganw234.github.io/loganw.dev/`:
+
+- `BUILD` reads "Deployed from 7174f67cbcd0bc6a9d9e1fbadbd26cbdcce732a9".
+- index.html, style.css, facts.json and the three prints are byte-identical
+  to `public/`.
+- In the browser pane the fonts loaded under the Content-Security-Policy,
+  and the console showed no errors.
+- The prints were not fetched there, because the pane was hidden and they
+  load lazily. They load where the pane is drawn, as they did at 16:4x
+  locally.
+
+**The custom domain.** `gh api -X PUT repos/loganw234/loganw.dev/pages -f
+cname=loganw.dev` succeeded. It was set before any DNS change, as GitHub
+advises against a takeover.
+
+- HTTPS is enforced once GitHub has a certificate, which needs Logan's DNS
+  records first.
+- loganw.dev still resolves to 15.197.148.33 and 3.33.130.190, not to
+  GitHub.
