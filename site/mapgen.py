@@ -186,11 +186,18 @@ def block():
     order = sorted(M["nodes"].values(), key=lambda n: (n["born"].text, n["name"]))
     pos = "".join('<li>%s: %s</li>' % (esc(n["name"]), fig(n["born"])) for n in order)
     fam = "".join('<li>%s %s, created %s</li>' % (fig(f["v"]), esc(f["label"]), fig(f["span"])) for f in M["families"])
+    # Every other figure the drawing marks, with its source, so no figure on
+    # the page goes without one (verifier-P0 found four that did).
+    drawn = ['<li>the line marked "snapshot": %s</li>' % fig(M["now"])]
+    drawn += ['<li>%s: %s</li>' % (esc(n["name"]), fig(n["vis"])) for n in order if n["vis"].text == "private"]
+    drawn += ['<li>%s: %s%s%s</li>' % (esc(n["name"]), esc(n["note"][0]), fig(n["note"][1]), esc(n["note"][2]))
+              for n in order if n["note"]]
     cap = ("Across: the day each repository was born &mdash; its first commit at the pin, on its author's calendar; "
            "the date its README states it was split out of another; or, for a repository read only through the "
            "GitHub snapshot, its first commit there, in UTC. Down: the threads. Read each arrow as a sentence, tail "
            "to head; each one names the file that says so.")
     return ('<figure class="map"><div class="map-scroll">%s</div><figcaption>%s</figcaption>%s'
             '<details class="evidence"><summary>The file behind each arrow, and behind each position</summary>'
-            '<ol>%s</ol><p>Positions, earliest first:</p><ul>%s</ul><p>Families:</p><ul>%s</ul></details></figure>'
-            % (svg(M), cap, legend(), ev, pos, fam))
+            '<ol>%s</ol><p>Positions, earliest first:</p><ul>%s</ul><p>Families:</p><ul>%s</ul>'
+            '<p>The rest of what the drawing marks:</p><ul>%s</ul></details></figure>'
+            % (svg(M), cap, legend(), ev, pos, fam, "".join(drawn)))

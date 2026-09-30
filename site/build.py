@@ -357,7 +357,8 @@ class _Marks(html.parser.HTMLParser):
             self.problems.append("a mark for fact %s sits inside the mark for fact %s" % (f, self._mark()["f"]))
         if tag == "a" and self._mark() is not None:
             self._mark()["href"] = a.get("href", "")
-        self.stack.append(dict(tag=tag, cls=cls, f=f, buf=[], href=None))
+        self.stack.append(dict(tag=tag, cls=cls, f=f, buf=[], href=None,
+                               footer=tag == "footer" or any(n["tag"] == "footer" for n in self.stack)))
 
     def handle_startendtag(self, tag, attrs):
         self._attrs(tag, attrs)
@@ -390,6 +391,9 @@ def dupes(attrs):
 
 
 NAMES_FILE = SITE / "data" / "numeral_names.json"
+
+
+NAME_SHAPE = re.compile(r"[A-Z][A-Za-z]*(?:[ -][A-Z][A-Za-z]*)*[ -]\d+(?:\.\d+)?")
 
 
 def numeral_names():
@@ -440,6 +444,12 @@ def check_numbers(root=PUBLIC, names=None):
     for n in sorted(names):
         if not any(n in r["text"] or n in r["raw"] for r in recs):
             problems.append("%s allows %r, and no fact's text holds it" % (NAMES_FILE.name, n))
+        # A name is a proper name ending in its number - "Mercenaries 2",
+        # "IEEE 754", "UTF-8" - never a phrase a figure could hide in ("28 of
+        # 41" appears in a fact's text too; verifier-P0).
+        if not NAME_SHAPE.fullmatch(n):
+            problems.append("%s allows %r, which is not the shape of a name: capitalised words, then one number"
+                            % (NAMES_FILE.name, n))
     files = published(root)
     if not any(f.endswith(".html") for f in files):
         return ["no page is published"], None
@@ -467,6 +477,16 @@ def check_numbers(root=PUBLIC, names=None):
                                         % (rel, rec["id"], got, rec["text"]))
                     if m["tag"] == "span" and render.cls_of(rec) not in m["cls"]:
                         problems.append("%s: fact %d is marked as %r, not %r" % (rel, rec["id"], " ".join(m["cls"]), render.cls_of(rec)))
+            # Every figure above the footer has its source somewhere on the
+            # page - beside it, or in the list under the map - as the footer
+            # says. The footer's own pins and date are printed bare, and its
+            # sentence says so.
+            labelled = {m["f"] for m in p.marks if "src" in m["cls"]}
+            for m in p.marks:
+                rec = by_id.get(int(m["f"])) if m["f"].isdigit() else None
+                if rec and "src" not in m["cls"] and not m["footer"] and rec["text"] and m["f"] not in labelled:
+                    problems.append("%s: fact %s is printed above the footer, and its source is nowhere on the page"
+                                    % (rel, m["f"]))
             for text, tick in p.loose:
                 problems += _loose_problems(rel, text, tick, names, allowed)
             for t in p.attr_text:
@@ -802,10 +822,16 @@ def _git_out(root, *args, stdin=None):
 
 
 def tracked_blobs(root=ROOT):
-    """[(where, bytes)]: everything a push of this repository would publish.
-    Every file git would commit now (tracked, or new and not ignored); every
-    blob reachable from any ref, so a name that survives only in an earlier
-    commit is found (verifier-P0); every commit message; every branch name."""
+    """[(where, bytes)]: what a push of this repository would publish, as
+    text this search can read:
+      * every file git would commit now (tracked, or new and not ignored);
+      * every blob reachable from any ref, so a name that survives only in an
+        earlier commit is found (verifier-P0);
+      * every path, now and in history, since a name can be a file's name;
+      * every commit message, every annotated tag's message, and every
+        branch and tag name.
+    What it cannot read: text drawn as pixels, and text inside compressed
+    data other than a PNG's text chunks (a font's tables, say)."""
     out, seen = [], set()
     ls = _git_out(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").decode("utf-8", "replace")
     for rel in sorted(set(x for x in ls.split("\0") if x)):
@@ -829,10 +855,39 @@ def tracked_blobs(root=ROOT):
         if sha not in seen:
             seen.add(sha)
             out.append(("%s in history (blob %s)" % (paths[sha], sha[:7]), body))
+    out.append(("paths", "\n".join(sorted(set(ls.split("\0")) | set(paths.values()))).encode()))
     for what, args in (("commit messages", ["log", "--all", "--format=%B"]),
-                       ("branch names", ["for-each-ref", "--format=%(refname)"])):
+                       ("tag messages", ["for-each-ref", "refs/tags", "--format=%(contents)"]),
+                       ("branch and tag names", ["for-each-ref", "--format=%(refname)"])):
         out.append((what, _git_out(root, *args)))
     return out
+
+
+def png_text(b):
+    """The text chunks of a PNG, compressed ones inflated: tEXt, zTXt and
+    iTXt. verifier-P0 hid a name in a compressed chunk, which a byte search
+    cannot see."""
+    import zlib
+    out, pos = [], 8
+    while pos + 8 <= len(b):
+        n, kind = int.from_bytes(b[pos:pos + 4], "big"), b[pos + 4:pos + 8]
+        data = b[pos + 8:pos + 8 + n]
+        pos += 12 + n
+        try:
+            if kind == b"tEXt":
+                out.append(data.replace(b"\0", b" "))
+            elif kind == b"zTXt":
+                key, _, rest = data.partition(b"\0")
+                out.append(key + b" " + zlib.decompress(rest[1:]))
+            elif kind == b"iTXt":
+                key, _, rest = data.partition(b"\0")
+                compressed, rest = rest[0], rest[2:]
+                lang, _, rest = rest.partition(b"\0")
+                tkey, _, text = rest.partition(b"\0")
+                out.append(key + b" " + tkey + b" " + (zlib.decompress(text) if compressed else text))
+        except (zlib.error, IndexError):
+            out.append(b"(an unreadable text chunk)")
+    return b"\n".join(out)
 
 
 def _as_text(b):
@@ -861,6 +916,8 @@ def find_named(names, blobs):
     for where, b in blobs:
         t = b if isinstance(b, str) else _as_text(b)
         if t is None:
+            if b.startswith(b"\x89PNG\r\n\x1a\n"):
+                b = b + b"\n" + png_text(b)
             if any(r in b.lower() for r in raw):
                 hits.append("%s (bytes)" % where)
             continue
@@ -1074,6 +1131,9 @@ def controls():
                     check_numbers, "three")
             planted("numbers", "a figure span with no fact",
                     t.replace("</footer>", '<span class="fig">x</span></footer>', 1), check_numbers, "no fact id")
+            planted("numbers", "a figure's source label removed",
+                    re.sub(r'<span class="src" data-f="%d">.*?</span>(?=</td>)' % agent["id"], "", t, count=1, flags=re.S),
+                    check_numbers, "fact %d is printed above the footer, and its source is nowhere" % agent["id"])
             planted("numbers", "a source label changed",
                     re.sub(r'(<span class="src" data-f="%d"> (?:<a [^>]*>)?\()' % agent["id"], r"\1planted ", t, count=1),
                     check_numbers, "fact %d's source" % agent["id"])
@@ -1089,6 +1149,10 @@ def controls():
             planted("numbers", "a name allowed with no fact behind it",
                     t.replace("</footer>", "<p>after 4096 tests</p></footer>", 1),
                     lambda r: check_numbers(r, names={"4096 tests": "planted"}), "no fact's text holds it")
+            held = next(r["text"] for r in data["facts"] if r["method"] == "facts.agents")
+            planted("numbers", "a figure allowed as a name because a fact holds it",
+                    t.replace("</footer>", "<p>%s</p></footer>" % held, 1),
+                    lambda r: check_numbers(r, names={held: "planted"}), "not the shape of a name")
             css = root / "style.css"
             saved_css = css.read_text(encoding="utf-8")
             for what, rule, want in (("a figure in CSS generated content", '.stamp::after{content:" 3397 tests"}', "'3397'"),
@@ -1262,8 +1326,29 @@ def controls():
     report("ledger", len(heads) == 2, "a heading inside a code fence: %d headings read of 2 outside fences" % len(heads))
     for what, text in (("a fence never closed", "## 2026-01-01 - a\n```\n## 2026-01-02 - b\n"),
                        ("four backticks closed by three", "## 2026-01-01 - a\n````\n```\n## 2026-01-02 - b\n"),
-                       ("a heading underlined with dashes", "## 2026-01-01 - a\n\n2026-01-02 - b\n---\n")):
+                       ("a heading underlined with dashes", "## 2026-01-01 - a\n\n2026-01-02 - b\n---\n"),
+                       ("a heading underlined with a single dash", "## 2026-01-01 - a\n\n2026-01-02 - b\n-\n"),
+                       ("a heading inside a quote", "## 2026-01-01 - a\n> ## 2026-01-02 - b\n"),
+                       ("a heading inside a list item", "## 2026-01-01 - a\n- ## 2026-01-02 - b\n"),
+                       ("an HTML heading", "## 2026-01-01 - a\n<h2>2026-01-02 - b</h2>\n")):
         refused("ledger", what, lambda text=text: facts.ledger_headings(text))
+    # Every real ledger, against CommonMark's own count of its level-2
+    # headings: an independent reading, where markdown-it-py is installed.
+    try:
+        from markdown_it import MarkdownIt
+        md = MarkdownIt("commonmark")
+        for name in sorted(n for n, c in facts.PINS["repos"].items() if c.get("verified_by", {}).get("ledger")) \
+                + ["cft-fp256"]:
+            try:
+                t, ents = facts.entries(name, "docs/VALIDATION.md")
+            except Unavailable as e:
+                skip("ledger", "%s: %s" % (name, e))
+                continue
+            h2 = sum(1 for tok in md.parse(t) if tok.type == "heading_open" and tok.tag == "h2")
+            report("ledger", len(ents) == h2, "%s: %d entries read, and CommonMark renders %d level-2 headings"
+                   % (name, len(ents), h2))
+    except ImportError:
+        skip("ledger", "markdown-it-py is not installed here, so no ledger is read a second way")
     heads = facts.ledger_headings("## 2026-01-01 - a\n   ## 2026-01-02 - indented\n##\t2026-01-03 - a tab\n")
     report("ledger", len(heads) == 3, "headings indented, and after a tab: %d read of 3" % len(heads))
     refused("write", "a published path that climbs out of public/",
@@ -1296,6 +1381,19 @@ def controls():
         hits = find_named(["planted-private-repo"], tracked_blobs(pathlib.Path(d)))
         report("privacy", any("in history" in h for h in hits),
                "a private name only in an earlier commit: %s" % (hits or "passed"))
+        (pathlib.Path(d) / "planted-private-repo").mkdir()
+        (pathlib.Path(d) / "planted-private-repo" / "readme.md").write_text("nothing\n", encoding="utf-8")
+        g("add", "-A")
+        g("commit", "-qm", "a folder")
+        g("tag", "-a", "v0", "-m", "the tag message names planted-private-repo")
+        hits = find_named(["planted-private-repo"], tracked_blobs(pathlib.Path(d)))
+        for what, want in (("as a folder's name", "paths"), ("in an annotated tag's message", "tag messages")):
+            report("privacy", any(h.startswith(want) for h in hits), "a private name %s: %s" % (what, hits or "passed"))
+    import zlib
+    chunk = b"zTXt" + b"Comment\0\0" + zlib.compress(b"made in planted-private-repo")
+    png = b"\x89PNG\r\n\x1a\n" + (len(chunk) - 4).to_bytes(4, "big") + chunk + b"\0\0\0\0"
+    hits = find_named(["planted-private-repo"], [("planted.png", png)])
+    report("privacy", bool(hits), "a private name in a compressed PNG text chunk: %s" % (hits or "passed"))
 
     # D. Faults that need every pinned clone: a stale page, a stale pin, and
     #    each page's own controls.
@@ -1353,6 +1451,21 @@ def controls():
         finally:
             runs.remove(plant)
         report("newest", v.raw == plant["created"], "a newer passing run planted for %s: last verified %s" % (name, v.text))
+        # A run on a commit outside the pin's history says nothing about the
+        # pinned tree, pass or fail (verifier-P0 removed the ancestry check,
+        # and nothing changed at these pins).
+        before, red_before = facts.last_verified(name).text, facts.ci_red(name).text
+        for conclusion in ("success", "failure"):
+            plant = dict(workflow=wf, sha="f" * 40, branch="elsewhere", status="completed", conclusion=conclusion,
+                         created="2099-01-01T12:00:00Z", url="https://example.invalid/planted")
+            runs.append(plant)
+            try:
+                v, red = facts.last_verified(name), facts.ci_red(name)
+            finally:
+                runs.remove(plant)
+            ok = v.text == before and red.text == red_before
+            report("newest", ok, "a newer %s run on a commit outside %s's history: last verified %s, open %r"
+                   % (conclusion, name, v.text, red.text))
         for name in sorted(n for n, c in facts.PINS["repos"].items() if c.get("verified_by", {}).get("ledger")):
             led = facts.PINS["repos"][name]["verified_by"]["ledger"]
             t, ents = facts.entries(name, led["path"])
@@ -1433,10 +1546,12 @@ def main(argv=None):
         if a.privacy:
             hits, n, blobs = check_privacy()
             hist = sum(1 for w, _ in blobs if " in history (blob " in w)
+            other = {"paths", "commit messages", "tag messages", "branch and tag names"}
+            files = sum(1 for w, _ in blobs if " in history (blob " not in w and w not in other)
             return problems_out("privacy", ["%s names a private repository the site does not read" % h for h in hits],
                                 "; %d private repositories the site does not read, looked for in %d files, %d blobs "
-                                "reachable in history, the commit messages and the branch names"
-                                % (n, len(blobs) - hist - 2, hist))
+                                "reachable in history, every path, the commit and tag messages, and the branch and "
+                                "tag names" % (n, files, hist))
         if a.github:
             problems, n = check_github()
             return problems_out("github", problems, "; %d pins asked of GitHub, each the commit the snapshot "

@@ -177,7 +177,8 @@ def footer():
         else:
             li.append('<li>%s %s</li>' % (esc(name), fig(c, href=c.src.href, src=False)))
     return (
-        '<p>Every figure above this footer names where it was read. The commits below are the ones pins.json '
+        '<p>Every figure above this footer names where it was read: beside it, or, for what the map draws, in the '
+        'list under the map. The commits below are the ones pins.json '
         'names, and <a href="facts.json">facts.json</a> lists every figure on the page, with where it was read. '
         '<code>python site/build.py --verify-facts</code>, in a clone of <a href="%s">this site\'s repository</a>, '
         'reads each one again: from its repository at the commit below, or from the committed GitHub snapshot of '

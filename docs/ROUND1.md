@@ -140,6 +140,8 @@ applied in every brief.
 
 **The lead**
 
+- Every parcel, and each parcel's own verifier, is dispatched on Sonnet
+  (decision 24).
 - The lead's P0 goes past a verifier before any parcel that reads it is
   dispatched.
 - The lead arms its watch on the ledger in the same step as its first

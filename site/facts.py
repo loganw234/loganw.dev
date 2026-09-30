@@ -565,11 +565,17 @@ def ledger_headings(t):
     counted). A heading may be indented up to three spaces, or have a tab
     after its marks, as CommonMark allows.
 
-    Two shapes are refused, because either would drop entries without a word:
+    Every other shape that renders as a level-2 heading is refused, because
+    each would drop an entry without a word:
       * a fence still open at the end of the file, which swallows every
         heading after it (verifier-P0 left one open, and 1 of 3 was read);
-      * a setext heading - a line underlined with ---, which renders as a
-        level-2 heading this parser does not read.
+      * a setext heading: a line underlined with dashes, even a single one;
+      * a heading inside a quote or a list item;
+      * an HTML <h2> block.
+    A refusal can be too eager: a rule after an indented list line, say. It
+    is loud, and the ledger can say it another way. The desktop's controls
+    compare every ledger's entry count with CommonMark's own count of its
+    level-2 headings (markdown-it-py), where that library is installed.
     """
     out, fence, pos, prev, opened = [], None, 0, "", 0
     lines = t.splitlines(keepends=True)
@@ -585,11 +591,18 @@ def ledger_headings(t):
             h = re.match(r" {0,3}##(?!#)[ \t]+(.*?)\s*$", s)
             if h:
                 out.append((pos, "## " + h.group(1), s))
-            elif re.match(r" {0,3}-{2,}\s*$", s) and prev.strip() \
-                    and not re.match(r" {0,3}(?:#|[-*+] |\d+[.)] |\||>|-{2,}\s*$)", prev):
+            elif re.match(r" {0,3}-+[ \t]*$", s) and prev.strip() \
+                    and not re.match(r" {0,3}(?:#|[-*+] |\d+[.)] |\||>|-+[ \t]*$)", prev):
                 raise Refusal("line %d underlines the line above it with dashes, which makes a heading this parser "
                               "does not read; write it as '## ...', or put a blank line before the rule" % i)
-        prev = s if fence is None else ""
+            elif re.match(r" {0,3}(?:>[ \t]?)+ {0,3}##(?!#)(?:[ \t]|$)", s) \
+                    or re.match(r" {0,3}(?:[-*+]|\d{1,9}[.)])[ \t]+##(?!#)(?:[ \t]|$)", s):
+                raise Refusal("line %d is a heading inside a quote or a list item, which this parser does not read; "
+                              "write it as '## ...' at the start of the line" % i)
+            elif re.match(r" {0,3}<h2\b", s, re.I):
+                raise Refusal("line %d is an HTML heading, which this parser does not read; write it as '## ...'" % i)
+        # a fence's own lines end a paragraph, so a rule after one is only a rule
+        prev = s if fence is None and not m else ""
         pos += len(line)
     if fence is not None:
         raise Refusal("the code fence opened at line %d is never closed, so every heading after it would be "

@@ -158,6 +158,11 @@ where they were longer.
     always there. So the counts are honest, but the overall work is
     basically entirely AI." The trailer count is therefore a lower bound,
     not a measure of AI use.
+24. **The parcels' model.** In Logan's words: "For the agents involving
+    parcels, as they arent 'code heavy' tasks, dispatch them as Sonnet models
+    (5.5 is current)". Every parcel, and each parcel's own verifier, is
+    dispatched on Sonnet. The verifier of the shared core, which is code,
+    stays on the lead's model.
 
 ---
 

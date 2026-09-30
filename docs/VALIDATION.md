@@ -545,3 +545,65 @@ Logan, and the site doesn't paper over it.
 
 **The count.** `--control` caught 109 of 109. The runner now has one more
 stage, `github`.
+
+## 2026-09-29 - verifier-P0 on p0.2 at 3743c52: NOT READY on four small gaps; fixed
+
+verifier-P0 re-checked `p0.2` at `3743c52`: 11 of 11 passed, and controls
+caught 109. It held these by faults it chose:
+
+- the newest rule, both ways;
+- the manifest, including a stylesheet built into `public/` that existed
+  only untracked;
+- a local-only pin vouched for by a hand-edited snapshot, caught by the
+  `github` stage;
+- local-only;
+- docs.
+
+Four gaps passed every stage:
+
+1. **Ancestry.** Removing the check that a run is on the pinned commit or an
+   ancestor of it changed nothing at these pins, and no control planted a
+   run outside the pin's history.
+2. **A single dash.** A heading underlined with one dash was dropped without
+   a word. The rule matched two dashes or more, and the docstring promised a
+   refusal.
+3. **Privacy.** The search missed a name that appeared only as a path, in an
+   annotated tag's message, or in a compressed PNG text chunk.
+4. **The footer.** It said every figure above it names where it was read.
+   Four of the map's figures had no source anywhere on the page: the
+   snapshot date, two "private" markers and "refesl.live".
+
+**Fixed:**
+
+1. A control plants a newer run on a commit outside atlas-film's history,
+   once passing and once failing. Neither may change last verified or the
+   open column.
+2. The parser refuses:
+   - an underline of one dash or more;
+   - a heading inside a quote or a list item;
+   - an HTML `<h2>`.
+
+   A rule after a closed fence is still read as a rule. On the desktop, a
+   control reads every ledger a second way, with markdown-it-py's CommonMark
+   parser, and compares counts: 152, 37 and 19 entries match 152, 37 and 19
+   level-2 headings. Where markdown-it-py is missing, the control is skipped
+   by name.
+3. The privacy search reads every path, now and in history, every annotated
+   tag's message, and every PNG text chunk, compressed ones inflated. What it
+   cannot read is stated: text drawn as pixels, and compressed data in other
+   formats.
+4. The list under the map now gives the source of everything the drawing
+   marks. The numbers stage refuses a figure above the footer whose source
+   is nowhere on the page, and the footer says where the map's sources are.
+
+**The two side notes:**
+
+- A name in `numeral_names.json` must now have the shape of one:
+  capitalised words, then one number. So "28 of 41", which a fact holds,
+  can't be allowed as a name.
+- Headings in a quote or as HTML are refused, as above.
+
+**Also recorded:** decision 24, Logan's word that the parcels, and their
+verifiers, run on Sonnet.
+
+`--control` now catches 123 of 123.
