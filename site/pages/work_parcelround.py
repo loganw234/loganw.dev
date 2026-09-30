@@ -15,7 +15,7 @@ PAGE = {"file": "work-parcelround.html", "nav": "Work",
                         "the failures it kept, and how to try to prove it wrong."}
 
 
-def _sections():
+def _sections(built):
     S = _dossier.section
 
     what_it_is = S("What it is", [_dossier.para([
@@ -84,8 +84,7 @@ def _sections():
     ], ordered=True)])
 
     prove_it_wrong = S("Prove it wrong", [
-        _dossier.para(["Cheapest first; the site-wide rules of engagement are stated once, on the Corrections "
-                       "page — not yet built, so this dossier does not link it."]),
+        _dossier.prove_it_wrong_opening(built),
         _dossier.list_([
             ["Count ", C("CASE-STUDY.md"), "'s own corrections yourself; a count that disagrees with the figure "
              "this dossier's Verified section quotes is a disproof."],
@@ -106,13 +105,13 @@ def _sections():
 
 
 def render_page(ctx):
-    sections = _sections()
+    sections = _sections(ctx["built"])
     ctx["_p3_sections"] = sections
     return _dossier.html(NAME, sections)
 
 
 def extra_files(ctx):
-    sections = ctx.get("_p3_sections") or _sections()
+    sections = ctx.get("_p3_sections") or _sections(ctx["built"])
     text = _dossier.twin(NAME, "%s — dossier" % NAME, sections)
     html = _dossier.html(NAME, sections)
     _dossier.twin_ids(NAME, html, text)

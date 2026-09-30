@@ -62,7 +62,7 @@ def case_study_total_agrees(name):
              raw=str(total), num=True)
 
 
-def _sections():
+def _sections(built):
     S = _dossier.section
     mechanisms = mechanism_count_agrees(NAME)
     case_total = case_study_total_agrees(NAME)
@@ -140,8 +140,7 @@ def _sections():
     ], ordered=True)])
 
     prove_it_wrong = S("Prove it wrong", [
-        _dossier.para(["Cheapest first; the site-wide rules of engagement are stated once, on the Corrections "
-                       "page — not yet built, so this dossier does not link it."]),
+        _dossier.prove_it_wrong_opening(built),
         _dossier.list_([
             [C("python tools/check_claims.py"), " on a clone, and see whether it still finds nothing."],
             ["Add up ", C("CASE-STUDY.md"), "'s per-repository table yourself; a sum that disagrees with the "
@@ -164,13 +163,13 @@ def _sections():
 
 
 def render_page(ctx):
-    sections = _sections()
+    sections = _sections(ctx["built"])
     ctx["_p3_sections"] = sections
     return _dossier.html(NAME, sections)
 
 
 def extra_files(ctx):
-    sections = ctx.get("_p3_sections") or _sections()
+    sections = ctx.get("_p3_sections") or _sections(ctx["built"])
     text = _dossier.twin(NAME, "%s — dossier" % NAME, sections)
     html = _dossier.html(NAME, sections)
     _dossier.twin_ids(NAME, html, text)

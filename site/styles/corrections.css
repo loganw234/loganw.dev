@@ -1,0 +1,6 @@
+/* P4: Corrections and Propose. Most of the look comes free from
+   site/style.css (measure, lede, h2, table, cta, plain); this is only what
+   those rules do not already cover. */
+.pulls table{min-width:0}
+tr.signature td{font-style:italic;color:var(--muted)}
+.doors .cta+.cta{margin-top:10px}

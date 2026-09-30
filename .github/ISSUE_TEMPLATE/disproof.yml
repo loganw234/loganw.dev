@@ -1,0 +1,35 @@
+name: Disproof
+description: A claim this site states, and a way to show it wrong.
+title: "[DISPROOF] "
+labels:
+  - DISPROOF
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The rules of engagement are on the site's [Corrections](https://loganw.dev/corrections.html) page.
+        A disproof is a command, an input and the bit that differs, or a clause citation. A misquotation in
+        the site's own documentation counts too. Every filing gets a dated disposition: fixed, with the
+        finder named, or refused by name.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The published page the claim is on, by its file name.
+      placeholder: work-cft-fp256.html
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: The claim
+      description: The sentence, or the figure and its fact id (facts.json's "id"), that the page states.
+    validations:
+      required: true
+  - type: textarea
+    id: disproof
+    attributes:
+      label: The disproof
+      description: Either the command, the input and the bit that differs, or the clause cited.
+    validations:
+      required: true

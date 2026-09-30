@@ -45,29 +45,49 @@ def controls():
     out.append(("map-parity", bool(problems), "a copy of the narrow renderer with %r dropped: %s"
                % (any_name, problems[0] if problems else "the parity check passed anyway")))
 
-    # 3. A door linked too early: propose.html is not a file this round
-    # publishes (Propose is P4's, not built yet), so a link to it from any
-    # thread page must be refused by build.py's own links check. Deferred
-    # import: build.py imports pages, which imports this module, so the
-    # import has to happen after this module already exists, not at the top
-    # of it.
-    import build as _build
-    root = _build.PUBLIC
-    for file in ("thread-determinism.html", "thread-film.html", "thread-preservation.html"):
-        f = root / file
-        if not f.is_file():
-            out.append(("door-not-early", False, "could not plant: %s is not published" % file))
-            continue
-        t = f.read_text(encoding="utf-8")
-        planted = t.replace("</main>", '<a href="propose.html">propose</a></main>', 1)
-        if planted == t:
-            out.append(("door-not-early", False, "could not plant a link into %s" % file))
-            continue
-        f.write_text(planted, encoding="utf-8", newline="\n")
-        try:
-            found = [p for p in _build.check_links(root) if "propose.html" in p]
-        finally:
-            f.write_text(t, encoding="utf-8", newline="\n")
-        out.append(("door-not-early", bool(found), "a planted link to propose.html in %s: %s"
-                   % (file, found[0] if found else "the links check passed it anyway")))
+    # 3. A door links to Propose only once Propose is built.
+    #
+    # Rewritten (wave2-prep, granted to P4 in briefs/P4.md): the old version
+    # above wrote a planted link into public/'s built thread pages and
+    # expected build.check_links to refuse it, because propose.html was not
+    # yet a published file. Once P4 publishes propose.html that target
+    # resolves, the plant is no longer a fault, the control can never fail
+    # again, and under --require-all the gate would then fail on a control
+    # that cannot fail. It also wrote into the real public/, never a copy.
+    #
+    # The property survives without any of that: each thread page's own
+    # render_page links Propose exactly when ctx["built"] names it, and not
+    # before. Checked here by calling the three real modules' render_page
+    # directly, in memory, under both states - never touching public/, and
+    # never writing a file at all. To show the check itself bites, two fake
+    # doors are run through the same test: one that links early, and one
+    # that never catches up once Propose exists.
+    import pages.thread_determinism as _det
+    import pages.thread_film as _film
+    import pages.thread_preservation as _pres
+
+    def links_propose(render_page, built):
+        html = render_page({"built": dict(built), "pages": {}})
+        return 'href="propose.html"' in html
+
+    def door_ok(render_page):
+        early = links_propose(render_page, {})
+        missing = not links_propose(render_page, {"Propose": "propose.html"})
+        return not early and not missing
+
+    for mod, label in ((_det, "thread-determinism"), (_film, "thread-film"), (_pres, "thread-preservation")):
+        ok = door_ok(mod.render_page)
+        out.append(("door-not-early", ok, "%s, rendered in memory with and without Propose in ctx['built']: %s"
+                   % (label, "links it only once built, as it must" if ok
+                      else "NOT CAUGHT: links early, or never catches up")))
+
+    early_linked = links_propose(lambda ctx: '<p class="cta"><a href="propose.html">Propose a thread</a>.</p>', {})
+    out.append(("door-not-early", early_linked,
+               "a fake door linking Propose before it's built: %s" % ("caught" if early_linked else "NOT CAUGHT")))
+
+    late_missing = not links_propose(lambda ctx: '<p class="cta">a door with no link</p>',
+                                     {"Propose": "propose.html"})
+    out.append(("door-not-early", late_missing,
+               "a fake door that never links Propose once it's built: %s"
+               % ("caught" if late_missing else "NOT CAUGHT")))
     return out
