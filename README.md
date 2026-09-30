@@ -14,11 +14,14 @@ isn't.** A figure comes from one of two places:
 What no file can back is marked *stated*, with who said it and when.
 [public/facts.json](public/facts.json) lists every figure with where it was
 read. If the build can't read a figure from its source, it stops and names
-the figure. The `numbers` stage refuses any numeral on a page that isn't
-inside a figure's mark, and any mark whose text isn't exactly its own fact's.
+the figure. The `numbers` stage refuses a numeral on a page that isn't inside
+a figure's mark, and any mark whose text isn't exactly its own fact's.
 
 What that doesn't cover:
 
+- **Digits inside names.** Digits written straight after a letter are read
+  as part of a name, like cft-fp256 or binary32.com. So a figure glued to a
+  word, like "x3397", would pass.
 - **Numbers in words.** The numbers stage sees only the number words it lists
   ("seven", "twenty"), not "one" or "first".
 - **Snapshot figures.** These are read again from the committed snapshot, not

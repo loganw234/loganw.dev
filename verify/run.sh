@@ -19,6 +19,9 @@
 # fetches them at their pins). There, by name and never passed:
 #   build     is skipped (it renders, and rendering needs every clone);
 #   privacy   is skipped (it needs the owner's login to list private names);
+#   github    is skipped (it needs the owner's login to read private pins; the
+#             facts stage fetches every public pin from GitHub, which fails
+#             on a commit GitHub does not have);
 #   facts     skips each figure from a private repository;
 #   controls  skips drift and stale-pin, which render.
 # Everything else runs in CI: manifest, numbers, links, local-only, docs, the
@@ -198,7 +201,8 @@ stage numbers "every numeral on a page sits in a figure's mark, and every mark i
 stage links "every relative link names a published file exactly, and every #anchor exists" -- "$PY" "$B" --links
 stage local-only "only allowed elements and attributes, the policy on every page, and no load from another host" -- "$PY" "$B" --local-only
 stage docs "the documents' links and anchors resolve, and none states the runner's stage count" -- "$PY" "$B" --docs
-stage privacy "no tracked file, commit message or branch names a private repository the site does not read" -- "$PY" "$B" --privacy
+stage privacy "nothing a push would publish, history included, names a private repository the site does not read" -- "$PY" "$B" --privacy
+stage github "every pin is a commit GitHub has now, as the snapshot recorded; asked of GitHub itself" -- "$PY" "$B" --github
 stage controls "a planted fault for each check above, each caught by name" -- "$PY" "$B" --control
 # The runner's own control: a real check pointed at a planted copy. If this
 # stage passes, the runner cannot tell a failing check from a passing one.

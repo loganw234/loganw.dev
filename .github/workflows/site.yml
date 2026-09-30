@@ -6,7 +6,9 @@
 # (LOGANW_FETCH=1), and no login that can list private repositories. So these
 # are SKIPPED BY NAME here, never passed:
 #   - the `build` stage, which renders and needs every clone;
-#   - the `privacy` stage;
+#   - the `privacy` and `github` stages, which need a login that can read the
+#     owner's private repositories (here `facts` fetches every public pin from
+#     GitHub, which fails on a commit GitHub does not have);
 #   - each figure from a private repository, inside `facts`;
 #   - the drift and stale-pin controls, inside `controls`.
 # Everything else runs:

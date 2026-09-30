@@ -25,9 +25,10 @@ The source repositories are the authority, each read at the commit named in
 
 - **Write figures through `@fact`.** A figure must come out of a function
   decorated with `@fact` (`site/facts.py`). `fig()` refuses a figure that
-  isn't exactly what its fact returned. The `numbers` stage refuses any
+  isn't exactly what its fact returned. The `numbers` stage refuses a
   numeral on a page outside a figure's mark, and any mark whose text isn't
-  its own fact's.
+  its own fact's. Digits straight after a letter are read as a name
+  (cft-fp256), so "x3397" would pass; that is a stated limit.
 - **Put new facts in your own page module.** Re-derivation imports the module
   each fact was defined in, so a new fact never needs an edit to `facts.py`.
 - **What a check proves.** A figure lifted from prose shows that the page
@@ -92,7 +93,9 @@ The source repositories are the authority, each read at the commit named in
     - Words the lead drafted for someone take `draft=True` until that person
       approves them.
 13. **No document states how many stages the runner has.** `--list` prints
-    them, and `--docs` refuses a count in any form.
+    them. `--docs` refuses a count written close to that word, in digits or
+    in the number words it lists; `build.STAGE_COUNT` is the rule. The ledger
+    may state one, as a fact about its date.
 
 ## The discipline that matters most here
 

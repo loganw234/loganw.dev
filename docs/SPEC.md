@@ -181,10 +181,16 @@ measured them are in `docs/VALIDATION.md`.
 
 ## 4. Definitions the build uses
 
-- **A pin.** A commit named in `pins.json` that GitHub has. The snapshot
-  records the full SHA GitHub gives for each pin, and the build refuses a pin
-  the snapshot didn't look up or GitHub doesn't have: a figure read at a
-  commit nobody else can fetch could be checked by no one else.
+- **A pin.** A commit named in `pins.json` that GitHub has, because a figure
+  read at a commit nobody else can fetch could be checked by no one else. It
+  is held three ways:
+  - The snapshot records the full SHA GitHub gives for each pin. The build
+    refuses a pin the snapshot didn't look up, or says GitHub lacks. That is
+    only the snapshot's word: a hand-edited snapshot would pass the build.
+  - The `github` stage asks GitHub itself about every pin, private ones
+    included, with Logan's login. It runs on the desktop only.
+  - In CI, the `facts` stage fetches every public pin from GitHub, and fails
+    on a commit GitHub doesn't have.
 - **Last verified.** The newest recorded pass of a repository's own gate, at
   or before its pin. Two kinds of record count:
   - **a CI run.** In `pins.json`, every workflow of every pinned repository

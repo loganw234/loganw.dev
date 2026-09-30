@@ -13,10 +13,12 @@ Every figure comes out of a function decorated with @fact. The decorator
 logs what was read and how - the method, its arguments, the value - and gives
 the figure an id. The renderer prints a figure only if it is exactly what the
 log holds for its id, and marks it with that id; the `numbers` stage then
-refuses any numeral on a page that is not inside such a mark, and any mark
+refuses a numeral on a page that is not inside such a mark, and any mark
 whose text is not its own fact's. So every figure a page prints in digits is
-in facts.json, and `build.py --verify-facts` reads each one again: at its pin,
-or from the committed snapshot.
+in facts.json - except digits written straight after a letter, which are read
+as part of a name (cft-fp256), so "x3397" would pass - and
+`build.py --verify-facts` reads each one again: at its pin, or from the
+committed snapshot.
 
 What a check here proves, and what it does not:
 
@@ -557,21 +559,41 @@ def last_commit(name, path):
 
 
 def ledger_headings(t):
-    """A ledger's `## ` headings outside fenced code: [(offset, line)]. A
-    heading shape inside a fence is an example, not an entry (verifier-P0 built
-    one that the first parser counted)."""
-    out, fence, pos = [], None, 0
-    for line in t.splitlines(keepends=True):
+    """A ledger's level-2 headings outside fenced code: [(offset, '## title',
+    the line as written)]. A heading shape inside a fence is an
+    example, not an entry (verifier-P0 built one that the first parser
+    counted). A heading may be indented up to three spaces, or have a tab
+    after its marks, as CommonMark allows.
+
+    Two shapes are refused, because either would drop entries without a word:
+      * a fence still open at the end of the file, which swallows every
+        heading after it (verifier-P0 left one open, and 1 of 3 was read);
+      * a setext heading - a line underlined with ---, which renders as a
+        level-2 heading this parser does not read.
+    """
+    out, fence, pos, prev, opened = [], None, 0, "", 0
+    lines = t.splitlines(keepends=True)
+    for i, line in enumerate(lines, 1):
         s = line.rstrip("\r\n")
         m = re.match(r" {0,3}(`{3,}|~{3,})", s)
         if fence is None and m:
-            fence = m.group(1)
-        elif fence is not None and m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) \
-                and s.strip() == m.group(1):
-            fence = None
-        elif fence is None and s.startswith("## "):
-            out.append((pos, s))
+            fence, opened = m.group(1), i
+        elif fence is not None:
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and s.strip() == m.group(1):
+                fence = None
+        else:
+            h = re.match(r" {0,3}##(?!#)[ \t]+(.*?)\s*$", s)
+            if h:
+                out.append((pos, "## " + h.group(1), s))
+            elif re.match(r" {0,3}-{2,}\s*$", s) and prev.strip() \
+                    and not re.match(r" {0,3}(?:#|[-*+] |\d+[.)] |\||>|-{2,}\s*$)", prev):
+                raise Refusal("line %d underlines the line above it with dashes, which makes a heading this parser "
+                              "does not read; write it as '## ...', or put a blank line before the rule" % i)
+        prev = s if fence is None else ""
         pos += len(line)
+    if fence is not None:
+        raise Refusal("the code fence opened at line %d is never closed, so every heading after it would be "
+                      "dropped" % opened)
     return out
 
 
@@ -592,16 +614,19 @@ def entries(name, path):
     drop an entry without a word."""
     p = pin(name)
     t = p.show(path)
-    heads = ledger_headings(t)
+    try:
+        heads = ledger_headings(t)
+    except Refusal as e:
+        raise Refusal("%s %s %s: %s" % (name, p.short, path, e))
     out = []
-    for i, (start, head) in enumerate(heads):
+    for i, (start, head, raw) in enumerate(heads):
         end = heads[i + 1][0] if i + 1 < len(heads) else len(t)
         title, line = head[3:].strip(), _line(t, start)
         m = re.match(r"(\d{4}-\d{2}-\d{2})\b", title) or re.search(r"\((\d{4}-\d{2}-\d{2})\)$", title)
         if m:
             date, how = m.group(1), "dated"
         elif re.match(r"\d+\.", title):
-            dates = p.git("log", "--reverse", "--format=%ad", "--date=short", "-S", head,
+            dates = p.git("log", "--reverse", "--format=%ad", "--date=short", "-S", raw,
                           p.full, "--", path).split()
             if not dates:
                 raise Refusal("%s %s %s:%d: no commit wrote this numbered heading" % (name, p.short, path, line))

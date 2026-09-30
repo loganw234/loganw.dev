@@ -455,3 +455,93 @@ Node 24. The breaking changes in between don't touch this site:
   used, and Python versions past their end of life. 3.12 is not one of them.
 
 The first push tests the deploy job itself; nothing here can run it locally.
+
+## 2026-09-29 - verifier-P0 on bc2ffbc: NOT READY; the rest of its findings, fixed on p0.2
+
+verifier-P0's re-check of `p0.1` at `bc2ffbc` came back **NOT READY**.
+
+**Held by gates it watched fail:**
+
+- open regressions;
+- drift and manifest;
+- the runner;
+- CI.
+
+**Beyond the five findings fixed in the P0.2 entry above, still open:**
+
+- **The "newest" rule.** Making `last_verified` take the *oldest* pass
+  changed four dates on Home, and every stage passed.
+- **The ledger parser.** A fence left open, or 4 backticks closed by 3,
+  dropped every later heading without a word.
+- **MANIFEST.** Its header said the source lines hash what the build read
+  besides the pins. They hashed only pins.json and the snapshot.
+- **Pins.** The rule that GitHub has each pin was only the snapshot's word.
+  A local-only pin plus a hand-edited snapshot passed everything, and SPEC
+  section 4 stated the rule as absolute.
+- **Assets.** An asset named with `../` wrote outside `public/`.
+- **Docs.** The stage-count rule missed "Stages: 10.", "The stage count is
+  10.", "a dozen stages", "ten separate, independent stages" and "10 (ten)
+  stages". VALIDATION.md's links were never checked, and a raw `<img src>`
+  to a missing file passed.
+- **Privacy.** The search skipped any file with a NUL byte, so UTF-16 went
+  unread. It never read earlier commits, which a push would publish.
+- **False claims:**
+  - CLAUDE.md trap 13 ("in any form");
+  - "refuses any numeral", in the README, CLAUDE.md and facts.py;
+  - the footer ("every figure ... names where it was read", while its own
+    pins print without a label);
+  - Home's fourth check, which said "a figure from a private repository is
+    skipped by name", while private snapshot figures are re-read.
+
+**Fixed on `p0.2`:**
+
+- **The "newest" rule.**
+  - A control plants a newer passing run for atlas-film.
+  - For each ledger, a control finds the newest pass a second way, by
+    walking the entries from the newest back, and compares it with the
+    page.
+- **The ledger parser.**
+  - It refuses an unclosed fence, and a heading underlined with dashes.
+  - It reads a heading indented up to three spaces, or with a tab after its
+    marks, as CommonMark does.
+  - At the pins, none of the three ledgers has any of these shapes.
+- **MANIFEST** now hashes every file under `site/`, and `--manifest` checks
+  each against the checkout. So in CI, a code change that was never rebuilt
+  into `public/` fails too. The header now says exactly what the source
+  lines hash.
+- **A new `github` stage** asks GitHub itself about every pin, with Logan's
+  login, on the desktop. In CI it is skipped by name, and `facts` fetches
+  each public pin from GitHub. SPEC section 4 now names all three ways the
+  rule is held.
+- **Writing.** `write()` refuses any published path that climbs out of
+  `public/`.
+- **Docs.** The stage-count rule now matches a count close to "stages" on
+  either side, and near "stage count" and "number of stages". "stage 2", an
+  index, is not a count. Links are checked in every document, the ledger
+  included, and raw `<img src>` links are read.
+- **Privacy.** The search reads every file as bytes: UTF-16 by its
+  byte-order mark or its NUL pattern, and the name as UTF-8 or UTF-16 in any
+  other binary file. It also reads every blob reachable from any ref.
+- **The claims.** Each is reworded.
+  - The numerals limit is stated in the README, CLAUDE.md and facts.py:
+    digits straight after a letter are read as a name, so "x3397" would
+    pass.
+  - Trap 13 names its rule.
+  - The footer says what it labels, and what facts.json lists.
+  - The fourth check says what is skipped and what is only listed.
+
+**Correction to the P0.1 entry.** It credited cft-rebound's move to
+2026-09-14 to "entries 36 and 37". Only entry 36 matches a declared pass
+form: `hw/verify-image.sh` 8 of 8 PASS, and `device-test` 813 checks 0
+failed. Entry 37's "60 rows, 0 failures" is a benchmark table, which no
+declared form matches. The date is right, and so is its source.
+
+**binary-sites, measured.** Its `build` workflow is classed as verifying.
+Its Chromium smoke test exits 0 when the runner has no Chromium. The run at
+the pinned commit, `35645956458`, ran the test: its log prints "ok" for all
+four sites. So the pass Home shows included the browser check. The
+skip-and-exit-0 is a weakness in binary-sites' own gate. It is reported to
+Logan, and the site doesn't paper over it.
+
+**The count.** `--control` caught 109 of 109. The runner now has one more
+stage, `github`.

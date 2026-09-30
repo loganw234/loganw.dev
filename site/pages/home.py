@@ -186,7 +186,8 @@ def checks():
          P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True), "."],
         [C("python site/build.py --verify-facts"), " in a clone of ", L(SOURCE_REPO, "this site"),
          ": every figure on this page read again, from its repository at its pin or from the committed GitHub "
-         "snapshot. A figure from a private repository is skipped by name."],
+         "snapshot. One read at a private repository's pin is skipped by name, and a stated one has no source "
+         "to read."],
     ]
     return "<ol>%s</ol>" % "".join("<li>%s</li>" % render(i) for i in items)
 

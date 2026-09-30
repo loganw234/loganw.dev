@@ -52,7 +52,8 @@ import render                   # noqa: E402
 BUILD_NOTE = ("This is the committed copy of the site. The deploy replaces this file with the commit it was "
               "deployed from, so a reader can ask which commit a live page came from.\n")
 MANIFEST_HEAD = ("# sha256 of every file in public/ except BUILD, which the deploy replaces with the commit it was "
-                 "deployed from, and this file. The source lines hash what the build read besides the pins.")
+                 "deployed from, and this file. The source lines hash what the build read besides the pinned "
+                 "repositories: pins.json, the snapshot, and every file under site/.")
 
 
 def sha256(b):
@@ -127,8 +128,13 @@ def section_index(mods):
 
 
 def sources():
-    """What the build read besides the pins, by path: pins.json and the snapshot."""
-    return [(p, (ROOT / p).read_bytes()) for p in ("pins.json", facts.PINS["snapshot"])]
+    """What the build read besides the pins, by path: pins.json, the snapshot,
+    and every file under site/ - the code, its data, the fonts and the
+    stylesheets. CI checks each against the checkout, so a change to any of
+    them that was not rebuilt into public/ fails there too."""
+    site = sorted(f.relative_to(ROOT).as_posix() for f in SITE.rglob("*")
+                  if f.is_file() and "__pycache__" not in f.parts)
+    return [(p, (ROOT / p).read_bytes()) for p in ["pins.json", facts.PINS["snapshot"]] + site]
 
 
 def render_all():
@@ -188,7 +194,18 @@ def published(root):
     return sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file())
 
 
+def inside(root, rel):
+    """rel names a file under root: relative, no '..', no drive. verifier-P0
+    wrote into site/data/ through an asset named '../site/data/...'."""
+    parts = rel.split("/")
+    return bool(rel) and not rel.startswith("/") and "\\" not in rel and ":" not in rel \
+        and all(p not in ("", ".", "..") for p in parts)
+
+
 def write(text, binary, root=PUBLIC):
+    bad = sorted(r for r in set(text) | set(binary) if not inside(root, r))
+    if bad:
+        raise Refusal("the build would write outside public/: %s" % ", ".join(bad))
     root.mkdir(parents=True, exist_ok=True)
     want = set(text) | set(binary)
     for rel in published(root):
@@ -260,11 +277,14 @@ def check_manifest(root=PUBLIC):
         problems.append("BUILD is missing")
     elif root == PUBLIC and (root / "BUILD").read_text(encoding="utf-8") != BUILD_NOTE:
         problems.append("BUILD is not the committed note; only the deploy rewrites it")
-    for path in ("pins.json", facts.PINS["snapshot"]):
+    now = {p for p, _ in sources()}
+    for path in sorted(now | set(srcs)):
         if path not in srcs:
-            problems.append("MANIFEST does not hash %s, which the build reads" % path)
+            problems.append("MANIFEST does not hash %s, which the build reads: public/ was built before it existed" % path)
+        elif path not in now:
+            problems.append("MANIFEST hashes %s, which no longer exists: public/ was built from a tree that had it" % path)
         elif sha256((ROOT / path).read_bytes()) != srcs[path]:
-            problems.append("%s is not the bytes the build read" % path)
+            problems.append("%s is not the bytes the build read: it changed, and public/ was not rebuilt" % path)
     return problems + check_font_sources(root)
 
 
@@ -682,13 +702,13 @@ def check_links(root=PUBLIC):
     return problems
 
 
-DOCS_EXEMPT = {"docs/VALIDATION.md"}   # the ledger: a count in it is a fact about its date
+COUNT_EXEMPT = {"VALIDATION.md"}   # the ledger: a count in it is a fact about its date, but its links are checked
 
 
 def doc_files():
     fs = [ROOT / "README.md", ROOT / "CLAUDE.md", ROOT / "design" / "README.md"]
     fs += sorted((ROOT / "docs").glob("*.md"))
-    return [f for f in fs if f.is_file() and f.relative_to(ROOT).as_posix() not in DOCS_EXEMPT]
+    return [f for f in fs if f.is_file()]
 
 
 def runner_stages():
@@ -712,8 +732,14 @@ def _prose(t):
 
 
 COUNT_WORDS = ("one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|"
-               "sixteen|seventeen|eighteen|nineteen|twenty")
-STAGE_COUNT = re.compile(r"\b(?:\d+|%s)(?:[\s-]+[a-z]+){0,2}?[\s-]+stages?\b" % COUNT_WORDS, re.I)
+               "sixteen|seventeen|eighteen|nineteen|twenty|dozen")
+# A count within three words of "stages", on either side, or of "stage count"
+# and "number of stages": "10 stages", "ten separate, independent stages",
+# "10 (ten) stages", "Stages: 10", "The stage count is 10" (verifier-P0 found
+# the last four past the first rule). "stage 2", an index, is not a count.
+_N = r"(?:\d+|%s)\b" % COUNT_WORDS
+STAGE_COUNT = re.compile(r"\b%s(?:\W+\w+){0,3}?\W+stages?\b|\b(?:stages|stage count|number of stages)\b(?:\W+\w+){0,3}?\W+%s"
+                         % (_N, _N), re.I)
 
 
 def slugs(t):
@@ -737,19 +763,24 @@ def md_text(s):
 def check_docs(files=None):
     """No document states how many stages the runner has: `run.sh --list`
     prints them, and a count in prose goes stale (verifier-P0 found one in a
-    code fence that no check read). Every relative link resolves - inline,
-    with a title, by reference, or a raw <a> - and so does its #anchor."""
+    code fence that no check read). What counts as stating one is STAGE_COUNT
+    above: a count near "stages", in digits or in the words it lists. The
+    ledger, docs/VALIDATION.md, may state one, as a fact about its date.
+    Every relative link in every document resolves - inline, with a title, by
+    reference, or a raw <a> or <img> - and so does its #anchor."""
     problems = []
     for f in files if files is not None else doc_files():
         rel = f.name if files is not None else f.relative_to(ROOT).as_posix()
         t = f.read_text(encoding="utf-8")
-        for m in STAGE_COUNT.finditer(" ".join(t.split())):
-            problems.append("%s states a stage count, %r; `bash verify/run.sh --list` prints the stages instead"
-                            % (rel, m.group(0)))
+        if f.name not in COUNT_EXEMPT:
+            for m in STAGE_COUNT.finditer(" ".join(t.split())):
+                problems.append("%s states a stage count, %r; `bash verify/run.sh --list` prints the stages instead"
+                                % (rel, m.group(0)))
         prose = _prose(t)
         defs = {k.lower(): v for k, v in re.findall(r"^ {0,3}\[([^\]]+)\]:\s*<?(\S+?)>?(?:\s+.*)?$", prose, re.M)}
         hrefs = re.findall(r"\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)", prose)
         hrefs += re.findall(r"<a\s[^>]*href=[\"']([^\"']+)[\"']", prose, re.I)
+        hrefs += re.findall(r"<img\s[^>]*src=[\"']([^\"']+)[\"']", prose, re.I)
         hrefs += list(defs.values())
         for text, ref in re.findall(r"\[([^\]]+)\]\[([^\]]*)\]", prose):
             if (ref or text).lower() not in defs:
@@ -766,30 +797,73 @@ def check_docs(files=None):
     return problems
 
 
-def tracked_texts(root=ROOT):
-    """[(where, text)]: every file git would commit (tracked, or new and not
-    ignored), every commit message on every branch, and every branch name."""
-    out = []
-    ls = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-                        capture_output=True).stdout.decode("utf-8", "replace")
+def _git_out(root, *args, stdin=None):
+    return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True).stdout
+
+
+def tracked_blobs(root=ROOT):
+    """[(where, bytes)]: everything a push of this repository would publish.
+    Every file git would commit now (tracked, or new and not ignored); every
+    blob reachable from any ref, so a name that survives only in an earlier
+    commit is found (verifier-P0); every commit message; every branch name."""
+    out, seen = [], set()
+    ls = _git_out(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").decode("utf-8", "replace")
     for rel in sorted(set(x for x in ls.split("\0") if x)):
         f = root / rel
         if f.is_file():
-            b = f.read_bytes()
-            if b"\0" not in b:
-                out.append((rel, b.decode("utf-8", "replace")))
+            out.append((rel, f.read_bytes()))
+    paths = {}
+    for line in _git_out(root, "rev-list", "--all", "--objects").decode("utf-8", "replace").splitlines():
+        sha, _, path = line.partition(" ")
+        if path:
+            paths.setdefault(sha, path)
+    kinds = _git_out(root, "cat-file", "--batch-check", stdin="\n".join(paths).encode()).decode().splitlines()
+    blobs = [k.split()[0] for k in kinds if k.split()[1:2] == ["blob"]]
+    data = _git_out(root, "cat-file", "--batch", stdin="\n".join(blobs).encode())
+    pos = 0
+    while pos < len(data):
+        nl = data.index(b"\n", pos)
+        sha, _, size = data[pos:nl].decode().split()
+        body = data[nl + 1:nl + 1 + int(size)]
+        pos = nl + 1 + int(size) + 1
+        if sha not in seen:
+            seen.add(sha)
+            out.append(("%s in history (blob %s)" % (paths[sha], sha[:7]), body))
     for what, args in (("commit messages", ["log", "--all", "--format=%B"]),
                        ("branch names", ["for-each-ref", "--format=%(refname)"])):
-        out.append((what, subprocess.run(["git", "-C", str(root), *args], capture_output=True).stdout.decode("utf-8", "replace")))
+        out.append((what, _git_out(root, *args)))
     return out
 
 
-def find_named(names, texts):
-    """Where any of names appears as a word: ['where:line']. The names are not
-    printed, since printing them is the leak this looks for."""
+def _as_text(b):
+    """A file's text in the encoding it is in: UTF-16 by its byte-order mark,
+    or by a NUL in nearly every other byte; otherwise UTF-8. None for any
+    other binary file."""
+    if b[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return b.decode("utf-16", "replace")
+    if b"\0" in b:
+        for enc, alt in (("utf-16-le", b[1::2]), ("utf-16-be", b[0::2])):
+            if len(alt) >= 2 and alt.count(0) > 0.9 * len(alt):
+                return b[:len(b) - len(b) % 2].decode(enc, "replace")
+        return None
+    return b.decode("utf-8", "replace")
+
+
+def find_named(names, blobs):
+    """Where any of names appears: ['where:line'] in text, whatever its
+    encoding, and ['where (bytes)'] in any other file, for the name in UTF-8
+    or UTF-16. The names are not printed, since printing them is the leak this
+    looks for."""
     pats = [re.compile(r"(?<![\w.-])%s(?![\w-])" % re.escape(n), re.I) for n in names]
+    raw = [enc for n in names for enc in (n.lower().encode("utf-8"), n.lower().encode("utf-16-le"),
+                                          n.lower().encode("utf-16-be"))]
     hits = []
-    for where, t in texts:
+    for where, b in blobs:
+        t = b if isinstance(b, str) else _as_text(b)
+        if t is None:
+            if any(r in b.lower() for r in raw):
+                hits.append("%s (bytes)" % where)
+            continue
         lines = t.splitlines()
         for i, line in enumerate(lines, 1):
             # a name wrapped at one of its own hyphens is read as one word
@@ -797,6 +871,41 @@ def find_named(names, texts):
             if any(p.search(joined) for p in pats):
                 hits.append("%s:%d" % (where, i))
     return hits
+
+
+def check_github(only=None):
+    """Every pin, asked of GitHub now: it must resolve there, to the SHA the
+    snapshot recorded. The build takes the snapshot's word that GitHub has a
+    pin; this stage takes GitHub's own, with the owner's login, so it reaches
+    private repositories too (verifier-P0 hand-edited a snapshot to vouch for
+    a local-only commit, and every other stage passed). Desktop only: CI has
+    no login that can read the private pins, and is skipped by name; there,
+    `facts` fetches each public pin from GitHub, which fails on a commit
+    GitHub does not have."""
+    if os.environ.get("CI"):
+        raise Unavailable("CI cannot read the private pins on GitHub; the desktop runs this stage")
+    problems, n = [], 0
+    for name, cfg in facts.PINS["repos"].items():
+        if only is not None and name not in only:
+            continue
+        try:
+            r = subprocess.run(["gh", "api", "repos/%s/%s/commits/%s" % (*facts.split(name), cfg["commit"]),
+                                "--jq", ".sha"], capture_output=True)
+        except FileNotFoundError:
+            raise Unavailable("gh is not installed here")
+        out = r.stdout.decode().strip()
+        if r.returncode != 0:
+            status = re.search(r'"status":\s*"(\d+)"', out)
+            if status and status.group(1) in ("404", "422"):
+                problems.append("%s: GitHub does not have the pinned commit %s" % (name, cfg["commit"]))
+                continue
+            raise Unavailable("gh cannot ask GitHub about %s here: %s" % (name, r.stderr.decode().strip()[:120]))
+        n += 1
+        rec = facts.snap().get("pins", {}).get(name, {})
+        if out != rec.get("sha"):
+            problems.append("%s: GitHub resolves %s to %s, and the snapshot recorded %s"
+                            % (name, cfg["commit"], out[:12], (rec.get("sha") or "nothing")[:12]))
+    return problems, n
 
 
 def check_privacy():
@@ -820,8 +929,8 @@ def check_privacy():
     read = {facts.split(k)[1] for k in facts.PINS["repos"] if facts.split(k)[0] == facts.OWNER}
     read |= set(facts.PINS["github_only"])
     unread = [n for n in names if n not in read]
-    texts = tracked_texts()
-    return find_named(unread, texts), len(unread), len(texts)
+    blobs = tracked_blobs()
+    return find_named(unread, blobs), len(unread), blobs
 
 
 def verify_facts(root=PUBLIC, require_all=False):
@@ -933,6 +1042,20 @@ def controls():
             found = [f for f in check_font_sources(root) if want in f]
             report("manifest", bool(found), "%s in fonts/SOURCES.txt: %s" % (what, found[0] if found else "passed"))
         src_txt.write_text(saved_src, encoding="utf-8")
+        mf = root / "MANIFEST"
+        saved_mf = mf.read_text(encoding="utf-8")
+        for what, new, want in (("site/render.py changed after the build",
+                                 re.sub(r"(# source site/render\.py )[0-9a-f]{64}", r"\g<1>" + "0" * 64, saved_mf),
+                                 "site/render.py is not the bytes"),
+                                ("site/mapgen.py added after the build",
+                                 re.sub(r"# source site/mapgen\.py [0-9a-f]{64}\n", "", saved_mf), "does not hash site/mapgen.py")):
+            if new == saved_mf:
+                report("manifest", False, "could not plant %s" % what)
+                continue
+            mf.write_text(new, encoding="utf-8")
+            found = [f for f in check_manifest(root) if want in f]
+            report("manifest", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+        mf.write_text(saved_mf, encoding="utf-8")
         planted("manifest", "a byte of index.html changed", t.replace("Ledger", "Ledgeг", 1), check_manifest, "index.html")
 
         # numbers: a typed figure, a figure copied with its text changed, a
@@ -1064,13 +1187,26 @@ def controls():
                                   ("a reference link", "[x][r]\n\n[r]: planted.md", "planted.md"),
                                   ("an undefined reference", "[x][nowhere]", "[nowhere]"),
                                   ("a raw anchor", '<a href="planted.md">x</a>', "planted.md"),
-                                  ("a missing heading anchor", "[x](README.md#no-such-heading)", "#no-such-heading")):
+                                  ("a missing heading anchor", "[x](README.md#no-such-heading)", "#no-such-heading"),
+                                  ("Stages: 10", "Stages: 10.", "'Stages: 10'"),
+                                  ("the stage count is 10", "The stage count is 10.", "'stage count is 10'"),
+                                  ("a dozen stages", "It has a dozen stages.", "'dozen stages'"),
+                                  ("ten separate, independent stages", "It runs ten separate, independent stages.",
+                                   "'ten separate, independent stages'"),
+                                  ("10 (ten) stages", "It runs 10 (ten) stages.", "'10 (ten) stages'"),
+                                  ("a raw image to a missing file", '<img src="planted.png" alt="">', "planted.png")):
             if base:
                 report("docs", False, "could not plant %s: CLAUDE.md already fails: %s" % (what, base[0]))
                 continue
             copy.write_text(doc + "\n" + plant + "\n", encoding="utf-8")
             found = [f for f in check_docs([copy]) if want in f]
             report("docs", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+        # the ledger: its links are checked, and a stage count in it is a fact about its date
+        ledger = pathlib.Path(d) / "VALIDATION.md"
+        ledger.write_text("# ledger\n\nIt ran 10 stages.\n\n[x](planted.md)\n", encoding="utf-8")
+        found = check_docs([ledger])
+        report("docs", any("planted.md" in f for f in found) and not any("stage count" in f for f in found),
+               "the ledger, with a stage count and a broken link: %s" % (found or "passed"))
 
     # C. Rules that need no source: the page seam, workflow classes, pins
     #    GitHub must have, paraphrases, statements tied to a pin, fenced
@@ -1124,6 +1260,14 @@ def controls():
             lambda: facts.stated("planted", "Logan", "2026-09-29", holds_at={"cft-fp256": "0000000"}), "restate")
     heads = facts.ledger_headings("## 2026-01-01 - a\n```\n## 2026-01-02 - fenced\n```\n## 2026-01-03 - b\n")
     report("ledger", len(heads) == 2, "a heading inside a code fence: %d headings read of 2 outside fences" % len(heads))
+    for what, text in (("a fence never closed", "## 2026-01-01 - a\n```\n## 2026-01-02 - b\n"),
+                       ("four backticks closed by three", "## 2026-01-01 - a\n````\n```\n## 2026-01-02 - b\n"),
+                       ("a heading underlined with dashes", "## 2026-01-01 - a\n\n2026-01-02 - b\n---\n")):
+        refused("ledger", what, lambda text=text: facts.ledger_headings(text))
+    heads = facts.ledger_headings("## 2026-01-01 - a\n   ## 2026-01-02 - indented\n##\t2026-01-03 - a tab\n")
+    report("ledger", len(heads) == 3, "headings indented, and after a tab: %d read of 3" % len(heads))
+    refused("write", "a published path that climbs out of public/",
+            lambda: write({"../site/data/planted.json": "{}"}, {}, pathlib.Path(tempfile.gettempdir()) / "planted-root"))
     facts.reset_log()
     v = facts.stated("planted", "Logan", "2026-09-29")
     import dataclasses
@@ -1135,6 +1279,23 @@ def controls():
     report("privacy", hits == ["planted.md:2"], "a private name in a tracked file: %s" % (hits or "passed"))
     hits = find_named(["planted-private-repo"], [("planted.md", "see planted-private-\nrepo for more")])
     report("privacy", hits == ["planted.md:1"], "a private name wrapped at its hyphen: %s" % (hits or "passed"))
+    for what, blob in (("in a UTF-16 file with a byte-order mark", "see planted-private-repo".encode("utf-16")),
+                       ("in a UTF-16 file without one", "see planted-private-repo".encode("utf-16-le")),
+                       ("inside a binary file", b"\x89PNG\r\n\x1a\n\0\0planted-private-repo\0")):
+        hits = find_named(["planted-private-repo"], [("planted.bin", blob)])
+        report("privacy", bool(hits), "a private name %s: %s" % (what, hits or "passed"))
+    with tempfile.TemporaryDirectory() as d:
+        g = lambda *a: subprocess.run(["git", "-C", d, "-c", "user.name=planted", "-c", "user.email=planted@invalid",
+                                       *a], capture_output=True)
+        g("init", "-q")
+        (pathlib.Path(d) / "notes.md").write_text("see planted-private-repo\n", encoding="utf-8")
+        g("add", "-A")
+        g("commit", "-qm", "a note")
+        (pathlib.Path(d) / "notes.md").write_text("nothing here\n", encoding="utf-8")
+        g("commit", "-qam", "the note removed")
+        hits = find_named(["planted-private-repo"], tracked_blobs(pathlib.Path(d)))
+        report("privacy", any("in history" in h for h in hits),
+               "a private name only in an earlier commit: %s" % (hits or "passed"))
 
     # D. Faults that need every pinned clone: a stale page, a stale pin, and
     #    each page's own controls.
@@ -1176,6 +1337,46 @@ def controls():
             facts.PINS["repos"]["cft-fp256"]["commit"], recs["cft-fp256"] = saved_pin, saved_rec
             facts.forget_pins()
 
+    # "Last verified" takes the newest pass. verifier-P0 made it take the
+    # oldest, and every stage passed: a newer passing run is planted for
+    # atlas-film, and each ledger's newest pass is found again a second way,
+    # by walking its entries from the newest back.
+    try:
+        name = "atlas-film"
+        wf, p = facts.verifying(name)[0], facts.pin(name)
+        runs = facts.snap()["runs"].setdefault(name, [])
+        plant = dict(workflow=wf, sha=p.full, branch="main", status="completed", conclusion="success",
+                     created="2099-01-01T12:00:00Z", url="https://example.invalid/planted")
+        runs.append(plant)
+        try:
+            v = facts.last_verified(name)
+        finally:
+            runs.remove(plant)
+        report("newest", v.raw == plant["created"], "a newer passing run planted for %s: last verified %s" % (name, v.text))
+        for name in sorted(n for n, c in facts.PINS["repos"].items() if c.get("verified_by", {}).get("ledger")):
+            led = facts.PINS["repos"][name]["verified_by"]["ledger"]
+            t, ents = facts.entries(name, led["path"])
+            want = next((e["date"] for e in sorted(ents, key=lambda e: (e["date"], e["start"]), reverse=True)
+                         if any(re.search(pat, t[e["start"]:e["end"]], re.M) for pat in led["passes"].values())), None)
+            got = facts.last_verified(name)
+            ci = got.src.kind == "api"
+            report("newest", ci or got.text == want, "%s's newest ledger pass, found again from its newest entry back: "
+                   "%s; last verified shows %s" % (name, want, got.text))
+    except Unavailable as e:
+        skip("newest", "needs atlas-film, cft-rebound and Quantum-Film at their pins: %s" % e)
+
+    # The GitHub stage, asked about one pin whose recorded SHA is planted wrong
+    recs = facts.snap()["pins"]
+    saved = recs["cft-fp256"]
+    recs["cft-fp256"] = dict(saved, sha="0" * 40)
+    try:
+        found = check_github(only=["cft-fp256"])[0]
+        report("github", bool(found), "a snapshot's SHA for cft-fp256 planted wrong: %s" % (found[0] if found else "passed"))
+    except Unavailable as e:
+        skip("github", str(e))
+    finally:
+        recs["cft-fp256"] = saved
+
     for m in pages():
         try:
             for name, caught, how in getattr(m, "controls", lambda: [])():
@@ -1199,6 +1400,7 @@ def main(argv=None):
                        ("--local-only", "only allowed tags and attributes; nothing loads from another host"),
                        ("--docs", "the documents' links resolve, and none states the stage count"),
                        ("--privacy", "no tracked file names a private repository the site does not read"),
+                       ("--github", "every pin is a commit GitHub has now, as the snapshot recorded"),
                        ("--planted-link", "the runner's own control: the links check on a planted copy"),
                        ("--control", "run the negative controls")):
         g.add_argument(flag, action="store_true", help=what)
@@ -1229,10 +1431,16 @@ def main(argv=None):
         if a.docs:
             return problems_out("docs", check_docs(), " in %d documents" % len(doc_files()))
         if a.privacy:
-            hits, n, m = check_privacy()
+            hits, n, blobs = check_privacy()
+            hist = sum(1 for w, _ in blobs if " in history (blob " in w)
             return problems_out("privacy", ["%s names a private repository the site does not read" % h for h in hits],
-                                "; %d private repositories the site does not read, looked for in %d files, the "
-                                "commit messages and the branch names" % (n, m - 2))
+                                "; %d private repositories the site does not read, looked for in %d files, %d blobs "
+                                "reachable in history, the commit messages and the branch names"
+                                % (n, len(blobs) - hist - 2, hist))
+        if a.github:
+            problems, n = check_github()
+            return problems_out("github", problems, "; %d pins asked of GitHub, each the commit the snapshot "
+                                "recorded" % n)
         if a.planted_link:
             return planted_link()
         if a.control:
