@@ -38,15 +38,21 @@ What that doesn't cover:
 - **Paraphrases.** A paraphrase prints its source's own words beside it, and
   can't add a numeral those words don't have. Whether it keeps their meaning
   is for the reader to judge.
-- **Images.** An image is a PNG, checked as the bytes its pin gives, and
-  for what its text chunks say. Any chunk that could hold text no check
-  reads, such as `eXIf` or `iCCP`, is refused (`build.PNG_CHUNKS`). What
-  the image shows is not read.
+- **Images.** An image is a PNG, checked as the bytes its pin gives. It may
+  hold only chunks that carry no text (`build.PNG_CHUNKS`), each of the
+  size the format gives it, and nothing after its end. What it shows is
+  not read, and neither are its palette and transparency, which are image
+  content too.
 - **Pages.** Every page is held to a subset of HTML in which this check's
-  parser and a browser build the same page (`build.PARENTS`): strict
-  nesting, each element only where HTML allows it, text only where a
-  browser draws it, and no comment. No browser is run, so the subset is
-  what's held, not a rendering.
+  parser and a browser build the same page (`build.PARENTS`):
+  - every tag written one way, and every `&` a reference ending in `;`;
+  - strict nesting, and each element only where HTML allows it;
+  - text only where a browser draws it, by HTML's own whitespace;
+  - no comment.
+
+  The gate runs under the one Python `.python-version` names, since
+  Python's HTML parser reads edge cases differently between releases. No
+  browser is run, so the subset is what's held, not a rendering.
 - **Names and addresses.** No published file may hold an email address
   except `logan@loganw.dev`, and the name Wally appears only on the
   Preservation thread's page. The local-only stage reads each file as a
@@ -56,10 +62,14 @@ What that doesn't cover:
     own;
   - percent-encoding decoded;
   - Unicode's compatibility forms, such as a fullwidth letter;
-  - a JSON file's strings, and a PNG's text chunks.
+  - a JSON file's strings.
 
-  A character a browser draws as nothing is refused outright. The stage
-  doesn't render, so these pass:
+  A character a browser draws as nothing is refused outright, as itself or
+  as a reference. The name is matched between letters, so "Wally2" counts.
+  The privacy stage also refuses an address in any file or commit message
+  that pushing HEAD would publish, history included, other than the
+  contact or one at a domain reserved for examples. The stage doesn't
+  render, so these pass:
   - text put together by layout alone;
   - a name or an address in look-alike letters from another script;
   - an address spelled out for a person to reassemble.

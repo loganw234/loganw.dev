@@ -413,7 +413,7 @@ class _Marks(html.parser.HTMLParser):
         m = self._mark()
         if m is not None:
             m["buf"].append(data)
-        elif data.strip():
+        elif data.strip(HTML_SPACE):
             self.last = None
             # A month tick on a chart's axis: SVG text of class tick, inside an
             # svg, and nothing else, however it is classed.
@@ -789,7 +789,7 @@ class _Holders(html.parser.HTMLParser):
             self.stack.pop()
 
     def handle_data(self, data):
-        if self.stack and self.stack[-1] is not None and data.strip():
+        if self.stack and self.stack[-1] is not None and data.strip(HTML_SPACE):
             self.stack[-1]["text"] = True
 
 
@@ -1000,6 +1000,12 @@ ALLOWED = {
 SCHEME = re.compile(r"^\s*([a-z][a-z0-9+.-]*):", re.I)
 
 
+# HTML's own whitespace: space, tab, line feed, form feed and carriage return.
+# Python's str.strip() also counts a no-break space, which HTML reads as text:
+# one after the charset <meta> closes the head in a browser, and the policy
+# lands in the body (verifier-seam). Built from code points (CLAUDE.md trap 8).
+HTML_SPACE = "".join(map(chr, (32, 9, 10, 12, 13)))
+
 # Where each allowed element may stand, and where text may: the subset of
 # HTML in which Python's parser and a browser build the same page. A browser
 # repairs what this subset refuses: it drops a stray end tag and a <td>
@@ -1014,7 +1020,7 @@ _PHRASING = _FLOW | {"p", "h1", "h2", "h3", "h4", "dt", "figcaption", "summary",
                      "code", "em", "strong", "b", "i", "small", "sub", "sup", "abbr"}
 _SHAPE_PARENTS = {"svg", "g", "marker"}
 PARENTS = {"html": {None}, "head": {"html"}, "body": {"html"}, "meta": {"head"}, "link": {"head"},
-           "title": {"head", "svg", "g", "path", "circle", "rect", "line", "text"}, "main": {"body"},
+           "title": {"head", "svg", "g", "path", "circle", "rect", "line"}, "main": {"body"},
            "summary": {"details"}, "figcaption": {"figure"}, "caption": {"table"}, "thead": {"table"},
            "tbody": {"table"}, "tr": {"thead", "tbody"}, "td": {"tr"}, "th": {"tr"}, "li": {"ul", "ol"},
            "dt": {"dl"}, "dd": {"dl"}, "defs": {"svg"}, "marker": {"defs"}, "g": {"svg", "g"},
@@ -1033,17 +1039,49 @@ if set(PARENTS) != set(ALLOWED):
                   % sorted(set(PARENTS) ^ set(ALLOWED)))
 
 
+# Every tag written the one way the build writes tags, so that no two parsers
+# can cut a page into different tags: Python's releases differ on an end tag
+# holding an attribute (verifier-seam), and a browser has rules of its own
+# for everything else. A name is lower case; a value is double-quoted and
+# holds no <, > or "; an end tag is its name alone; and every & starts a
+# character reference that ends in ;. What doesn't fit is named by count,
+# never quoted, since it could hold an address.
+_CANON_START = re.compile(r'<[a-z][a-z0-9]*(?: [A-Za-z][A-Za-z0-9:-]*="[^"<>]*")*/?>')
+_CANON_END = re.compile(r"</[a-z][a-z0-9]*>")
+_BARE_AMP = re.compile(r"&(?!(?:#[0-9]+|#x[0-9A-Fa-f]+|[A-Za-z][A-Za-z0-9]*);)")
+
+
+def canonical_problems(page):
+    out = []
+    if not page.startswith("<!doctype html>"):
+        out.append("a page that doesn't open with <!doctype html>")
+    body = page[len("<!doctype html>"):] if page.startswith("<!doctype html>") else page
+    tags = [m.group(0) for m in re.finditer(r"<[^<>]*>", body)]
+    odd = sum(1 for s in tags if not (_CANON_START.fullmatch(s) or _CANON_END.fullmatch(s)))
+    if odd:
+        out.append('%d tag(s) not written the one way the build writes them: <name attr="value">, <name .../> '
+                   "or </name>" % odd)
+    if body.count("<") != len(tags) or body.count(">") != len(tags):
+        out.append("a < or > outside a tag, where two parsers can disagree about where a tag begins")
+    bare = len(_BARE_AMP.findall(page))
+    if bare:
+        out.append("%d & that start(s) no character reference ending in ;" % bare)
+    return out
+
+
 class _Tags(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.problems, self.head = [], []
-        self.stack, self.started, self.closing = [], False, False
+        self.stack, self.started, self.closing, self.html_children = [], False, False, []
 
     def _enter(self, tag):
         """The page's structure, held to PARENTS: where the element stands,
         whether it was self-closed where a browser would leave it open, and
         what stays open."""
         parent = self.stack[-1] if self.stack else None
+        if parent == "html":
+            self.html_children.append(tag)
         if tag in PARENTS and parent not in PARENTS[tag]:
             self.problems.append("<%s> inside <%s>, where a browser builds another page than this check reads"
                                  % (tag, parent or "nothing"))
@@ -1070,7 +1108,7 @@ class _Tags(html.parser.HTMLParser):
                                  "another way" % (tag, tag))
 
     def handle_data(self, data):
-        if data.strip():
+        if data.strip(HTML_SPACE):
             where = self.stack[-1] if self.stack else None
             if where in NO_TEXT:
                 self.problems.append("text directly inside <%s>, which a browser moves or doesn't draw"
@@ -1086,6 +1124,9 @@ class _Tags(html.parser.HTMLParser):
         super().close()
         if self.stack:
             self.problems.append("<%s> left open at the end of the page" % "><".join(self.stack))
+        if self.html_children != ["head", "body"]:
+            self.problems.append("<html> holds %s, not a <head> and then a <body>, which a browser reorders"
+                                 % ", ".join("<%s>" % c for c in self.html_children))
 
     def handle_starttag(self, tag, attrs):
         self._enter(tag)
@@ -1181,7 +1222,9 @@ def css_problems(css):
         out.append("a backslash escape, which could spell a load")
     code, _, urls = css_parts(css)
     for pat, what in ((r"@import", "@import"), (r"image-set\(", "image-set()"), (r"(?<![\w-])src\(", "src()"),
-                      (r"expression\(", "expression()"), (r"-moz-binding", "-moz-binding"), (r"behavior\s*:", "behavior")):
+                      (r"expression\(", "expression()"), (r"-moz-binding", "-moz-binding"), (r"behavior\s*:", "behavior"),
+                      # draws a word backwards, as the refused override characters do (verifier-seam)
+                      (r"(?<![\w-])(?:direction|unicode-bidi)\s*:", "direction or unicode-bidi")):
         if re.search(pat, code, re.I):
             out.append("uses %s" % what)
     for u in urls:
@@ -1204,6 +1247,7 @@ def check_local_only(root=PUBLIC):
             p.feed(f.read_text(encoding="utf-8"))
             p.close()
             problems += ["%s: %s" % (rel, x) for x in p.problems]
+            problems += ["%s: %s" % (rel, x) for x in canonical_problems(f.read_text(encoding="utf-8"))]
             h = p.head
             if len(h) < 2 or h[0] != ("meta", {"charset": "utf-8"}) or h[1][0] != "meta" \
                     or h[1][1].get("http-equiv") != "Content-Security-Policy" or h[1][1].get("content") != render.CSP:
@@ -1241,22 +1285,31 @@ def type_problems(rel, data):
     return []
 
 
-# The PNG chunks that carry no text, and the three that do, which texts_of
-# reads. Any other chunk is refused, since no check reads it: verifier-seam
-# put an address in an eXIf chunk. An ICC profile (iCCP) holds text too, and
-# so does a chunk type of anyone's own. The site's prints hold only IHDR,
-# IDAT and IEND.
+# The PNG chunks that carry no text. Any other is refused, since no check
+# reads it: verifier-seam put an address in an eXIf chunk, and in a UTF-16
+# string inside a text chunk. So a text chunk (tEXt, zTXt, iTXt) is refused
+# too, as are an ICC profile (iCCP), which holds text, and a chunk type of
+# anyone's own. A chunk whose size the format fixes must be that size, so
+# nothing rides after its fields (verifier-seam: an address in IEND's data).
+# The palette and transparency are image content, like the pixels, and are
+# not read (README). The site's prints hold only IHDR, IDAT and IEND.
 PNG_CHUNKS = {"IHDR", "PLTE", "IDAT", "IEND", "tRNS", "gAMA", "cHRM", "sRGB", "sBIT", "pHYs", "bKGD", "hIST",
-              "tIME", "tEXt", "zTXt", "iTXt"}
+              "tIME"}
+PNG_SIZES = {"IHDR": {13}, "IEND": {0}, "gAMA": {4}, "cHRM": {32}, "sRGB": {1}, "pHYs": {9}, "tIME": {7},
+             "sBIT": {1, 2, 3, 4}, "bKGD": {1, 2, 6}}
 
 
 def png_chunk_problems(data):
-    pos, kinds = 8, []
+    pos, kinds, out = 8, [], []
     while pos + 8 <= len(data):
         n = int.from_bytes(data[pos:pos + 4], "big")
-        kinds.append(data[pos + 4:pos + 8].decode("latin-1"))
+        kind = data[pos + 4:pos + 8].decode("latin-1")
+        kinds.append(kind)
+        if kind in PNG_SIZES and n not in PNG_SIZES[kind]:
+            out.append("a PNG %s chunk of %d bytes, a size the format doesn't give it, so the rest goes unread"
+                       % (kind, n))
         pos += 12 + n
-    out = ["a PNG chunk no check reads: %s" % k for k in sorted(set(kinds) - PNG_CHUNKS)]
+    out += ["a PNG chunk no check reads: %s" % k for k in sorted(set(kinds) - PNG_CHUNKS)]
     if pos != len(data) or not kinds or kinds[-1] != "IEND":
         out.append("a PNG that does not end with its IEND chunk, so bytes after it go unread")
     return out
@@ -1269,7 +1322,8 @@ def png_chunk_problems(data):
 SITE_CONTACTS = {"logan@loganw.dev"}
 # In any script (an IDN domain, a non-ASCII top-level domain), with a quoted
 # local part or an address literal, as verifier-seam wrote them.
-EMAIL = re.compile(r'(?:"[^"\r\n]+"|[\w.%+-]+)@(?:\[[^\]\s]+\]|[\w-]+(?:\.[\w-]+)*\.(?:[^\W\d_]{2,}|xn--[\w-]+))')
+EMAIL = re.compile(r'(?:"[^"\r\n]+"|[\w.%+-]+)@(?:\[(?:[0-9]{1,3}(?:\.[0-9]{1,3}){3}|IPv6:[0-9A-Fa-f:.]+)\]'
+                   r'|[\w-]+(?:\.[\w-]+)*\.(?:[^\W\d_]{2,}|xn--[\w-]+))')
 
 
 # How each allowed tag is laid out, for reading a page's text as a reader
@@ -1338,6 +1392,10 @@ def invisible_problems(rel, data):
             texts = list(_json_strings(json.loads(t)))
         except ValueError:
             pass
+    elif rel.endswith(".html"):
+        # A character reference is drawn as its character: &#x202E; drew a
+        # word backwards while this read only the reference (verifier-seam).
+        texts.append(html.unescape(t))
     found = sorted({"U+%04X" % ord(c) for s in texts for c in IGNORABLE_RE.findall(s) + CONTROL_RE.findall(s)})
     return ["a character a browser draws as nothing, or a control character: %s" % ", ".join(found[:8])] if found else []
 
@@ -1452,7 +1510,8 @@ def only_in_problems(rel, data):
     names = [(name, files) for name, files in sorted(ONLY_IN.items()) if rel not in files]
     views = texts_of(rel, data) if names else []
     return ["names %s, which may be published only in %s" % (name, ", ".join(files))
-            for name, files in names if any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
+            for name, files in names
+            if any(re.search(r"(?i)(?<![^\W\d_])%s(?![^\W\d_])" % re.escape(name), v) for v in views)]
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.png")   # PNG only: its text chunks are read (texts_of)
@@ -1704,7 +1763,7 @@ def _git_out(root, *args, stdin=None):
     return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True).stdout
 
 
-def tracked_blobs(root=ROOT):
+def tracked_blobs(root=ROOT, refs=("--all",)):
     """[(where, bytes)]: what a push of this repository would publish, as
     text this search can read:
       * every file git would commit now (tracked, or new and not ignored);
@@ -1714,6 +1773,8 @@ def tracked_blobs(root=ROOT):
       * every commit message, every annotated tag's message, and every
         branch and tag name;
       * every author, committer and tagger: name and email.
+    refs chooses the history read: every ref by default, or ("HEAD",) for
+    what pushing the commit being built publishes.
     What it cannot read: text drawn as pixels, and text inside compressed
     data other than a PNG's text chunks (a font's tables, say)."""
     out, seen = [], set()
@@ -1723,7 +1784,7 @@ def tracked_blobs(root=ROOT):
         if f.is_file():
             out.append((rel, f.read_bytes()))
     paths = {}
-    for line in _git_out(root, "rev-list", "--all", "--objects").decode("utf-8", "replace").splitlines():
+    for line in _git_out(root, "rev-list", *refs, "--objects").decode("utf-8", "replace").splitlines():
         sha, _, path = line.partition(" ")
         if path:
             paths.setdefault(sha, path)
@@ -1740,9 +1801,9 @@ def tracked_blobs(root=ROOT):
             seen.add(sha)
             out.append(("%s in history (blob %s)" % (paths[sha], sha[:7]), body))
     out.append(("paths", "\n".join(sorted(set(ls.split("\0")) | set(paths.values()))).encode()))
-    for what, args in (("commit messages", ["log", "--all", "--format=%B"]),
+    for what, args in (("commit messages", ["log", *refs, "--format=%B"]),
                        ("tag messages", ["for-each-ref", "refs/tags", "--format=%(contents)"]),
-                       ("commit identities", ["log", "--all", "--format=%an%n%ae%n%cn%n%ce"]),
+                       ("commit identities", ["log", *refs, "--format=%an%n%ae%n%cn%n%ce"]),
                        ("tagger identities", ["for-each-ref", "refs/tags", "--format=%(taggername)%0a%(taggeremail)"]),
                        ("branch and tag names", ["for-each-ref", "--format=%(refname)"])):
         out.append((what, _git_out(root, *args)))
@@ -1849,6 +1910,40 @@ def check_github(only=None):
             problems.append("%s: GitHub resolves %s to %s, and the snapshot recorded %s"
                             % (name, cfg["commit"], out[:12], (rec.get("sha") or "nothing")[:12]))
     return problems, n
+
+
+# An address in a file this repository would publish, now or in its history,
+# or in a commit or tag message, other than the site's contact or one at a
+# domain reserved for examples (RFC 2606, RFC 6761). The round's ledger held
+# Logan's address in three files, and folding it into docs/VALIDATION.md
+# must not carry it here (verifier-seam). A commit's author field is git's
+# own record, not a file, and is not read here. Named by count, never quoted.
+EXAMPLE_DOMAINS = {"example.com", "example.net", "example.org"}
+EXAMPLE_TLDS = {"example", "invalid", "test", "localhost"}
+EXAMPLE_IPS = ("192.0.2.", "198.51.100.", "203.0.113.", "ipv6:2001:db8:")   # RFC 5737, RFC 3849
+# The co-author trailer's address, which every agent's commit message carries.
+MACHINE_ADDRESSES = {"noreply@anthropic.com"}
+
+
+def _example(address):
+    d = address.rsplit("@", 1)[1].lower().strip("[]")
+    return (any(d == x or d.endswith("." + x) for x in EXAMPLE_DOMAINS) or d.rsplit(".", 1)[-1] in EXAMPLE_TLDS
+            or d.startswith(EXAMPLE_IPS))
+
+
+def address_problems(blobs):
+    out = []
+    for where, b in blobs:
+        if where in ("commit identities", "tagger identities"):
+            continue
+        t = _as_text(b)
+        if t is None:
+            continue
+        found = {m.group(0).lower() for v in (t, html.unescape(t), urllib.parse.unquote(t)) for m in EMAIL.finditer(v)}
+        n = sum(1 for a in found if a not in SITE_CONTACTS | MACHINE_ADDRESSES and not _example(a))
+        if n:
+            out.append("%s holds %d email address(es) other than the site's contact" % (where, n))
+    return out
 
 
 def check_privacy():
@@ -2007,7 +2102,11 @@ def controls():
         # numbers: a typed figure, a figure copied with its text changed, a
         # number word, a figure span with no fact, and a source label changed
         data = json.loads((root / "facts.json").read_text(encoding="utf-8"))
-        agent = next(r for r in data["facts"] if r["method"] == "facts.agents" and r["args"]["name"] == "cft-fp256")
+        # Each fact is taken from the page it is planted in, never as the
+        # first of its method in facts.json: a page that sorts before
+        # home.py logs the same method first (P4 found it, with corrections.py).
+        agent = next((r for r in data["facts"] if r["method"] == "facts.agents" and r["args"]["name"] == "cft-fp256"
+                      and 'data-f="%d"' % r["id"] in t), {"id": 0, "text": "(none on index.html)"})
         mark = '<span class="fig" data-f="%d">%s</span>' % (agent["id"], agent["text"])
         if mark not in t:
             report("numbers", False, "could not plant: %r is not in the page" % mark)
@@ -2026,10 +2125,11 @@ def controls():
             planted("numbers", "a second copy of a figure, with no label beside it",
                     t.replace("<footer>", "<p>%s</p><footer>" % mark, 1),
                     check_numbers, "fact %d is printed above the footer without its source beside it" % agent["id"])
-            snap_id = next(r["id"] for r in data["facts"] if r["method"] == "facts.snapshot_date")
+            snap_li = re.search(r'<li>the line marked "snapshot": .*?</li>', t, re.S)
+            snap_id = re.search(r'data-f="([0-9]+)"', snap_li.group(0)).group(1) if snap_li else "(no line)"
             planted("numbers", "a figure the map draws, with its line under the map removed",
-                    re.sub(r'<li>the line marked "snapshot": .*?</li>', "", t, count=1, flags=re.S),
-                    check_numbers, "fact %d is drawn in the map" % snap_id)
+                    t.replace(snap_li.group(0), "", 1) if snap_li else t,
+                    check_numbers, "fact %s is drawn in the map" % snap_id)
             planted("numbers", "a source label changed",
                     re.sub(r'(<span class="src" data-f="%d"> (?:<a [^>]*>)?\()' % agent["id"], r"\1planted ", t, count=1),
                     check_numbers, "fact %d's source" % agent["id"])
@@ -2288,6 +2388,33 @@ def controls():
                  "<a> inside <a>"),
                 ("an element left open", "<div>", "left open")):
             planted("local-only", what, t.replace("</footer>", shape + "</footer>", 1), check_local_only, want)
+        # verifier-seam's fourth round: the subset's own gaps, each by the
+        # rule meant for it.
+        for what, new, want in (
+                ("an end tag holding an attribute, which two Pythons read two ways",
+                 t.replace("</footer>", '<p><b>Wal</b title=">">ly</p></footer>', 1), "not written the one way"),
+                ("a tag name in capitals", t.replace("</footer>", "<P>x</P></footer>", 1), "not written the one way"),
+                ("an unquoted attribute", t.replace("</footer>", "<p class=x>y</p></footer>", 1),
+                 "not written the one way"),
+                ("a bare ampersand", t.replace("</footer>", "<p>a & b</p></footer>", 1),
+                 "start(s) no character reference"),
+                ("a < in text", t.replace("</footer>", "<p>a < b</p></footer>", 1), "a < or > outside a tag"),
+                ("a no-break space after the charset, which closes the head in a browser",
+                 t.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + chr(0xA0), 1),
+                 "text directly inside <head>"),
+                ("an SVG title inside SVG text, splitting a word",
+                 t.replace("</footer>", "<svg><text>Wal<title></title>ly</text></svg></footer>", 1),
+                 "<title> inside <text>"),
+                ("a body before the head", t.replace("<head>", "<body></body><head>", 1),
+                 "not a <head> and then a <body>"),
+                ("a name written backwards between override references",
+                 t.replace("</footer>", "<p>&#x202E;yllaW&#x202C;</p></footer>", 1),
+                 "index.html: a character a browser draws as nothing, or a control character: U+202C, U+202E"),
+                ("Wally with a digit after it", t.replace("</footer>", "<p>ask Wally2</p></footer>", 1),
+                 "index.html: names Wally"),
+                ("Wally with an underscore after it", t.replace("</footer>", "<p>ask Wally_</p></footer>", 1),
+                 "index.html: names Wally")):
+            planted("local-only", what, new, check_local_only, want)
         # A character a browser draws as nothing, refused wherever it is.
         for what, cp in (("a soft hyphen", 0xAD), ("U+2065, unassigned", 0x2065), ("U+FFF0, unassigned", 0xFFF0),
                          ("U+E0000, unassigned", 0xE0000), ("a right-to-left override", 0x202E)):
@@ -2348,7 +2475,13 @@ def controls():
                  saved_png[:33] + (4).to_bytes(4, "big") + b"eXIf" + b"x@y." + bytes(4) + saved_png[33:],
                  "a PNG chunk no check reads: eXIf"),
                 ("bytes after a PNG's IEND chunk", saved_png + b"write to someone@example.com",
-                 "does not end with its IEND")):
+                 "does not end with its IEND"),
+                ("an address inside IEND's own data, which the format gives none",
+                 saved_png[:-12] + (19).to_bytes(4, "big") + b"IEND" + b"someone@example.com" + bytes(4),
+                 "a PNG IEND chunk of 19 bytes"),
+                ("a text chunk, which no PNG here may hold",
+                 saved_png[:33] + (11).to_bytes(4, "big") + b"tEXt" + b"Comment" + bytes(1) + b"abc" + bytes(4)
+                 + saved_png[33:], "a PNG chunk no check reads: tEXt")):
             png.write_bytes(blob)
             found = [f for f in check_local_only(root) if f.startswith("assets/pauli-print.png") and want in f]
             report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
@@ -2388,8 +2521,11 @@ def controls():
                      "a semicolon inside an unquoted url()": "a malformed url()",
                      "a comment marker inside a string": "a comment marker inside a string",
                      "a string left open": "a string left open", "a comment left open": "a comment left open",
-                     "a form feed": "an ASCII control character"}
+                     "a form feed": "an ASCII control character",
+                     "a word drawn backwards by direction and unicode-bidi": "uses direction or unicode-bidi"}
         for what, css in (("URL( in capitals", "a{background:URL(https://x.invalid/a.png)}"),
+                          ("a word drawn backwards by direction and unicode-bidi",
+                           "p{unicode-bidi:bidi-override;direction:rtl}"),
                           ("@IMPORT", "@IMPORT 'https://x.invalid/a.css';"),
                           ("image-set", 'a{background:image-set("https://x.invalid/a.png" 1x)}'),
                           ("an escaped url", "a{background:u\\72l(https://x.invalid/a.png)}"),
@@ -2556,6 +2692,38 @@ def controls():
     printed = buf.getvalue()
     report("output", "someone@example.com" not in printed and "[an address]" in printed and "logan@loganw.dev" in printed,
            "an address in a line build.py prints: %r" % printed.strip())
+    for what, line in (("as a character reference", "refused: someone&#64;example.com"),
+                       ("percent-encoded", "refused: someone%40example.com"),
+                       ("with a fullwidth at sign", "refused: someone" + chr(0xFF20) + "example.com")):
+        buf = io.StringIO()
+        _Masked(buf).write(line + chr(10))
+        printed = buf.getvalue()
+        report("output", "example.com" not in printed and "withheld" in printed,
+               "an address %s in a line build.py prints: %r" % (what, printed.strip()))
+    # An address in a file that pushing HEAD would publish, now or in its
+    # history; and the site's contact, an example domain and the co-author
+    # trailer's address, which pass.
+    # Put together at run time, so that this file holds no address itself.
+    real = "someone" + chr(64) + "realdomain.co.uk"
+    # One control: the address at a real domain is refused, while the
+    # contact, example addresses and the trailer's address beside it pass.
+    planted_real = address_problems([("docs/planted.md", ("write to " + real).encode())])
+    allowed = address_problems([("docs/allowed.md", b"logan@loganw.dev, a@example.com, noreply@anthropic.com, "
+                                                    b"x@[192.0.2.1]")])
+    report("privacy", bool(planted_real) and not allowed,
+           "an address at a real domain in a tracked file: %s; and the contact, example addresses and the trailer's "
+           "address: %s" % (planted_real or "passed", allowed or "passed, as they must"))
+    with tempfile.TemporaryDirectory() as d:
+        g = lambda *a: subprocess.run(["git", "-C", d, "-c", "user.name=planted", "-c", "user.email=planted@invalid",
+                                       *a], capture_output=True)
+        g("init", "-q")
+        (pathlib.Path(d) / "notes.md").write_text("write to " + real + chr(10), encoding="utf-8", newline="\n")
+        g("add", "-A")
+        g("commit", "-qm", "a note")
+        (pathlib.Path(d) / "notes.md").write_text("nothing here" + chr(10), encoding="utf-8", newline="\n")
+        g("commit", "-qam", "the note removed")
+        found = [h for h in address_problems(tracked_blobs(pathlib.Path(d), refs=("HEAD",))) if "in history" in h]
+        report("privacy", bool(found), "an address that survives only in HEAD's history: %s" % (found or "passed"))
     refused("assets", "an asset published as a JPEG, whose metadata no check reads",
             lambda: check_asset("assets/x.jpg", bytes([0xFF, 0xD8, 0xFF, 0xE0])), "lower-case .png")
     refused("own", "a commit cited by a name rather than a hash, as HEAD~1 moves with history",
@@ -2723,7 +2891,9 @@ def controls():
         for name in ("drift", "stale-pin"):
             skip(name, "needs every pinned clone: %s" % e)
     if text is not None:
-        abi = [r for r in facts.LOG if r["method"] == "facts.macros"][0]
+        abi = next((r for r in facts.LOG if r["method"] == "facts.macros"
+                    and '<span class="fig" data-f="%d">' % r["id"] in text["index.html"]),
+                   {"id": 0, "text": "(none on index.html)"})
         needle = '<span class="fig" data-f="%d">%s</span>' % (abi["id"], abi["text"])
         with tempfile.TemporaryDirectory() as d:
             root = pathlib.Path(d)
@@ -2856,8 +3026,14 @@ class _Masked:
         self.inner = inner
 
     def write(self, s):
-        return self.inner.write(EMAIL.sub(
-            lambda m: m.group(0) if m.group(0).lower() in SITE_CONTACTS else "[an address]", s))
+        out = EMAIL.sub(lambda m: m.group(0) if m.group(0).lower() in SITE_CONTACTS else "[an address]", s)
+        # An address written encoded (&#64;, %40, a fullwidth at sign) is
+        # still one (verifier-seam). A line that names one in any reading is
+        # withheld whole.
+        if any(m.group(0).lower() not in SITE_CONTACTS
+               for v in readings(".txt", out.encode("utf-8")) for m in EMAIL.finditer(v)):
+            out = "[a line naming an address, withheld]" + (chr(10) if s.endswith(chr(10)) else "")
+        return self.inner.write(out)
 
     def __getattr__(self, name):
         return getattr(self.inner, name)
@@ -2914,10 +3090,13 @@ def main(argv=None):
             other = {"paths", "commit messages", "tag messages", "commit identities", "tagger identities",
                      "branch and tag names"}
             files = sum(1 for w, _ in blobs if " in history (blob " not in w and w not in other)
-            return problems_out("privacy", ["%s names a private repository the site does not read" % h for h in hits],
+            addressed = address_problems(tracked_blobs(refs=("HEAD",)))
+            return problems_out("privacy", ["%s names a private repository the site does not read" % h for h in hits]
+                                + addressed,
                                 "; %d private repositories the site does not read, looked for in %d files, %d blobs "
                                 "reachable in history, every path, the commit and tag messages, every author, "
-                                "committer and tagger, and the branch and tag names" % (n, files, hist))
+                                "committer and tagger, and the branch and tag names; and no email address but the contact in what "
+                                "pushing HEAD publishes" % (n, files, hist))
         if a.github:
             problems, n = check_github()
             return problems_out("github", problems, "; %d pins asked of GitHub, each the commit the snapshot "
