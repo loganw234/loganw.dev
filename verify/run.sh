@@ -91,6 +91,14 @@ if [ "$REQUIRE_ALL" = 1 ] && { [ -n "$ONLY" ] || [ -n "$SKIP" ]; }; then
   die "--require-all runs every stage; it cannot be combined with --only or --skip"
 fi
 
+# The pages are read with Python's own HTML parser, whose reading of edge
+# cases changes between releases: an end tag holding an attribute passed on
+# 3.12.9 and would be refused on 3.12.14 (verifier-seam). So the gate runs
+# under exactly the Python .python-version names, as CI's setup does.
+PYV=$("$PY" -c 'import platform; print(platform.python_version())' 2>/dev/null || echo unknown)
+PYWANT=$(tr -d ' \r\n' < "$ROOT/.python-version")
+[ "$PYV" = "$PYWANT" ] || die "this is Python $PYV; the gate runs under Python $PYWANT (.python-version), because the pages are held to what that Python's HTML parser reads"
+
 COMMIT=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo nogit)
 DIRTY=0; [ -n "$(git -C "$ROOT" status --porcelain 2>/dev/null)" ] && DIRTY=1
 [ "$DIRTY" = 1 ] && COMMIT="$COMMIT-dirty"
