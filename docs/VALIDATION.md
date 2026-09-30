@@ -435,3 +435,23 @@ clear to begin".
   - begin the round.
 
   Logan gave this clearance in the same message.
+
+## 2026-09-29 - the workflow's actions, moved to their current majors before the first push
+
+Read from each action's GitHub releases, 2026-09-29:
+
+| action | was | now |
+|---|---|---|
+| actions/checkout | v4 | v7 |
+| actions/setup-python | v5 | v7 |
+| actions/upload-pages-artifact | v3 | v5 |
+| actions/deploy-pages | v4 | v5 |
+
+The old majors ran on Node 20; checkout v5 and setup-python v6 moved to
+Node 24. The breaking changes in between don't touch this site:
+
+- upload-pages-artifact v4 leaves dotfiles out, and `public/` has none;
+- setup-python v7 removed the `pip-install` input, which this workflow never
+  used, and Python versions past their end of life. 3.12 is not one of them.
+
+The first push tests the deploy job itself; nothing here can run it locally.

@@ -34,8 +34,8 @@ jobs:
   gate:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: LOGANW_FETCH=1 bash verify/run.sh
@@ -51,13 +51,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: stage public/ as committed, and write which commit it is into BUILD
         run: |
           cp -r public _site
           printf 'Deployed from %s\n' "$GITHUB_SHA" > _site/BUILD
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
