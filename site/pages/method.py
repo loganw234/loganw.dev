@@ -72,6 +72,30 @@ def methods_block(ctx):
 # and this site's own, each naming its round and its source.
 # ---------------------------------------------------------------------------
 
+CONTROL_COUNT = re.compile(r"`--control` caught (\d+ of \d+)\.")
+
+
+@fact
+def newest_control_count(path):
+    """The first "`--control` caught N of N" this site's own ledger
+    records, searched from its newest entry back - never a fixed line: the
+    ledger is append-only and grows at every merge, so a quote of "the
+    newest entry" goes stale the moment a later entry lands that doesn't
+    happen to repeat this line (verifier-P5, d445b42: quoted "275 of 275"
+    at the then-newest entry; 07b1526 appended one with "294 of 294" before
+    the page was even merged). Reading newest-back keeps the figure true as
+    the ledger keeps growing, since a rebuild re-reads it from the tree
+    being built."""
+    text, entries = facts.own_entries(path)
+    for e in reversed(entries):
+        m = CONTROL_COUNT.search(text, e["start"], e["end"])
+        if m:
+            line = text.count("\n", 0, m.start(1)) + 1
+            return V(m.group(1), facts.own_src(path, line, "the newest entry that records the controls"),
+                     raw=m.group(1), num=True)
+    raise Refusal("this site's %s: no entry records \"`--control` caught N of N\"" % path)
+
+
 def stats_block():
     items = [
         render(["ParcelRound's second round: ",
@@ -88,8 +112,8 @@ def stats_block():
         render(["This site's own round, P3's verifier: ",
                 facts.own_prose("docs/VALIDATION.md",
                                 r"(The lead's control on the verifier\s+caught 2 of 2)\."), "."]),
-        render(["This site's own round, as a whole, in the ledger's newest entry: ",
-                facts.own_prose("docs/VALIDATION.md", r"`--control` caught (275 of 275)\."), "."]),
+        render(["This site's own round, as a whole, in the newest entry that records the controls: ",
+                newest_control_count("docs/VALIDATION.md"), "."]),
     ]
     note = ("Each figure is as of its source's repository at its pin, or of this site's own ledger as read in "
            "the commit being built — never live.")
@@ -103,6 +127,10 @@ def stats_block():
 
 STATEMENT_9 = ("AI Collaborators are attributed equal to the human one, the projects wouldnt exist if either "
               "were removed.")
+
+# Kept in one place (decision 9; SPEC section 3's row): local-only refuses
+# this text on any other published page or text file (build.only_here_problems).
+ONLY_HERE = [STATEMENT_9]
 
 GEMINI = re.compile(r"^Co-Authored-By:.*\bgemini\b", re.I | re.M)
 
@@ -189,22 +217,35 @@ def render_page(ctx):
 def controls():
     out = []
 
-    # 2. The co-authorship statement appears once, on Method alone (About
-    # names the collaborators and links back, per decision 9's own scope).
-    facts.reset_log()
-    coauthor_statement()
-    method_hits = sum(1 for r in facts.LOG if r["text"] == STATEMENT_9)
-
-    import pages.about as about_mod
-    facts.reset_log()
-    about_mod.render_page({"built": {"Method": "method.html"},
-                           "pages": {"Threads": ["thread-preservation.html"], "Work": []}})
-    real_total = method_hits + sum(1 for r in facts.LOG if r["text"] == STATEMENT_9)
-    about_mod.S(STATEMENT_9)   # the plant: a second copy, logged onto About's own real log
-    planted_total = method_hits + sum(1 for r in facts.LOG if r["text"] == STATEMENT_9)
-    out.append(("statement9-once", real_total == 1 and planted_total != 1,
-               "the real pages state decision 9's words %d time(s) in all; a copy with it planted on About too "
-               "gives %d" % (real_total, planted_total)))
+    # 2. The co-authorship statement appears once, on Method alone: held by
+    # ONLY_HERE (verifier-P5, d445b42: the earlier version of this control
+    # only re-rendered Method and About, so a copy on Home - or any other
+    # already-built page - passed every stage). Plant it on a copy of
+    # public/'s Home, and watch build.check_local_only refuse it by name;
+    # About's "stated once, on Method" is held the same way, by the same
+    # gate, since only_here_problems reads every published page but the
+    # one ONLY_HERE names.
+    import shutil
+    import build as _build
+    with tempfile.TemporaryDirectory() as d:
+        root = pathlib.Path(d)
+        shutil.copytree(_build.PUBLIC, root, dirs_exist_ok=True)
+        home_page = root / "index.html"
+        t = home_page.read_text(encoding="utf-8")
+        planted = t.replace("</main>", "<p>%s</p></main>" % STATEMENT_9, 1)
+        if planted == t:
+            out.append(("statement9-once", False, "could not plant: </main> is not in index.html"))
+        else:
+            home_page.write_text(planted, encoding="utf-8", newline="\n")
+            try:
+                problems = _build.check_local_only(root)
+            finally:
+                home_page.write_text(t, encoding="utf-8", newline="\n")
+            want = "states pages.method's ONLY_HERE text"
+            found = [p for p in problems if want in p]
+            out.append(("statement9-once", bool(found),
+                       "decision 9's statement planted on index.html, in a copy of public/: %s"
+                       % (found[0] if found else "passed")))
 
     # 3. Gemini's count, by the commit rule: a repository built in a
     # temporary directory, one commit crediting Gemini twice over (once as
