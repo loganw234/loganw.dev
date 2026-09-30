@@ -3,26 +3,26 @@ ParcelRound — dossier
 
 I. What it is
 
-A method for splitting one body of work across several coding agents at once, without the pieces failing to meet [fact 1324].
+A method for splitting one body of work across several coding agents at once, without the pieces failing to meet [fact 1381].
 
 II. What it is not
 
-Under “Is this for you? [fact 1325]”: “Don't” for a single task, for exploratory work where the split isn't obvious yet, or where the pieces can't be tested separately [fact 1326]. Two agents on a two-way split is usually slower than doing it yourself, because the brief costs more than the work [fact 1327].
+Under “Is this for you? [fact 1382]”: “Don't” for a single task, for exploratory work where the split isn't obvious yet, or where the pieces can't be tested separately [fact 1383]. Two agents on a two-way split is usually slower than doing it yourself, because the brief costs more than the work [fact 1384].
 
 III. The contract
 
-Under “The one failure mode [fact 1328]”: the work between the parcels belongs to nobody, and it is invisible because every parcel's own gate is green [fact 1329].
+Under “The one failure mode [fact 1385]”: the work between the parcels belongs to nobody, and it is invisible because every parcel's own gate is green [fact 1386].
 
 IV. Verified
 
 No docs/VALIDATION.md ledger and no workflow: the method has no build of its own to gate. What its case studies record instead is a measurement of the method: 
 
-- The round CASE-STUDY.md measures returned “twelve corrections from five parcels — every single parcel corrected its brief [fact 1330]”, on the strength of one line: “Report anything you found that this brief got wrong [fact 1331].”
+- The round CASE-STUDY.md measures returned “twelve corrections from five parcels — every single parcel corrected its brief [fact 1387]”, on the strength of one line: “Report anything you found that this brief got wrong [fact 1388].”
 
 V. Kept failures
 
-- every guess was AHEAD of the clock (by 3 to 90 minutes) [fact 1332], across every author of that round. The fix that finally held for the lead was mechanical: write the entry with a placeholder and let the append command substitute date [fact 1333] The method's own rule now: “stamps are substituted, not typed [fact 1334]” Recorded by commit f2a0483 [fact 1335].
-- which is how a wrong number propagates - it was in the ledger for fifteen minutes and got used once [fact 1336]. a correction should EDIT nothing but should be linked from the entry it corrects [fact 1337] ("see 11:52" appended below the old entry is an append, not an edit [fact 1338]), and a number a sibling might reuse should be stated in the entry that supersedes it in the form the sibling would search for [fact 1339]. Recorded by commit 42e76cc [fact 1340].
+- every guess was AHEAD of the clock (by 3 to 90 minutes) [fact 1389], across every author of that round. The fix that finally held for the lead was mechanical: write the entry with a placeholder and let the append command substitute date [fact 1390] The method's own rule now: “stamps are substituted, not typed [fact 1391]” Recorded by commit f2a0483 [fact 1392].
+- which is how a wrong number propagates - it was in the ledger for fifteen minutes and got used once [fact 1393]. a correction should EDIT nothing but should be linked from the entry it corrects [fact 1394] ("see 11:52" appended below the old entry is an append, not an edit [fact 1395]), and a number a sibling might reuse should be stated in the entry that supersedes it in the form the sibling would search for [fact 1396]. Recorded by commit 42e76cc [fact 1397].
 
 VI. Test it
 
@@ -40,13 +40,14 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 
 VIII. Connections
 
-- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 1341]
+- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 1409]
+- StoryDocs documents ParcelRound: HonestFramework and ParcelRound [fact 1417]
 
 IX. Provenance
 
-ParcelRound read at 8767e23 [fact 1342].
+ParcelRound read at 8767e23 [fact 1420].
 
-- README.md [fact 1343]
-- METHOD.md [fact 1344]
-- CASE-STUDY.md [fact 1345]
-- CASE-STUDY-2.md [fact 1346]
+- README.md [fact 1421]
+- METHOD.md [fact 1422]
+- CASE-STUDY.md [fact 1423]
+- CASE-STUDY-2.md [fact 1424]

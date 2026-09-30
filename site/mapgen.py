@@ -164,6 +164,20 @@ def _storydocs_edges():
     return out
 
 
+def all_edges():
+    """Every edge the map draws, each with its evidence as a figure:
+    relations.json's own edges, then those derived at a pin (StoryDocs'
+    documents edges). One list, read by the map and by each dossier's
+    Connections, so the two cannot disagree. At P2's merge the dossiers read
+    relations.json alone, and every one of them missed StoryDocs."""
+    edges = []
+    for e in DATA["edges"]:
+        if e["kind"] not in KIND:
+            raise Refusal("an edge has kind %r, which relations.json does not define" % e["kind"])
+        edges.append(dict(e, v=facts.prose(e["repo"], e["path"], e["pattern"])))
+    return edges + _storydocs_edges()
+
+
 def build():
     nodes = {}
     for n in DATA["nodes"]:
@@ -188,19 +202,12 @@ def build():
             note = (before, facts.prose(name, n["note"]["path"], n["note"]["pattern"]), after)
         nodes[name] = dict(name=name, lane=n["lane"], row=n["row"], born=b,
                            vis=facts.api_visibility([name]), trunk=n.get("trunk", False), note=note)
-    edges = []
-    for e in DATA["edges"]:
+    edges = all_edges()
+    for e in edges:
         for end in (e["tail"], e["head"]):
             if end not in nodes:
-                raise Refusal("an edge names %s, which is not on the map" % end)
-        if e["kind"] not in KIND:
-            raise Refusal("an edge has kind %r, which relations.json does not define" % e["kind"])
-        edges.append(dict(e, v=facts.prose(e["repo"], e["path"], e["pattern"])))
-    for e in _storydocs_edges():
-        for end in (e["tail"], e["head"]):
-            if end not in nodes:
-                raise Refusal("StoryDocs documents %s, which is not on the map" % end)
-        edges.append(e)
+                raise Refusal("an edge (%s %s %s) names %s, which is not on the map"
+                              % (e["tail"], e["kind"], e["head"], end))
     fams = []
     for f in DATA["families"]:
         span = facts.family_span(f["match"], f["exclude"])

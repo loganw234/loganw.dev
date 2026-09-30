@@ -44,22 +44,23 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 
 VIII. Connections
 
-- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 1167]
-- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 1168]
-- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1169]
-- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1170]
-- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 1171]
-- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1172]
+- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 1169]
+- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 1170]
+- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1174]
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1175]
+- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 1177]
+- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1179]
+- StoryDocs documents cft-fp256: projects/cft-fp256 [fact 1185]
 
 IX. Provenance
 
-cft-fp256 read at 77b8440 [fact 1173].
+cft-fp256 read at 77b8440 [fact 1189].
 
-- README.md [fact 1174]
-- CONFORMANCE.md [fact 1175]
-- CLAUDE.md [fact 1176]
-- docs/VALIDATION.md [fact 1177]
+- README.md [fact 1190]
+- CONFORMANCE.md [fact 1191]
+- CLAUDE.md [fact 1192]
+- docs/VALIDATION.md [fact 1193]
 
-HonestFramework read at 65447fd [fact 1178].
+HonestFramework read at 65447fd [fact 1194].
 
-- CASE-STUDY.md [fact 1179]
+- CASE-STUDY.md [fact 1195]

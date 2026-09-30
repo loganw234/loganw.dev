@@ -1096,3 +1096,36 @@ site's contact, `logan@loganw.dev` (decision 14).
   both are caught.
 - Main's published files hold none today. P2 must meet the rule before its
   merge.
+
+## 2026-09-29 - P2 merged (squashed), live; the lead's seam fix: one list of edges for the map and the dossiers
+
+**P2.** verifier-P2 said READY at `bdbac1f`.
+
+- Its first NOT READY was on a gap in a control: `credits-grouping` never
+  exercised case-folding. P2 added `credits-case-fold`, and the verifier
+  watched it fail on its own fault.
+- The lead's own finding was that P2's facts.json keyed an account by its
+  email address. P2 now keys by a hash, and the verifier found no trace of
+  the address in any tracked or published file.
+- P2's earlier branch commits held that address. So P2 was squash-merged as
+  `6c163dd`, and main's history never holds it in a file.
+- `bash verify/run.sh --require-all` on the squash passed 11 of 11, with
+  nothing skipped.
+
+**The seam.** At the merge, all five dossiers' Connections read
+relations.json alone. The map, since P2, also draws the edges derived at
+StoryDocs' pin, so each dossier missed StoryDocs.
+
+- `mapgen.all_edges()` is now the one list. It holds relations.json's own
+  edges, then those derived at a pin, each with its evidence.
+- `mapgen.build()` and `_dossier.edges_for()` both read it.
+- cft-fp256, Quantum-Film, HonestFramework and ParcelRound now list
+  StoryDocs. cft-rebound does not, since StoryDocs has no `projects/`
+  directory for it.
+
+**New controls:**
+
+- Each of the 5 dossiers lists exactly the map's edges touching it.
+- The old reading, relations.json alone, is shown to miss 4 edges.
+
+`--control` caught 187 of 187.

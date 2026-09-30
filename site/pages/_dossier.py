@@ -185,11 +185,12 @@ def ledger_title(name, path, line):
 # ---------------------------------------------------------------------------
 
 def edges_for(node):
-    out = []
-    for e in RELATIONS["edges"]:
-        if node in (e["tail"], e["head"]):
-            out.append((e, facts.prose(e["repo"], e["path"], e["pattern"])))
-    return out
+    """Every edge the map draws that touches node, with its evidence: the same
+    list the map itself uses (mapgen.all_edges), so a dossier's Connections
+    include the edges derived at a pin - StoryDocs' - and not only
+    relations.json's own. (The lead, at P2's merge.)"""
+    import mapgen
+    return [(e, e["v"]) for e in mapgen.all_edges() if node in (e["tail"], e["head"])]
 
 
 def connections_block(node):

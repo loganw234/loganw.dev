@@ -1970,6 +1970,30 @@ def controls():
     except Unavailable as e:
         skip("newest", "needs atlas-film, cft-rebound and Quantum-Film at their pins: %s" % e)
 
+    # The map and every dossier's Connections read one list of edges
+    # (mapgen.all_edges). Held both ways: each dossier lists exactly the map's
+    # edges touching its project, and the reading P3 first had - relations.json
+    # alone - is shown to miss one, as it did StoryDocs' at P2's merge.
+    try:
+        import mapgen
+        from pages import _dossier
+        drawn = {(e["tail"], e["kind"], e["head"]) for e in mapgen.all_edges()}
+        dossiers = [m.NAME for m in pages() if m.__name__.startswith("pages.work_") and hasattr(m, "NAME")]
+        off = []
+        for node in dossiers:
+            listed = {(e["tail"], e["kind"], e["head"]) for e, _ in _dossier.edges_for(node)}
+            want = {x for x in drawn if node in (x[0], x[2])}
+            if listed != want:
+                off.append("%s: %d listed, %d drawn" % (node, len(listed), len(want)))
+        report("connections", bool(dossiers) and not off, "each of %d dossiers lists exactly the map's edges touching "
+               "it: %s" % (len(dossiers), "; ".join(off) or "all agree"))
+        old = {(e["tail"], e["kind"], e["head"]) for e in _dossier.RELATIONS["edges"]}
+        missed = sorted(x for x in drawn - old if any(n in (x[0], x[2]) for n in dossiers))
+        report("connections", bool(missed), "a dossier reading relations.json alone would miss %d edge(s), such as %s"
+               % (len(missed), " ".join(missed[0]) if missed else "none"))
+    except Unavailable as e:
+        skip("connections", "needs every pinned clone: %s" % e)
+
     # The GitHub stage, asked about one pin whose recorded SHA is planted wrong
     recs = facts.snap()["pins"]
     saved = recs["cft-fp256"]
