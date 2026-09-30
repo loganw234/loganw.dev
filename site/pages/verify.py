@@ -59,11 +59,16 @@ def checks():
     items.append([
         C("make verify-quick"), ". Cost: ",
         P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True), ". ",
-        "It runs the software stack those stages name against the golden model; it does not run ",
+        "`quick` is ",
+        P("cft-fp256", "docs/VERIFICATION.md",
+          r"`quick` is (the\s+`docs`, `generated`, `buildargs` and `sweepjudge` checks, the\s+model-versus-C "
+          r"stages, the GPU's photograph, the bindings, the language\s+legs, the soak spot check, the "
+          r"workloads, the demos and the remote\s+backend)"),
+        "; it does not run ",
         P("cft-fp256", "docs/VERIFICATION.md",
           r"`gate` adds (the golden\s+suite, the vectors, the library replay, the transcendentals, MPFR, the\s+"
           r"C\+\+ replay, lint and formal)"),
-        " - those need the slower ", C("make verify-gate"), ". And, on the card itself, ",
+        " - those need ", C("make verify-gate"), ". And, ",
         P("cft-fp256", "README.md", r"\*\*(CI's green tick does not cover synthesis, timing or silicon)\.\*\*"),
         ".",
     ])
