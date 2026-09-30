@@ -1516,16 +1516,21 @@ def only_in_problems(rel, data):
             if any(re.search(r"(?i)(?<![^\W\d_])%s(?![^\W\d_])" % re.escape(name), v) for v in views)]
 
 
+def _folded(s):
+    """A text as the ONLY_HERE check compares it: in Unicode's compatibility
+    form, with its whitespace collapsed and in lower case."""
+    return " ".join(unicodedata.normalize("NFKC", s).split()).lower()
+
+
 def only_here():
-    """{text as read: (module, file)}: each text a page module declares in
-    ONLY_HERE, which only that page may print. Decision 9's statement is
+    """{text as compared: (module, file)}: each text a page module declares
+    in ONLY_HERE, which only that page may print. Decision 9's statement is
     kept in one place, the Method page, and a check that rendered Method and
-    About alone passed a copy of it on Home (verifier-P5). Read with its
-    whitespace collapsed and in lower case."""
+    About alone passed a copy of it on Home (verifier-P5)."""
     out = {}
     for m in pages():
         for s in getattr(m, "ONLY_HERE", []):
-            k = " ".join(s.split()).lower()
+            k = _folded(s)
             if k in out and out[k][1] != m.PAGE["file"]:
                 raise Refusal("%s and %s both declare the same ONLY_HERE text" % (out[k][0], m.__name__))
             out[k] = (m.__name__, m.PAGE["file"])
@@ -1533,21 +1538,20 @@ def only_here():
 
 
 def only_here_problems(rel, data, declared):
-    """A published page or text file, other than the declaring page, whose
-    text holds a declared text. facts.json, which records every statement's
-    text, holds each by design. A restatement in other words passes: the
-    check reads the words, not their meaning (a stated limit)."""
+    """A published page or text file, other than the declaring page, that
+    holds a declared text in any of the readings the name and address
+    checks use (texts_of): its text, each attribute's value (a description,
+    a tooltip), references and percent-encoding decoded, and compatibility
+    forms folded. verifier-seam put the statement in a meta description and
+    a tooltip, which the first version never read. facts.json, which
+    records every statement's text, holds each by design. A restatement in
+    other words passes: the check reads the words, not their meaning (a
+    stated limit)."""
     if rel == "facts.json" or not rel.endswith((".html", ".txt")) or not declared:
         return []
-    t = data.decode("utf-8", "replace")
-    if rel.endswith(".html"):
-        p = _Text()
-        p.feed(t)
-        p.close()
-        t = "".join(p.parts)
-    t = " ".join(html.unescape(t).split()).lower()
+    views = [_folded(v) for v in texts_of(rel, data)]
     return ["states %s's ONLY_HERE text, which only %s may print" % (mod, file)
-            for k, (mod, file) in sorted(declared.items()) if rel != file and k in t]
+            for k, (mod, file) in sorted(declared.items()) if rel != file and any(k in v for v in views)]
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.png")   # PNG only: its text chunks are read (texts_of)
@@ -2415,6 +2419,20 @@ def controls():
         report("local-only", bool(found) and not at_home,
                "a page's ONLY_HERE text on another page: %s; on its own page: %s"
                % (found[0] if found else "passed", at_home or "passed, as it must"))
+        # ...and where verifier-seam put it: an attribute's value, which a
+        # search result, a link preview or a tooltip shows; and in fullwidth
+        # letters.
+        full = "".join(chr(ord(c) + 0xFEE0) if "a" <= c <= "z" else c for c in "a statement planted to be printed once")
+        meta = re.search(r'<meta name="description" content="[^"]*">', t)
+        for what, new in (("in the page's meta description",
+                           t.replace(meta.group(0), '<meta name="description" content="A statement planted to be printed '
+                                                    'once">', 1) if meta else t),
+                          ("in a tooltip", t.replace("</footer>", '<p><span title="A statement planted to be printed '
+                                                                  'once">x</span></p></footer>', 1)),
+                          ("in fullwidth letters", t.replace("</footer>", "<p>%s</p></footer>" % full, 1))):
+            found = only_here_problems("index.html", new.encode(), declared) if new != t else []
+            report("local-only", bool(found), "a page's ONLY_HERE text %s on another page: %s"
+                   % (what, found[0] if found else ("passed" if new != t else "could not plant")))
         planted("local-only", "an email address on a page, with a fullwidth at sign",
                 t.replace("</footer>", "<p>someone%sexample.com</p></footer>" % chr(0xFF20), 1), check_local_only,
                 "index.html: an email address")

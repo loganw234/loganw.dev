@@ -1602,3 +1602,32 @@ About's two new sentences are drafts, labelled so until Logan approves
 them.
 
 `--control` caught 307 of 307.
+
+## 2026-09-30 - verifier-seam: NOT READY on 576b08a; ONLY_HERE now reads attributes and folded forms
+
+verifier-seam checked the lead's commits since `07b1526`. Both merges took
+exactly the verified tips (`4d11e60`, never the planted `bd44300`; and
+`4a883e4`), each tree equal to its tip's, and nothing on main was lost.
+Every figure in the two newest entries checked out against the bytes.
+
+**The one defect: ONLY_HERE read a page's text, and nothing else.** An
+exact copy of decision 9's statement passed every stage in any of these:
+
+- another page's meta description, which a search result or a link
+  preview shows;
+- a tooltip;
+- fullwidth letters.
+
+`only_here_problems` now reads the same readings the name and address
+checks use (`texts_of`): the text, each attribute's value, references and
+percent-encoding decoded, and compatibility forms folded. 3 new controls
+plant the statement in a meta description, in a tooltip and in fullwidth
+letters on Home, and each is refused.
+
+**Corrections.** The page contract and the entry "P4 merged; a page may
+keep a text to itself" said local-only "refuses each on any other published
+page". The merge message of `45a3165` said decision 9's statement is "held
+once by ONLY_HERE". Neither held for an attribute's value or a fullwidth
+copy until this entry's commit.
+
+`--control` caught 310 of 310.
