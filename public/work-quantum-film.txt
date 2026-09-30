@@ -1,0 +1,55 @@
+Quantum-Film — dossier
+======================
+
+I. What it is
+
+Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll the same, bit for bit, on every machine [fact 1019].
+
+II. What it is not
+
+- Not a quantum advantage. At these sizes both quantum laws are classically simulable. That is exactly what makes them checkable [fact 1020]
+- Not deterministic at the shot. A roll from a device is unique [fact 1021]
+- Not on hardware yet. [fact 1022]
+- Not a model of any real film's grain. [fact 1023]
+
+III. The contract
+
+“The authority is quantum_film/golden: pure Python and mpmath at 256 bits, with exact counter-based uniforms (SHA-256) [fact 1024] It imports nothing it could share with what it judges [fact 1025]; a test holds that mechanically [fact 1026].” The circuits, the float paths and Atlas's results are all scored against it [fact 1027].
+
+IV. Verified
+
+Last verified: 2026-09-26 [fact 1028].
+
+- 2026-09-25 - P0 finished for round 1: libcft built, the authority held to its own law, device rolls, and a test layout parcels cannot outgrow [fact 1029]
+- 2026-09-26 - P3 merged: the shelf's Pauli law ran on Atlas as a hardware-shaped circuit, and holds [fact 1030]
+
+V. Kept failures
+
+- The claim, in the README, STOCKS.md, ROUND1.md, DETERMINISM.md and the not-yet-dispatched P3 brief: givens.py's Pauli tile ran on Atlas and matched the exact law [fact 1031]. So the shelf's Pauli law has never run on Atlas [fact 1032] — 2026-09-25 - the P0 verifier: a run credited to the wrong law, gates that could not fail, and what now makes each one fail [fact 1033]. Fixed by commit b0e9ed1 [fact 1034].
+- 2026-09-26 - corrections to the P1 entry: two labels copied without their definitions [fact 1035]: The entry copied the label without its definition [fact 1036]. Fixed by commit 283330c [fact 1037].
+
+VI. Test it
+
+- make verify-quick: ~65 s: lint, docs, vectors, golden, circuits, decode, client, fixer, pinned, develop, the control and its twin [fact 1038].
+- make verify: adds the cft and live-Atlas stages [fact 1039].
+
+VII. Prove it wrong
+
+Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page — not yet built, so this dossier does not link it.
+
+- Look at the first prints yourself and compare the structure-factor claim against what the eye can actually see in the published images — free.
+- make verify-quick on a clean clone, and read whether The negative control, and its twin [fact 1040] still catches a moved crystal.
+- Feed the fixer a record with one crystal moved yourself, by hand, and confirm it is refused for its digest and for no other reason.
+- Repeat the same Atlas job and check whether the bytes really differ: “Identical requests to Atlas returned different bytes wherever sampling was involved [fact 1041],” which needs an Atlas account this dossier does not supply.
+
+VIII. Connections
+
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1042]
+- atlas-film underlies Quantum-Film: path = vendor/atlas-film [fact 1043]
+
+IX. Provenance
+
+Quantum-Film read at a7f02db [fact 1044].
+
+- README.md [fact 1045]
+- docs/VALIDATION.md [fact 1046]
