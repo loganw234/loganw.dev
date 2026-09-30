@@ -11,7 +11,7 @@ PAGE = {"file": "work-cft-fp256.html", "nav": "Work",
                         "the failures it kept, and how to try to prove it wrong."}
 
 
-def _sections():
+def _sections(built):
     S = _dossier.section
 
     what_it_is = S("What it is", [_dossier.para([
@@ -91,8 +91,7 @@ def _sections():
     ], ordered=True)])
 
     prove_it_wrong = S("Prove it wrong", [
-        _dossier.para(["Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page "
-                       "— not yet built, so this dossier does not link it."]),
+        _dossier.prove_it_wrong_opening(built),
         _dossier.list_([
             ["Open the web page above and hand it your own vector file: “",
              prose(NAME, "README.md", r"(Drop a vector file on it and it scores itself)\."), ".” Anything less "
@@ -117,13 +116,13 @@ def _sections():
 
 
 def render_page(ctx):
-    sections = _sections()
+    sections = _sections(ctx["built"])
     ctx["_p3_sections"] = sections
     return _dossier.html(NAME, sections)
 
 
 def extra_files(ctx):
-    sections = ctx.get("_p3_sections") or _sections()
+    sections = ctx.get("_p3_sections") or _sections(ctx["built"])
     text = _dossier.twin(NAME, "%s — dossier" % NAME, sections)
     html = _dossier.html(NAME, sections)
     _dossier.twin_ids(NAME, html, text)
@@ -131,12 +130,40 @@ def extra_files(ctx):
 
 
 def controls():
-    """A stale kept-failure hash is refused by the fact that checks the
-    commit at the pin; watched failing on a planted one-character mutation."""
+    """1. A stale kept-failure hash is refused by the fact that checks the
+    commit at the pin; watched failing on a planted one-character mutation.
+    2. The granted edit (briefs/P4.md, "the two granted edits"): every
+    dossier's "Prove it wrong" opening links Corrections once ctx["built"]
+    has it, and plainly does not before then - the same property
+    threads.py's door-not-early control holds the thread doors to. Tested
+    here, once, against _dossier.prove_it_wrong_opening() directly (every
+    dossier calls the same function, so this covers all five), and against
+    two fake openings that get one direction wrong each, to show the check
+    bites."""
     out = []
     try:
         _dossier.kept_failure(NAME, "8b7dea2", "a planted mutation of a real commit")
         out.append(("kept-failure", False, "a mutated hash (8b7dea2 for 8b7dea1) was accepted"))
     except facts.Refusal as e:
         out.append(("kept-failure", True, "a mutated hash was refused: %s" % e))
+
+    def links_corrections(block):
+        return 'href="corrections.html"' in block["html"]
+
+    unbuilt = _dossier.prove_it_wrong_opening({})
+    built = _dossier.prove_it_wrong_opening({"Corrections": "corrections.html"})
+    early = links_corrections(unbuilt)
+    missing = not links_corrections(built)
+    out.append(("dossier-corrections-link", not early and not missing,
+               "prove_it_wrong_opening(), with and without Corrections in built: links it only once built (%s), "
+               "and not before (%s)" % (not missing, not early)))
+
+    fake_early = {"html": '<p><a href="corrections.html">Corrections</a></p>', "text": "x"}
+    out.append(("dossier-corrections-link", links_corrections(fake_early),
+               "a fake opening linking Corrections before it's built: %s"
+               % ("caught" if links_corrections(fake_early) else "NOT CAUGHT")))
+    fake_missing = {"html": "<p>no link here</p>", "text": "x"}
+    out.append(("dossier-corrections-link", not links_corrections(fake_missing),
+               "a fake opening that never links Corrections once it's built: %s"
+               % ("caught" if not links_corrections(fake_missing) else "NOT CAUGHT")))
     return out

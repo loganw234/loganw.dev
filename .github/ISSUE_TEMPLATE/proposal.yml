@@ -1,0 +1,33 @@
+name: Propose a thread
+description: A three-line proposal for something worth pulling on.
+title: "[proposal] "
+labels:
+  - proposal
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See the site's [Propose](https://loganw.dev/propose.html) page for what pulls and what doesn't, and
+        for the doors already open. Money is neither required nor sufficient; it changes the schedule, not
+        the standard. This form is the intake: timestamped, with no backend behind it.
+  - type: input
+    id: problem
+    attributes:
+      label: Problem
+      description: What's actually wrong, checkable by someone who distrusts it.
+    validations:
+      required: true
+  - type: input
+    id: who
+    attributes:
+      label: Who struggles
+      description: Who this is for, specifically.
+    validations:
+      required: true
+  - type: input
+    id: done
+    attributes:
+      label: Provable done
+      description: "“Done”, defined in advance, so it can end open, dated and usable."
+    validations:
+      required: true

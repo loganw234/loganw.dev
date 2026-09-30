@@ -71,6 +71,22 @@ def table(headers, rows):
     return {"html": html, "text": "\n".join(lines)}
 
 
+# ---------------------------------------------------------------------------
+# Every dossier's "Prove it wrong" section opens the same way: the site-wide
+# rules of engagement live on the Corrections page (P4). Before that page
+# exists, each dossier said so in words and printed no link; this switches
+# to a real link once ctx["built"] has it, the same way a thread page's own
+# door() links Propose (wave2-prep, granted to P4 in briefs/P4.md).
+# ---------------------------------------------------------------------------
+
+def prove_it_wrong_opening(built):
+    if "Corrections" in built:
+        return para(["Cheapest first; the site-wide rules of engagement are stated once, on the ",
+                     L(built["Corrections"], "Corrections page"), "."])
+    return para(["Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page "
+                 "— not yet built, so this dossier does not link it."])
+
+
 def section(title, blocks):
     if title not in TITLES:
         raise Refusal("a dossier section is titled %r, which is not one of the nine the spec fixes" % title)
