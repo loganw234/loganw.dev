@@ -1704,3 +1704,127 @@ and no gate reads pronouns.
 - Measured on the rebuilt site: no he, his, him, she or her in any
   published page's text.
 - CLAUDE.md trap 18 records it, and the verifier template now names it.
+
+## 2026-09-30 - the round closes: About's sentences approved, the door kept, the labels made, the ledger archived
+
+**Logan's decisions,** in chat on 2026-09-30:
+
+1. "Both sentences are approved": About's two drafted sentences (SPEC
+   decision 26).
+   - They are now Logan's statements of that date, and About carries no
+     draft label.
+   - `render_page` refuses every `stated()` figure the page prints that
+     carries no draft label and isn't settled. Settled means its words, who
+     said them and when are exactly as `SETTLED` has them.
+     - Its marks are read by the numbers stage's own reader, so a mark is
+       found however its attribute is cased or its id encoded.
+     - Where or when the figure was rendered doesn't matter.
+   - A sentence printed as plain text, not through `stated()`, is outside
+     it: the check reads figures, and plain text is none.
+   - 17 controls check it:
+     - in each of About's five blocks, a statement planted before the
+       block's content and one planted after it, each refused by name,
+       while the same statement with its draft label passes;
+     - a statement rendered before the page starts, then printed inside
+       it;
+     - a settled sentence given another who, and one given another date;
+     - a statement whose who reads like a draft label;
+     - a statement returned through another fact;
+     - a mark whose attribute name is upper case, and one whose id is
+       written as character references.
+
+     Each also needs the real page to pass.
+   - Measured at unit level, on copies of `about.py`, each of these
+     sabotages fails at least one control:
+     - a window of the log in place of the printed marks;
+     - marks read by a regular expression, not the numbers stage's reader;
+     - the page's first printed figure skipped, or its last;
+     - the date left uncompared, or who;
+     - a draft label read as a substring;
+     - a statement known by its method rather than its kind;
+     - the refusal removed.
+2. On the workloads door: "Keep it, at worst aspirational, at best already
+   true" (SPEC decision 27). The door is unchanged.
+3. "Go ahead and create them": the labels DISPROOF and proposal now exist
+   on `loganw234/loganw.dev` (`gh label list`), so the issue forms' labels
+   apply.
+4. "Go ahead and cleanup".
+   - The five parcel worktrees are removed.
+   - The merged parcel branches are deleted, and so are P2's squash-merged
+     branch, `p0.1`, `p0.2` and `wave2-prep`.
+   - The control branches `verifier-P3-commit` and `verifier-P4-commit` are
+     kept locally, as the controls' record.
+   - GitHub has one branch, main (`git ls-remote`).
+5. "Archive the notes into ParcelRound with a case study doc regarding this
+   round". The round's ledger is `archive/round5-ledger.zip` in ParcelRound,
+   beside `CASE-STUDY-5.md`. It is on a branch there, and not yet pushed.
+6. On pronouns: "He/his is fine" (SPEC decision 28, CLAUDE.md trap 18).
+
+**Wave 2's side notes, closed:**
+
+- The page contract's `ONLY_HERE` paragraph now states what the check
+  compares, and its look-alike limit. It also says that a short declaration
+  could refuse by chance, loudly.
+- README "Pages" says `run.sh` checks Python's version string, not the
+  parser's bytes.
+- `row-typed-cell`'s docstring no longer understates the numbers stage.
+  Text typed over an existing mark is caught, digit or not.
+- The Corrections ledger's second row cited `1e21d8e`, where verifier-P1
+  said READY. But this ledger's wave 1 entry records its finding as fixed
+  at `5128ce6`.
+  - The row now cites `5128ce6`, as its source does, so one fix commit
+    answers the finding, as the page's caption says.
+  - The further sentence verifier-P1 found on `5128ce6` was fixed at
+    `1e21d8e`.
+- Method's "This is the one place the site states it" shows a reader no
+  limit. It stays as it is until Logan words it.
+
+**verifier-close** checked this entry's first three versions. None was
+pushed. It said NOT READY on each, and every finding is accepted.
+
+- **On the first,** three findings:
+  1. That version said the Corrections row named both commits. It named
+     one.
+  2. About's control planted in one block only. The register, rendered
+     before the refusal started reading, printed a changed sentence as
+     Logan's, and every stage passed.
+  3. The refusal's reach wasn't stated where the claim was made.
+- **On the second,** four findings:
+  1. A new block, rendered before the refusal started reading, still
+     passed. The check read a window of the log, so a list of blocks to
+     plant in couldn't cover it. It now reads the page's printed marks.
+  2. That version counted two findings where there were three.
+  3. The privacy stage's summary line claimed more than the stage checks.
+     It now says what README says: any file or commit message that
+     pushing HEAD publishes.
+  4. Two sabotages passed every control: the date left uncompared, and
+     the page's first figure skipped. Each now fails one.
+- **On the third,** one finding. The check read mark ids with a regular
+  expression. So an upper-case attribute name, or an id written as
+  character references, passed it, while the numbers stage still read the
+  mark as a figure. The check now reads marks with the numbers stage's own
+  reader.
+
+Each is answered above. Its side notes:
+
+- A statement known by its method rather than its kind would have let one
+  returned through another fact pass every control. A control plants one
+  now.
+
+- SPEC section 2's heading and the list at the top of SPEC now give both
+  dates.
+- README and CLAUDE.md trap 14 now name every address the privacy stage
+  allows: the contact, the co-author trailer's, and those reserved for
+  examples, domains or documentation address blocks.
+- A who that reads like a draft label no longer passes: a draft is read
+  from the label's start.
+- The question to Logan quoted About's first sentence and described the
+  second. Both were live on About, word for word, when Logan approved them.
+- Method's sentence had not been put to Logan. The lead's report of this
+  close puts it to him.
+
+**A correction to the entry above.** It says "every brief said to write
+"Logan"". Wave 2's briefs did. The rule was added at 22:20 on 2026-09-29,
+after wave 1 was dispatched.
+
+`--control` caught 330 of 330.

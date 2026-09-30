@@ -51,8 +51,10 @@ What that doesn't cover:
   - no comment.
 
   The gate runs under the one Python `.python-version` names, since
-  Python's HTML parser reads edge cases differently between releases. No
-  browser is run, so the subset is what's held, not a rendering.
+  Python's HTML parser reads edge cases differently between releases.
+  `verify/run.sh` checks Python's version string, not the parser's bytes,
+  so a patched build reporting the same version would pass. No browser is
+  run, so the subset is what's held, not a rendering.
 - **Names and addresses.** No published file may hold an email address
   except `logan@loganw.dev`, and the name Wally appears only on the
   Preservation thread's page. The local-only stage reads each file as a
@@ -68,7 +70,8 @@ What that doesn't cover:
   as a reference. The name is matched between letters, so "Wally2" counts.
   The privacy stage also refuses an address in any file or commit message
   that pushing HEAD would publish, history included, other than the
-  contact or one at a domain reserved for examples. The stage doesn't
+  contact, the co-author trailer's, or one reserved for examples (a domain,
+  or a documentation address block). The stage doesn't
   render, so these pass:
   - text put together by layout alone;
   - a name or an address in look-alike letters from another script;

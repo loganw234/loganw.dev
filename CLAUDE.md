@@ -129,9 +129,10 @@ a figure it didn't read there.
       An address in any script counts. A character a browser draws as
       nothing is refused outright, written as itself or as a reference. A
       PNG may hold no text chunk at all.
-    - The privacy stage also refuses an address, other than the contact or
-      one at a domain reserved for examples, in any file or commit message
-      that pushing HEAD would publish, history included.
+    - The privacy stage also refuses an address, other than the contact,
+      the co-author trailer's, or one reserved for examples (a domain, or a
+      documentation address block), in any file or commit message that
+      pushing HEAD would publish, history included.
     - A stylesheet may hold only the strings `build.CSS_STRINGS` lists, since
       `content` and list markers print strings.
     - These are stated limits; the check can't see:
@@ -168,11 +169,12 @@ a figure it didn't read there.
     author address in files, and P2 was squash-merged so that main never
     held it. The privacy stage reads what pushing HEAD publishes.
 
-18. **Logan's pronouns haven't been stated: write "Logan", never "he" or
-    "she",** on a page, in a comment and in the ledger. Every brief said so.
-    Still, P5's About went live saying "Logan, in his own register", and no
-    verifier caught it (corrected 2026-09-30). No gate reads pronouns: a
-    verifier checks for them.
+18. **Logan's pronouns are he and his:** "He/his is fine" (Logan,
+    2026-09-30). Before that they hadn't been stated, and wave 2's briefs
+    said to write "Logan". P5's About still went live saying "Logan, in his
+    own register", and no verifier caught it. For anyone else the site
+    names, write the name unless their pronouns are stated. No gate reads
+    pronouns: a verifier checks for them.
 
 ## The discipline that matters most here
 

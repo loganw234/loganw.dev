@@ -23,10 +23,10 @@
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "I have a GED, and one month of formal computer science.",
-    "when": "2026-09-29",
+    "when": "2026-09-30",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -39,14 +39,14 @@
    "raw": "I have a GED, and one month of formal computer science.",
    "said": "",
    "text": "I have a GED, and one month of formal computer science.",
-   "where": "drafted from Logan's words of 2026-09-29, not yet approved"
+   "where": "stated by Logan, 2026-09-30"
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "My own figure for the balance is still 1:24, not a measurement.",
-    "when": "2026-09-29",
+    "when": "2026-09-30",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -59,7 +59,7 @@
    "raw": "My own figure for the balance is still 1:24, not a measurement.",
    "said": "",
    "text": "My own figure for the balance is still 1:24, not a measurement.",
-   "where": "drafted from Logan's words of 2026-09-29, not yet approved"
+   "where": "stated by Logan, 2026-09-30"
   },
   {
    "args": {
@@ -845,20 +845,20 @@
   },
   {
    "args": {
-    "sha": "1e21d8e",
-    "what": "verifier-P1's finding on d474080, and its own re-sweep on 5128ce6: unquoted contract prose on verify.html; fixed by quoting, where verifier-P1 said READY"
+    "sha": "5128ce6",
+    "what": "verifier-P1's finding on d474080: unquoted contract prose on verify.html; fixed at 5128ce6, two of its three sentences cut and one quoted (the wave 1 entry, and its correction by verifier-seam). The one more such sentence verifier-P1 found on 5128ce6 is a further finding, fixed at 1e21d8e"
    },
-   "detail": "verifier-P1's finding on d474080, and its own re-sweep on 5128ce6: unquoted contract prose on verify.html; fixed by quoting, where verifier-P1 said READY",
-   "href": "https://github.com/loganw234/loganw.dev/commit/1e21d8e6f9db4b45bb90707378442d11ad83ba8b",
+   "detail": "verifier-P1's finding on d474080: unquoted contract prose on verify.html; fixed at 5128ce6, two of its three sentences cut and one quoted (the wave 1 entry, and its correction by verifier-seam). The one more such sentence verifier-P1 found on 5128ce6 is a further finding, fixed at 1e21d8e",
+   "href": "https://github.com/loganw234/loganw.dev/commit/5128ce66858a30c0411f0808784c04c050b3a691",
    "id": 49,
    "kind": "git",
    "method": "facts.own_commit",
    "num": true,
    "private": false,
-   "raw": "1e21d8e",
+   "raw": "5128ce6",
    "said": "",
-   "text": "1e21d8e",
-   "where": "this site's commit 1e21d8e"
+   "text": "5128ce6",
+   "where": "this site's commit 5128ce6"
   },
   {
    "args": {
@@ -5103,16 +5103,16 @@
     "path": "docs/VALIDATION.md"
    },
    "detail": "the newest entry that records the controls",
-   "href": "https://github.com/loganw234/loganw.dev/blob/main/docs/VALIDATION.md?plain=1#L1683",
+   "href": "https://github.com/loganw234/loganw.dev/blob/main/docs/VALIDATION.md?plain=1#L1830",
    "id": 287,
    "kind": "file",
    "method": "pages.method.newest_control_count",
    "num": true,
    "private": false,
-   "raw": "314 of 314",
+   "raw": "330 of 330",
    "said": "",
-   "text": "314 of 314",
-   "where": "this site's docs/VALIDATION.md:1683"
+   "text": "330 of 330",
+   "where": "this site's docs/VALIDATION.md:1830"
   },
   {
    "args": {

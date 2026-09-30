@@ -3169,8 +3169,9 @@ def main(argv=None):
                                 + addressed,
                                 "; %d private repositories the site does not read, looked for in %d files, %d blobs "
                                 "reachable in history, every path, the commit and tag messages, every author, "
-                                "committer and tagger, and the branch and tag names; and no email address but the contact in what "
-                                "pushing HEAD publishes" % (n, files, hist))
+                                "committer and tagger, and the branch and tag names; and no email address, in any "
+                                "file or commit message pushing HEAD publishes, but the contact, the co-author "
+                                "trailer's, and those reserved for examples" % (n, files, hist))
         if a.github:
             problems, n = check_github()
             return problems_out("github", problems, "; %d pins asked of GitHub, each the commit the snapshot "

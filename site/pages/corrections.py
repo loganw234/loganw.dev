@@ -115,8 +115,10 @@ def ledger_rows():
                         "by nothing; fixed so the link and its check read one href"),
         _row(r"(verify\.html stated details of cft-fp256's contract in its\s+own words, outside any quote)",
              r"\*\*(verifier-P1)\*\* \(Record and Verify\):",
-             "1e21d8e", "verifier-P1's finding on d474080, and its own re-sweep on 5128ce6: unquoted "
-                        "contract prose on verify.html; fixed by quoting, where verifier-P1 said READY"),
+             "5128ce6", "verifier-P1's finding on d474080: unquoted contract prose on verify.html; fixed at "
+                        "5128ce6, two of its three sentences cut and one quoted (the wave 1 entry, and its "
+                        "correction by verifier-seam). The one more such sentence verifier-P1 found on "
+                        "5128ce6 is a further finding, fixed at 1e21d8e"),
         _row(r"it found that (the `credits-grouping` control never exercised\s+case-folding\. A one-token "
              r"change to `account_of` passed that control and\s+broke the page)",
              r"\*\*(verifier-P2)\*\* \(the map on phones, and the Threads\):",
@@ -163,11 +165,15 @@ def controls():
     beside a row's real, read one must be refused by the numbers stage, by
     name, on a copy of the built page - the same shape verify.py's own
     "unsourced-sentence" control demonstrates. A typed cell that carries no
-    digit (a name such as "verifier-P1") is not something any gate here can
-    see; that is the site-wide limit CLAUDE.md and the README state (the
-    numbers stage sees numerals and the number words it lists, not prose),
-    and it is exactly the class of defect wave 1's verifiers caught only by
-    reading every sentence - the reason this ledger's own rows exist.
+    numeral the numbers stage reads (a name such as "verifier-P1", whose
+    digit follows a letter), outside any mark, is not something any gate
+    here can see; that is the site-wide limit CLAUDE.md and the
+    README state (the numbers stage sees numerals and the number words it
+    lists, not prose), and it is exactly the class of defect wave 1's
+    verifiers caught only by reading every sentence - the reason this
+    ledger's own rows exist. Text typed over a cell's existing mark is
+    caught, digit or not: the numbers stage refuses a mark whose text isn't
+    its own fact's (verifier-P4's side note, 2026-09-30).
     2. A fix commit main doesn't hold must be refused, and so must a
     one-character mutation of a real one (briefs/P4.md control 2)."""
     import pathlib

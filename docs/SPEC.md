@@ -3,7 +3,7 @@
 This file holds four things in order:
 
 1. **The spec**, word for word as Logan gave it on 2026-09-29.
-2. **Logan's decisions** that day.
+2. **Logan's decisions**, that day and on 2026-09-30.
 3. **Where the repositories corrected the spec**, measured.
 4. **The definitions the build uses.**
 
@@ -78,7 +78,7 @@ spec itself is left untouched, so the original stays readable.
 
 ---
 
-## 2. Decisions (Logan, 2026-09-29)
+## 2. Decisions (Logan, 2026-09-29 and 2026-09-30)
 
 Each decision is given in Logan's words where they were brief, and summarised
 where they were longer.
@@ -172,6 +172,19 @@ where they were longer.
     recipe, a claimed printing method, or a historical process's parameters —
     and see it reproduced to the same bits, or shown where it doesn't." It is
     printed as Logan's statement.
+26. **About's two drafted sentences.** In Logan's words, on 2026-09-30:
+    "Both sentences are approved". "I have a GED, and one month of formal
+    computer science." and "My own figure for the balance is still 1:24,
+    not a measurement." are printed as Logan's statements of that date,
+    with no draft label.
+27. **The workloads door's "bit-identical everywhere".** Logan's words on
+    that door say that a workload that fits libcft "runs bit-identical
+    everywhere", and cft-fp256's record at its pin says the cross-device
+    half isn't shown yet. In Logan's words, on 2026-09-30: "Keep it, at worst aspirational,
+    at best already true". The door keeps the wording, printed as Logan's
+    statement, so the site doesn't claim it as sourced.
+28. **Logan's pronouns.** In Logan's words, on 2026-09-30: "He/his is
+    fine" (CLAUDE.md trap 18).
 
 ---
 

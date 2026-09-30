@@ -35,7 +35,12 @@ the lead's.
 A module may declare ONLY_HERE = [text, ...]: texts that only its own page
 may print, such as decision 9's statement, which the site keeps in one
 place. local-only refuses each on any other published page or text file
-(build.only_here_problems). A restatement in other words passes.
+(build.only_here_problems), comparing letters and digits alone, so the same
+words in any spacing, punctuation, case or compatibility form are refused.
+A restatement in other words passes, and so does a word in look-alike
+letters of another script (CLAUDE.md trap 14). A short declaration could
+turn up by chance in other text; local-only would then refuse it loudly,
+never pass it silently, so declare whole sentences.
 
 The module also defines:
   controls() (optional) -> [(name, caught, how)]: the page's own negative
