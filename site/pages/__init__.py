@@ -32,6 +32,11 @@ that must hide one view for another names each selector, the declaration it
 may use (display:none, say), and why, in site/data/css_hides.json, which is
 the lead's.
 
+A module may declare ONLY_HERE = [text, ...]: texts that only its own page
+may print, such as decision 9's statement, which the site keeps in one
+place. local-only refuses each on any other published page or text file
+(build.only_here_problems). A restatement in other words passes.
+
 The module also defines:
   controls() (optional) -> [(name, caught, how)]: the page's own negative
       controls, run by `build.py --control`. Each plants a fault the page's

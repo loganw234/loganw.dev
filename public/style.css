@@ -82,6 +82,12 @@ footer{font:12px/1.6 var(--mono);color:var(--muted);margin-top:3.4em;border-top:
 .evidence ol,.evidence ul{margin:.5em 0;padding-left:1.4em}.evidence li{margin:.25em 0}
 .evidence b{color:var(--ink);font-weight:500}
 @media (max-width:600px){header .name{font-size:38px}.lede{font-size:19px}}
+/* P4: Corrections and Propose. Most of the look comes free from
+   site/style.css (measure, lede, h2, table, cta, plain); this is only what
+   those rules do not already cover. */
+.pulls table{min-width:0}
+tr.signature td{font-style:italic;color:var(--muted)}
+.doors .cta+.cta{margin-top:10px}
 /* P2: the map's two layouts. Both are always drawn (mapgen.block()); only one
    shows at a time, chosen by width, at the 600px breakpoint site/style.css
    already uses for header/lede sizing. site/data/css_hides.json names

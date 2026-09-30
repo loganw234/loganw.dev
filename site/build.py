@@ -1240,6 +1240,7 @@ def check_local_only(root=PUBLIC):
     site's Content-Security-Policy as the first element after its charset, so
     the browser refuses a load or a script the check missed."""
     problems = []
+    declared = only_here()
     for rel in published(root):
         f = root / rel
         if rel.endswith(".html"):
@@ -1258,6 +1259,7 @@ def check_local_only(root=PUBLIC):
         problems += ["%s: %s" % (rel, x) for x in email_problems(rel, f.read_bytes())]
         problems += ["%s: %s" % (rel, x) for x in invisible_problems(rel, f.read_bytes())]
         problems += ["%s: %s" % (rel, x) for x in only_in_problems(rel, f.read_bytes())]
+        problems += ["%s: %s" % (rel, x) for x in only_here_problems(rel, f.read_bytes(), declared)]
     if not any(r.endswith(".html") for r in published(root)):
         problems.append("no page is published")
     return problems
@@ -1512,6 +1514,40 @@ def only_in_problems(rel, data):
     return ["names %s, which may be published only in %s" % (name, ", ".join(files))
             for name, files in names
             if any(re.search(r"(?i)(?<![^\W\d_])%s(?![^\W\d_])" % re.escape(name), v) for v in views)]
+
+
+def only_here():
+    """{text as read: (module, file)}: each text a page module declares in
+    ONLY_HERE, which only that page may print. Decision 9's statement is
+    kept in one place, the Method page, and a check that rendered Method and
+    About alone passed a copy of it on Home (verifier-P5). Read with its
+    whitespace collapsed and in lower case."""
+    out = {}
+    for m in pages():
+        for s in getattr(m, "ONLY_HERE", []):
+            k = " ".join(s.split()).lower()
+            if k in out and out[k][1] != m.PAGE["file"]:
+                raise Refusal("%s and %s both declare the same ONLY_HERE text" % (out[k][0], m.__name__))
+            out[k] = (m.__name__, m.PAGE["file"])
+    return out
+
+
+def only_here_problems(rel, data, declared):
+    """A published page or text file, other than the declaring page, whose
+    text holds a declared text. facts.json, which records every statement's
+    text, holds each by design. A restatement in other words passes: the
+    check reads the words, not their meaning (a stated limit)."""
+    if rel == "facts.json" or not rel.endswith((".html", ".txt")) or not declared:
+        return []
+    t = data.decode("utf-8", "replace")
+    if rel.endswith(".html"):
+        p = _Text()
+        p.feed(t)
+        p.close()
+        t = "".join(p.parts)
+    t = " ".join(html.unescape(t).split()).lower()
+    return ["states %s's ONLY_HERE text, which only %s may print" % (mod, file)
+            for k, (mod, file) in sorted(declared.items()) if rel != file and k in t]
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.png")   # PNG only: its text chunks are read (texts_of)
@@ -2370,6 +2406,15 @@ def controls():
                              "<p>%s</p>" % "".join(chr(c) for c in (0xFF37, 0xFF41, 0xFF4C, 0xFF4C, 0xFF59)))):
             planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
                     check_local_only, "index.html: names Wally")
+        # A text a page declares ONLY_HERE, printed on another page: refused
+        # there, split by markup too, and not on the page that declares it.
+        declared = {"a statement planted to be printed once": ("planted", "method.html")}
+        copy = t.replace("</footer>", "<p>A statement <b>planted</b> to be printed once</p></footer>", 1).encode()
+        found = only_here_problems("index.html", copy, declared)
+        at_home = only_here_problems("method.html", copy, declared)
+        report("local-only", bool(found) and not at_home,
+               "a page's ONLY_HERE text on another page: %s; on its own page: %s"
+               % (found[0] if found else "passed", at_home or "passed, as it must"))
         planted("local-only", "an email address on a page, with a fullwidth at sign",
                 t.replace("</footer>", "<p>someone%sexample.com</p></footer>" % chr(0xFF20), 1), check_local_only,
                 "index.html: an email address")
