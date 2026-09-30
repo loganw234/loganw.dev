@@ -40,11 +40,25 @@ What that doesn't cover:
   is for the reader to judge.
 - **Images.** An image is checked only as the bytes its pin gives. What it
   shows is not read.
+- **Names and addresses.** No published file may hold an email address
+  except `logan@loganw.dev`, and the name Wally appears only on the
+  Preservation thread's page. The local-only stage reads each file as a
+  browser or a parser decodes it: character references, percent-encoding,
+  inline markup inside a word, characters drawn as nothing, a JSON file's
+  strings, and a PNG's text chunks. It doesn't render, so these pass:
+  - text put together by layout alone;
+  - a name spelled with look-alike letters from another script;
+  - an address spelled out for a person to reassemble.
+
+  A font's compressed tables aren't read. `fonts/SOURCES.txt` holds each
+  font to its hash instead.
 - **Styles.** The gates read a page's HTML and its stylesheets' text. They
   don't render the page. The numbers stage refuses exactly the declarations
   listed below, unless `site/data/css_hides.json` names the selector and
   that declaration. `build.hiding_problems` is the rule. Property names are
-  read without a vendor prefix.
+  read without a vendor prefix. The class such an entry names may be carried
+  only by the elements the entry names in `on`, since any other element
+  carrying it would be hidden too.
   - `display:none`, `visibility:hidden` or `collapse`, and
     `content-visibility:hidden`.
   - `opacity`, `fill-opacity`, `font-size`, `scale` or `zoom` at zero or
@@ -78,7 +92,9 @@ What that doesn't cover:
   - a string or a comment left open;
   - a comment marker inside a string;
   - a malformed `url()`;
-  - a backslash escape.
+  - a backslash escape;
+  - a string holding a letter or a digit that `build.CSS_STRINGS` doesn't
+    list, since `content`, list markers and quotes print strings.
 
   A control reads the published stylesheet a second time with tinycss2, a
   parser that follows the CSS specifications. It fails the gate if the two
@@ -129,7 +145,7 @@ private repository, which it can't read.
 |---|---|
 | [pins.json](pins.json) | Every repository the site reads, the commit it reads it at, how each of its workflows counts, and which ledger lines count as a pass. |
 | [site/](site/) | The generator. [facts.py](site/facts.py) reads the figures, [render.py](site/render.py) holds the page shell, [pages/](site/pages/) has one module per page, [mapgen.py](site/mapgen.py) draws the map from [data/relations.json](site/data/relations.json), and [build.py](site/build.py) builds and checks. |
-| [public/](public/) | The built site, committed and deployed exactly as it stands. It includes `facts.json` and `MANIFEST`: the sha256 of every published file except `BUILD` and `MANIFEST` itself, and of pins.json and the snapshot. |
+| [public/](public/) | The built site, committed and deployed exactly as it stands. It includes `facts.json` and `MANIFEST`: the sha256 of every published file except `BUILD` and `MANIFEST` itself, and of what the build read besides the pins: pins.json, the snapshot, the site's own ledger, and every file under `site/`. |
 | [sources/](sources/) | GitHub snapshots, each taken once by `site/snapshot_github.py`. |
 | [verify/run.sh](verify/run.sh) | The one command above. |
 | [docs/SPEC.md](docs/SPEC.md) | The spec as given, the decisions made about it, and where the repositories corrected it. |

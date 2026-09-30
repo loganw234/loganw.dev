@@ -3,7 +3,7 @@
 
     python site/build.py                 # write public/ from the pins
     python site/build.py --check         # exit 1 if public/ differs from a fresh render
-    python site/build.py --manifest      # public/ matches its own MANIFEST, and so do pins.json and the snapshot
+    python site/build.py --manifest      # public/ matches its own MANIFEST, and so does what the build read
     python site/build.py --verify-facts  # read every figure in public/facts.json again
     python site/build.py --numbers       # every numeral on a page is a figure marked with its own fact
     python site/build.py --links         # every relative link resolves to a published file, exactly
@@ -38,6 +38,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.parse
 
 SITE = pathlib.Path(__file__).resolve().parent
@@ -128,14 +129,33 @@ def section_index(mods):
     return out
 
 
+BINARY_SOURCES = {".woff2", ".png", ".jpg", ".jpeg", ".webp"}   # .gitattributes: stored as they are
+
+
 def sources():
     """What the build read besides the pins, by path: pins.json, the snapshot,
-    and every file under site/ - the code, its data, the fonts and the
-    stylesheets. CI checks each against the checkout, so a change to any of
-    them that was not rebuilt into public/ fails there too."""
+    the site's own ledger, and every file under site/ - the code, its data,
+    the fonts and the stylesheets. CI checks each against the checkout, so a
+    change to any of them that was not rebuilt into public/ fails there too.
+
+    A text file holding a carriage return is refused. The repository stores
+    LF (.gitattributes), so git calls a CRLF copy unchanged, while its hash
+    here would not be the committed file's: the desktop would pass what CI
+    then fails (verifier-seam)."""
     site = sorted(f.relative_to(ROOT).as_posix() for f in SITE.rglob("*")
                   if f.is_file() and "__pycache__" not in f.parts)
-    return [(p, (ROOT / p).read_bytes()) for p in ["pins.json", facts.PINS["snapshot"]] + list(facts.OWN) + site]
+    return lf_only([(p, (ROOT / p).read_bytes())
+                    for p in ["pins.json", facts.PINS["snapshot"]] + list(facts.OWN) + site])
+
+
+def lf_only(pairs):
+    """pairs, or a refusal naming the first text file that holds a carriage
+    return (sources() says why)."""
+    for p, b in pairs:
+        if b"\r" in b and posixpath.splitext(p)[1].lower() not in BINARY_SOURCES:
+            raise Refusal("%s holds a carriage return; the repository stores it with LF line endings, so this copy's "
+                          "hash is not the committed file's. Save it with LF." % p)
+    return pairs
 
 
 def render_all():
@@ -249,8 +269,8 @@ def compare(text, binary, root=PUBLIC):
 # ---------------------------------------------------------------------------
 
 def check_manifest(root=PUBLIC):
-    """public/ is what its MANIFEST says, file for file, and pins.json and the
-    snapshot are the bytes the build read. What CI can hold without rendering:
+    """public/ is what its MANIFEST says, file for file, and what the build
+    read besides the pins (sources()) is the bytes it read. What CI can hold without rendering:
     a deleted page, or a page edited by hand without its MANIFEST line, fails
     here. A hand edit that also rewrites MANIFEST passes; only --check, on the
     desktop, sees that (a stated limit)."""
@@ -732,6 +752,69 @@ def crosscheck_css(css, reader=None):
     return out
 
 
+class _Holders(html.parser.HTMLParser):
+    """Every element carrying one of the given classes: its tag, the tags of
+    its direct children, and whether text sits directly in it."""
+    VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+
+    def __init__(self, classes):
+        super().__init__(convert_charrefs=True)
+        self.classes, self.stack, self.found = classes, [], []
+
+    def _open(self, tag, attrs, closes):
+        if self.stack and self.stack[-1] is not None:
+            self.stack[-1]["children"].append(tag)
+        hit = set((dict(attrs).get("class") or "").split()) & self.classes
+        rec = dict(tag=tag, classes=hit, children=[], text=False) if hit else None
+        if rec:
+            self.found.append(rec)
+        if not closes and tag not in self.VOID:
+            self.stack.append(rec)
+
+    def handle_starttag(self, tag, attrs):
+        self._open(tag, attrs, False)
+
+    def handle_startendtag(self, tag, attrs):
+        self._open(tag, attrs, True)
+
+    def handle_endtag(self, tag):
+        if self.stack:
+            self.stack.pop()
+
+    def handle_data(self, data):
+        if self.stack and self.stack[-1] is not None and data.strip():
+            self.stack[-1]["text"] = True
+
+
+def holder_problems(page):
+    """css_hides.json lets a selector hide what it styles, and names the
+    elements its class may be on: "div>svg" is a div holding one svg and
+    nothing else. The class on any other element is refused, since that
+    element would be hidden with it. verifier-seam gave Verify's source
+    labels the narrow map's class, and at one width they vanished while
+    every stage passed."""
+    allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
+    on, out = {}, []
+    for sel, entry in sorted(allowed.items()):
+        m = re.search(r"\.([\w-]+)$", sel.strip())
+        if not m or not entry.get("on"):
+            out.append("%s's entry %r names no class, or no element that class may be on" % (HIDES_FILE.name, sel))
+            continue
+        on.setdefault(m.group(1), set()).update(entry["on"])
+    p = _Holders(set(on))
+    p.feed(page)
+    p.close()
+    for rec in p.found:
+        for cls in sorted(rec["classes"]):
+            forms = on[cls]
+            if rec["tag"] in forms or ("div>svg" in forms and rec["tag"] == "div"
+                                       and rec["children"] == ["svg"] and not rec["text"]):
+                continue
+            out.append("a <%s> carries the class %r, which %s lets a stylesheet hide only on %s"
+                       % (rec["tag"], cls, HIDES_FILE.name, ", ".join(sorted(forms))))
+    return out
+
+
 def hiding_in(rules):
     """The hiding check over one reading of a stylesheet's blocks."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
@@ -798,6 +881,7 @@ def check_numbers(root=PUBLIC, names=None):
             p.feed((root / rel).read_text(encoding="utf-8"))
             p.close()
             problems += ["%s: %s" % (rel, x) for x in p.problems]
+            problems += ["%s: %s" % (rel, x) for x in holder_problems((root / rel).read_text(encoding="utf-8"))]
             for m in p.marks:
                 n_marks += 1
                 rec = by_id.get(int(m["f"])) if m["f"].isdigit() else None
@@ -939,6 +1023,28 @@ class _Tags(html.parser.HTMLParser):
 
     handle_startendtag = handle_starttag
 
+    # The build writes no comment, no processing instruction and no CDATA
+    # section. Each is refused: a browser shows none of them, so one inside a
+    # word joins it back up for a reader while a check on text sees two
+    # words (verifier-seam split an address with a comment), and in SVG a
+    # CDATA section is text.
+    def handle_comment(self, data):
+        self.problems.append("an HTML comment, which the build never writes: %r" % data[:40])
+
+    def handle_pi(self, data):
+        self.problems.append("a processing instruction, which the build never writes: %r" % data[:40])
+
+    def unknown_decl(self, data):
+        self.problems.append("a declaration or CDATA section, which the build never writes: %r" % data[:40])
+
+
+# The strings a stylesheet may hold that have a letter or a digit in them: the
+# font names, the charset, a font's format, and the two theme names. Any other
+# is refused. A string can be rendered as text, by content, a list marker or
+# quotes, so it could spell a word or a figure that no check on a page reads.
+# verifier-seam printed a name after the site's own, from two content strings.
+CSS_STRINGS = {"JetBrains Mono", "Newsreader", "Times New Roman", "dark", "light", "utf-8", "woff2"}
+
 
 def css_problems(css):
     """A stylesheet's loads. Comments go first, then anything that could spell
@@ -961,6 +1067,9 @@ def css_problems(css):
             out.append("a malformed url(): %r" % text[:60])
         elif kind == "string" and ("/*" in text or "*/" in text):
             out.append("a comment marker inside a string: %r" % text[:40])
+        elif kind == "string" and re.search(r"[^\W_]", text[1:-1]) and text[1:-1] not in CSS_STRINGS:
+            out.append("a string holding a letter or a digit, which a stylesheet can render as text (content, a list "
+                       "marker, quotes): %r. Only build.CSS_STRINGS may, and a url() is written unquoted" % text[:40])
     if "\\" in css:
         out.append("a backslash escape, which could spell a load")
     code, _, urls = css_parts(css)
@@ -1027,13 +1136,39 @@ def type_problems(rel, data):
 # the site is a new and more prominent place to publish it: parcel P2's first
 # credits keyed an account by its address, in facts.json's arguments.
 SITE_CONTACTS = {"logan@loganw.dev"}
-EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+# In any script (an IDN domain, a non-ASCII top-level domain), with a quoted
+# local part or an address literal, as verifier-seam wrote them.
+EMAIL = re.compile(r'(?:"[^"\r\n]+"|[\w.%+-]+)@(?:\[[^\]\s]+\]|[\w-]+(?:\.[\w-]+)*\.(?:[^\W\d_]{2,}|xn--[\w-]+))')
 
 
-# Tags a browser lays out inside a word without breaking it. Read without
-# them, a word they split is whole again; any other tag breaks a word, and is
-# read as a space, as a browser lays it out.
-INLINE_TAGS = r"a|abbr|b|bdi|bdo|cite|code|data|dfn|em|i|kbd|mark|q|s|samp|small|span|strong|sub|sup|time|u|var|wbr"
+# How each allowed tag is laid out, for reading a page's text as a reader
+# sees it. An inline tag sits inside a word without breaking it, so it is
+# read as nothing and a word it splits is whole again; any other tag breaks
+# a word, and is read as a space. Every tag ALLOWED names is in one of the
+# two sets, and the import refuses one that isn't, so a tag added to ALLOWED
+# is placed here before any page can use it.
+INLINE = {"a", "abbr", "b", "code", "em", "i", "small", "span", "strong", "sub", "sup", "wbr", "tspan"}
+BREAKING = {"html", "head", "body", "title", "meta", "link", "main", "header", "footer", "nav", "section",
+            "article", "div", "p", "h1", "h2", "h3", "h4", "pre", "br", "hr", "blockquote", "ul", "ol", "li",
+            "dl", "dt", "dd", "table", "caption", "thead", "tbody", "tr", "th", "td", "figure", "figcaption",
+            "details", "summary", "img", "svg", "defs", "marker", "g", "path", "line", "rect", "circle", "text"}
+if set(ALLOWED) != INLINE | BREAKING or INLINE & BREAKING:
+    raise Refusal("build.ALLOWED and build.INLINE/BREAKING disagree: %s; place every allowed tag in exactly one"
+                  % sorted(set(ALLOWED) ^ (INLINE | BREAKING) | (INLINE & BREAKING)))
+# Code points a browser draws as nothing, besides the format characters
+# (Unicode category Cf: a soft hyphen, zero-width spaces and joiners, a
+# byte-order mark): the combining grapheme joiner, the Hangul fillers, the
+# Khmer inherent vowels, and the variation selectors. Unicode's
+# Default_Ignorable_Code_Point, as far as this site needs it.
+IGNORABLE = frozenset([0x34F, 0x115F, 0x1160, 0x17B4, 0x17B5, 0x3164, 0xFFA0] + list(range(0x180B, 0x1810))
+                      + list(range(0xFE00, 0xFE10)) + list(range(0xE0100, 0xE01F0)))
+
+
+def visible(s):
+    """s without the characters a browser draws as nothing."""
+    if s.isascii():
+        return s
+    return "".join(c for c in s if ord(c) not in IGNORABLE and unicodedata.category(c) != "Cf")
 
 
 def _json_strings(o):
@@ -1053,10 +1188,15 @@ def readings(rel, data):
     published an address past a check that read raw bytes only):
     - as it is;
     - with its character references decoded;
-    - decoded, with inline tags removed and every other tag read as a space;
-    - each of those percent-decoded, as a link's target is.
-    A JSON file is read as its strings, each decoded the same way. A
-    stylesheet needs no more: local-only refuses a backslash escape in one."""
+    - decoded, with comments and inline tags removed and every other tag
+      read as a space;
+    - each of those percent-decoded, as a link's target is;
+    and each of those without the characters a browser draws as nothing. A
+    JSON file is read as its strings, each decoded the same way. A
+    stylesheet needs no more: local-only refuses a backslash escape in one,
+    and any string with a letter in it that build.CSS_STRINGS doesn't list.
+    What this can't see is text put together by layout alone: two elements
+    positioned side by side, say. The gates don't render (README)."""
     t = data.decode("utf-8", "replace")
     texts = [t]
     if rel.endswith(".json"):
@@ -1064,18 +1204,33 @@ def readings(rel, data):
             texts = list(_json_strings(json.loads(t)))
         except ValueError:
             pass
+    inline = re.compile(r"</?(?:%s)\b[^>]*>" % "|".join(sorted(INLINE, key=len, reverse=True)), re.I)
     out = []
     for s in texts:
-        flat = re.sub(r"<[^>]*>", " ", re.sub(r"</?(?:%s)\b[^>]*>" % INLINE_TAGS, "", s, flags=re.I))
+        flat = re.sub(r"<[^>]*>", " ", inline.sub("", re.sub(r"<!--.*?(?:-->|$)", "", s, flags=re.S)))
         for v in (s, html.unescape(s), html.unescape(flat)):
-            out += [v, urllib.parse.unquote(v)]
+            for w in (v, urllib.parse.unquote(v)):
+                out.append(visible(w))
     return out
 
 
+def texts_of(rel, data):
+    """What a published file says, for the checks on what may be published:
+    a text file in each of its readings(); a PNG, its text chunks, inflated.
+    A font is not read: its tables are compressed, and fonts/SOURCES.txt
+    holds each font to its published hash instead. The site publishes no
+    other kind of file (ASSET_NAME allows JPEG and WebP images, whose
+    metadata is not read; none is published)."""
+    ext = posixpath.splitext(rel)[1].lower()
+    if ext in TEXT_TYPES or rel in ("BUILD", "MANIFEST"):
+        return readings(rel, data)
+    if ext == ".png":
+        return readings(".txt", png_text(data))
+    return []
+
+
 def email_problems(rel, data):
-    if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
-        return []
-    found = sorted({m.group(0).lower() for v in readings(rel, data) for m in EMAIL.finditer(v)} - SITE_CONTACTS)
+    found = sorted({m.group(0).lower() for v in texts_of(rel, data) for m in EMAIL.finditer(v)} - SITE_CONTACTS)
     return ["an email address (%d found); only the site's contact, %s, may be published"
             % (len(found), ", ".join(sorted(SITE_CONTACTS)))] if found else []
 
@@ -1090,12 +1245,10 @@ ONLY_IN = {"Wally": ("thread-preservation.html", "facts.json")}
 
 
 def only_in_problems(rel, data):
-    if posixpath.splitext(rel)[1].lower() not in TEXT_TYPES and rel not in ("BUILD", "MANIFEST"):
-        return []
-    views = readings(rel, data)
+    names = [(name, files) for name, files in sorted(ONLY_IN.items()) if rel not in files]
+    views = texts_of(rel, data) if names else []
     return ["names %s, which may be published only in %s" % (name, ", ".join(files))
-            for name, files in sorted(ONLY_IN.items())
-            if rel not in files and any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
+            for name, files in names if any(re.search(r"(?i)\b%s\b" % re.escape(name), v) for v in views)]
 
 
 ASSET_NAME = re.compile(r"assets/[a-z0-9][a-z0-9-]*\.(?:png|jpg|jpeg|webp)")
@@ -1151,6 +1304,11 @@ def check_links(root=PUBLIC):
         elif rel.endswith(".css"):
             refs += [(rel, u) for u in css_parts((root / rel).read_text(encoding="utf-8"))[2]]
     for rel, u in refs:
+        # GitHub opens a Markdown file's rendered view at its top and ignores
+        # #L; ?plain=1 shows the line (facts.line_anchor; verifier-seam).
+        if re.match(r"https://github\.com/[^?#]+\.(?:md|markdown)#L\d+$", u, re.I):
+            problems.append("%s links to %s: GitHub opens a Markdown file at its top whatever the #L; put "
+                            "?plain=1 before it" % (rel, u))
         if SCHEME.match(u) or u.startswith("//"):
             continue
         t = _target(rel, u, files)
@@ -1169,7 +1327,11 @@ def check_links(root=PUBLIC):
 # control then in place, which compared two functions, said they agreed.
 _EDGE_TITLE = re.compile(r'<path class="edge [^"]*"[^>]*><title>([^<]*)</title>')
 _CONNECTIONS = re.compile(r"<h2><small>[IVX]+</small>Connections</h2>(.*?)(?=<h2|</main>)", re.S)
-_CONNECTION = re.compile(r"<li><code>([^<]*)</code> ([^<]*?) <code>([^<]*)</code>:")
+# A Connections section is one list, and each item in it is an edge written
+# the one way the dossiers write it. Anything else in the section is refused,
+# so an edge written another way can't pass unread (verifier-seam added one
+# with a parenthesis before its colon).
+_CONNECTION_LIST = re.compile(r"<ul>((?:<li>.*?</li>)+)</ul>", re.S)
 
 
 def check_connections(root=PUBLIC):
@@ -1178,6 +1340,8 @@ def check_connections(root=PUBLIC):
         return []
     kinds = json.loads((SITE / "data" / "relations.json").read_text(encoding="utf-8"))["kinds"]
     labels = sorted({label for _, label in kinds}, key=len, reverse=True)
+    item = re.compile(r"<li><code>([^<]*)</code> (%s) <code>([^<]*)</code>: (?:(?!<li>).)*</li>"
+                      % "|".join(re.escape(x) for x in labels), re.S)
     problems, drawn = [], set()
     for title in _EDGE_TITLE.findall(home.read_text(encoding="utf-8")):
         title = html.unescape(title)
@@ -1201,7 +1365,15 @@ def check_connections(root=PUBLIC):
         if sec is None:
             problems.append("%s has no Connections section" % rel)
             continue
-        listed = {tuple(html.unescape(x) for x in m) for m in _CONNECTION.findall(sec.group(1))}
+        whole = _CONNECTION_LIST.fullmatch(sec.group(1))
+        if whole is None:
+            problems.append("%s's Connections section is not one list of edges and nothing else" % rel)
+            continue
+        items = re.findall(r"<li>.*?</li>", whole.group(1), re.S)
+        odd = [x for x in items if not item.fullmatch(x)]
+        problems += ["%s's Connections has an item that is not an edge as the dossiers write one: %r"
+                     % (rel, re.sub(r"<[^>]*>", "", x)[:80]) for x in odd]
+        listed = {tuple(html.unescape(g) for g in item.fullmatch(x).groups()) for x in items if x not in odd}
         want = {e for e in drawn if node in (e[0], e[2])}
         problems += ["%s doesn't list the map's edge %r" % (rel, " ".join(e)) for e in sorted(want - listed)]
         problems += ["%s lists %r, which the map doesn't draw" % (rel, " ".join(e)) for e in sorted(listed - want)]
@@ -1815,6 +1987,83 @@ def controls():
                 report("links", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
             finally:
                 target.write_text(before, encoding="utf-8", newline="\n")
+        # ...and anything in the section that is not an edge written the one
+        # way, as verifier-seam added one.
+        if sec:
+            end = sec.end(1)
+            for what, new, want in (
+                    ("a Connections item written another way",
+                     saved_d[:end - len("</ul>")] + "<li><code>StoryDocs</code> documents <code>cft-rebound</code> "
+                     "(in its projects): x</li></ul>" + saved_d[end:], "is not an edge as the dossiers write one"),
+                    ("a sentence in the Connections section after its list",
+                     saved_d[:end] + "<p>StoryDocs documents cft-rebound too.</p>" + saved_d[end:],
+                     "is not one list of edges")):
+                dossier.write_text(new, encoding="utf-8", newline="\n")
+                try:
+                    found = [f for f in check_links(root) if want in f]
+                    report("links", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+                finally:
+                    dossier.write_text(saved_d, encoding="utf-8", newline="\n")
+        else:
+            report("links", False, "could not plant: work-cft-rebound.html has no Connections section")
+        planted("links", "a link to a line of a Markdown file without ?plain=1",
+                t.replace("</footer>", '<a href="https://github.com/x/y/blob/abc/README.md#L3">x</a></footer>', 1),
+                check_links, "?plain=1")
+
+        # The readings, in each shape verifier-seam used after the first fix.
+        for what, shape in (("split by a comment", "<p>some<!-- -->one@example.com</p>"),
+                            ("split by a zero-width space", "<p>someone@exa&#8203;mple.com</p>"),
+                            ("split by a soft hyphen", "<p>someone@exam&shy;ple.com</p>"),
+                            ("split by an SVG tspan", "<svg><text>some<tspan>one@example.com</tspan></text></svg>"),
+                            ("with a domain in another script", "<p>someone@ex%smple.com</p>" % chr(0xE4)),
+                            ("with a top-level domain in another script",
+                             "<p>someone@example.%s%s</p>" % (chr(0x440), chr(0x444))),
+                            ("as an address literal", "<p>someone@[192.0.2.1]</p>"),
+                            ("with a quoted local part", '<p>"some one"@example.com</p>')):
+            planted("local-only", "an email address on a page, %s" % what,
+                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, "index.html: an email address")
+        for what, shape in (("split by a comment", "<p>Wal<!-- -->ly</p>"),
+                            ("split by a soft hyphen", "<p>Wal&shy;ly</p>"),
+                            ("split by a zero-width space", "<p>W&#8203;ally</p>"),
+                            ("split by an SVG tspan", "<svg><text>Wal<tspan>ly</tspan></text></svg>")):
+            planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
+                    check_local_only, "index.html: names Wally")
+        for what, shape, want in (("an HTML comment", "<p>a<!-- b -->c</p>", "an HTML comment"),
+                                  ("a CDATA section in SVG text", "<svg><text>Wal<![CDATA[ly]]></text></svg>", "CDATA"),
+                                  ("a processing instruction", "<?xml-stylesheet href=x?>", "a processing instruction")):
+            planted("local-only", what, t.replace("</footer>", shape + "</footer>", 1), check_local_only, want)
+        style = root / "style.css"
+        saved_style = style.read_text(encoding="utf-8")
+        for what, rule in (("a name put together from two content strings", 'header::after{content:" / Wal" "ly"}'),
+                           ("an address put together from two content strings",
+                            'p::after{content:"someone@" "example.com"}'),
+                           ("a word as a list marker", 'li{list-style-type:"Wally "}')):
+            style.write_text(saved_style + rule + "\n", encoding="utf-8")
+            found = [f for f in check_local_only(root) if "a string holding a letter or a digit" in f]
+            report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+        style.write_text(saved_style, encoding="utf-8")
+        import zlib
+        png = root / "assets" / "pauli-print.png"
+        saved_png = png.read_bytes()
+        for what, chunk, want in (
+                ("an email address in a PNG text chunk", b"tEXt" + b"Comment\0write to someone@example.com",
+                 "an email address"),
+                ("an email address in a compressed PNG text chunk",
+                 b"zTXt" + b"Comment\0\0" + zlib.compress(b"write to someone@example.com"), "an email address"),
+                ("Wally in a PNG text chunk", b"tEXt" + b"Author\0Wally", "names Wally")):
+            png.write_bytes(saved_png[:33] + (len(chunk) - 4).to_bytes(4, "big") + chunk + b"\0\0\0\0" + saved_png[33:])
+            found = [f for f in check_local_only(root) if f.startswith("assets/pauli-print.png") and want in f]
+            report("local-only", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
+        png.write_bytes(saved_png)
+        # A class css_hides.json lets a stylesheet hide, on an element it
+        # doesn't name (verifier-seam: the narrow map's class on Verify's
+        # source labels).
+        for what, shape, want in (("the narrow map's class on a source label",
+                                   '<span class="src map-narrow">x</span>', "'map-narrow'"),
+                                  ("the wide map's class on a div holding text", '<div class="map-wide"><p>x</p></div>',
+                                   "'map-wide'"),
+                                  ("the arrows' class on SVG text", '<svg><text class="edge">x</text></svg>', "'edge'")):
+            planted("numbers", what, t.replace("</footer>", shape + "</footer>", 1), check_numbers, want)
         planted("local-only", "a preview card's text in a meta tag",
                 t.replace("</head>", '<meta name="twitter:description" content="3397 tests"></head>', 1),
                 check_local_only, "twitter:description")
@@ -1832,6 +2081,16 @@ def controls():
         for what, dest, blob in (("an asset published as .htm", "remote.htm", b"<script>1</script>"),
                                  ("an asset whose bytes are not its type", "assets/x.png", b"<script>1</script>")):
             refused("assets", what, lambda dest=dest, blob=blob: check_asset(dest, blob))
+        # Each is caught only by the rule it names: once CSS_STRINGS refused a
+        # string with a letter in it, @import and image-set() were refused by
+        # that rule and no longer showed their own.
+        css_wants = {"URL( in capitals": "loads from another host", "@IMPORT": "uses @import",
+                     "image-set": "uses image-set()", "an escaped url": "a backslash escape",
+                     "a quote inside an unquoted url()": "a malformed url()",
+                     "a semicolon inside an unquoted url()": "a malformed url()",
+                     "a comment marker inside a string": "a comment marker inside a string",
+                     "a string left open": "a string left open", "a comment left open": "a comment left open",
+                     "a form feed": "an ASCII control character"}
         for what, css in (("URL( in capitals", "a{background:URL(https://x.invalid/a.png)}"),
                           ("@IMPORT", "@IMPORT 'https://x.invalid/a.css';"),
                           ("image-set", 'a{background:image-set("https://x.invalid/a.png" 1x)}'),
@@ -1842,7 +2101,7 @@ def controls():
                           ("a string left open", ".a{content:'open\n}"),
                           ("a comment left open", ".a{color:red} /* never closed"),
                           ("a form feed", ".a{content:'x\fy'}")):
-            found = css_problems(css)
+            found = [f for f in css_problems(css) if css_wants[what] in f]
             report("local-only", bool(found), "%s in CSS: %s" % (what, found[0] if found else "passed"))
 
         # facts: a stale figure in facts.json, which must be named by its id
@@ -1994,6 +2253,30 @@ def controls():
     report("own", same is False, "a citation published at another line, the words the same: %s"
            % ("read again as different: %s" % now if same is False else "read again as the same"))
     facts.reset_log()
+    refused("own", "a commit cited by a name rather than a hash, as HEAD~1 moves with history",
+            lambda: facts.own_commit("HEAD~1", "planted"), "not a commit hash")
+    saved_own = facts.own_text
+    try:
+        facts.own_text = lambda path: "## 2026-01-01 - a\n\nthe planted words\n\n## an undated heading\n"
+        refused("own", "a quotation from a ledger with a heading not dated at its start",
+                lambda: facts.own_prose("docs/VALIDATION.md", r"(the planted words)"), "not dated at its start")
+    finally:
+        facts.own_text = saved_own
+    refused("manifest", "a source saved with CRLF line endings, which git would call unchanged",
+            lambda: lf_only([("site/planted.py", b"x = 1\r\n")]), "carriage return")
+    import mapgen
+    sp = mapgen.DATA.get("storydocs_projects", {})
+    multi = next((k for k, c in sorted(sp.items()) if len(c.get("nodes", [])) > 1), None)
+    if multi is None:
+        report("map", False, "could not plant: no StoryDocs directory maps to more than one node")
+    else:
+        saved_cfg = sp[multi]
+        sp[multi] = dict(saved_cfg, bend=[0] * (len(saved_cfg["nodes"]) - 1))
+        try:
+            refused("map", "a StoryDocs directory given one bend fewer than its nodes, which zip() would drop",
+                    mapgen._storydocs_edges, "bends for its")
+        finally:
+            sp[multi] = saved_cfg
     # A commit of the site's own that a page cites: on the history being
     # built, in a repository planted for the purpose, so CI runs it too.
     with tempfile.TemporaryDirectory() as d:
@@ -2206,26 +2489,28 @@ def controls():
         skip("newest", "needs atlas-film, cft-rebound and Quantum-Film at their pins: %s" % e)
 
     # The map and every dossier's Connections read one list of edges
-    # (mapgen.all_edges). Held both ways: each dossier lists exactly the map's
-    # edges touching its project, and the reading P3 first had - relations.json
-    # alone - is shown to miss one, as it did StoryDocs' at P2's merge.
+    # (mapgen.all_edges), and the links stage holds each dossier's published
+    # list to the published map (check_connections; its planted faults are in
+    # section A). The invariant that stood here compared two functions, not
+    # the pages, and reported itself as a control (verifier-seam). What
+    # stays is the reading P3 first had, relations.json alone, rendered and
+    # shown to be refused by the published-page check.
     try:
-        import mapgen
         from pages import _dossier
-        drawn = {(e["tail"], e["kind"], e["head"]) for e in mapgen.all_edges()}
-        dossiers = [m.NAME for m in pages() if m.__name__.startswith("pages.work_") and hasattr(m, "NAME")]
-        off = []
-        for node in dossiers:
-            listed = {(e["tail"], e["kind"], e["head"]) for e, _ in _dossier.edges_for(node)}
-            want = {x for x in drawn if node in (x[0], x[2])}
-            if listed != want:
-                off.append("%s: %d listed, %d drawn" % (node, len(listed), len(want)))
-        report("connections", bool(dossiers) and not off, "each of %d dossiers lists exactly the map's edges touching "
-               "it: %s" % (len(dossiers), "; ".join(off) or "all agree"))
-        old = {(e["tail"], e["kind"], e["head"]) for e in _dossier.RELATIONS["edges"]}
-        missed = sorted(x for x in drawn - old if any(n in (x[0], x[2]) for n in dossiers))
-        report("connections", bool(missed), "a dossier reading relations.json alone would miss %d edge(s), such as %s"
-               % (len(missed), " ".join(missed[0]) if missed else "none"))
+        saved_edges = _dossier.edges_for
+        _dossier.edges_for = lambda node: [(e, facts.prose(e["repo"], e["path"], e["pattern"]))
+                                           for e in _dossier.RELATIONS["edges"] if node in (e["tail"], e["head"])]
+        try:
+            planted_text, _ = render_all()
+        finally:
+            _dossier.edges_for = saved_edges
+        with tempfile.TemporaryDirectory() as d:
+            for rel, body in planted_text.items():
+                if rel.endswith(".html") and "/" not in rel:
+                    (pathlib.Path(d) / rel).write_text(body, encoding="utf-8", newline="\n")
+            found = [f for f in check_connections(pathlib.Path(d)) if "doesn't list the map's edge" in f]
+        report("connections", bool(found), "the dossiers rendered from relations.json alone, as P3 first read it: %s"
+               % (found[0] if found else "passed"))
     except Unavailable as e:
         skip("connections", "needs every pinned clone: %s" % e)
 

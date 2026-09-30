@@ -181,8 +181,9 @@ def footer():
         'list under the map. The commits below are the ones pins.json '
         'names, and <a href="facts.json">facts.json</a> lists every figure on the page, with where it was read. '
         '<code>python site/build.py --verify-facts</code>, in a clone of <a href="%s">this site\'s repository</a>, '
-        'reads each one again: from its repository at the commit below, or from the committed GitHub snapshot of '
-        '%s. It names each figure it cannot read, and a stated one has no source to read.</p>'
+        'reads each one again: from its repository at the commit below, from the committed GitHub snapshot of '
+        '%s, or from this site\'s own ledger in the clone. It names each figure it cannot read, and a stated one '
+        'has no source to read.</p>'
         '<ul class="pins">%s</ul>'
         '<p><a href="BUILD">BUILD</a> names the commit this copy was deployed from. MIT licence.</p>'
         % (SOURCE_REPO, fig(facts.snapshot_date(), src=False), "".join(li)))

@@ -105,11 +105,20 @@ a figure it didn't read there.
     it names only how many it found, since CI's logs are public. Key a
     commit's author by GitHub login, or by a hash of the address, never by
     the address itself.
-    - It reads each file as a browser or a parser would decode it:
-      character references, percent-encoding, markup inside a word, and a
-      JSON file's strings (`build.readings`).
-    - An address spelled out for a person to reassemble, such as "name at
-      example dot com", is not recognised. That is a stated limit.
+    - It reads each file as a browser or a parser would decode it
+      (`build.readings`): character references, percent-encoding, inline
+      markup inside a word (`build.INLINE`), characters drawn as nothing
+      (soft hyphens, zero-width spaces), a JSON file's strings, and a PNG's
+      text chunks. Addresses in any script count.
+    - The build writes no HTML comment, processing instruction or CDATA
+      section, and local-only refuses each. A stylesheet may hold a string
+      with a letter or a digit in it only if `build.CSS_STRINGS` lists it,
+      since `content` and list markers print strings.
+    - What it can't see is text put together by layout alone, such as two
+      elements positioned side by side, or an address spelled out for a
+      person to reassemble ("name at example dot com"). A font's compressed
+      tables aren't read; `fonts/SOURCES.txt` holds each font to its hash.
+      These are stated limits.
 
 15. **The site's own ledger is a source.** `facts.own_prose()` and
     `facts.own_entry()` read `docs/VALIDATION.md`, and MANIFEST hashes it.
@@ -118,11 +127,16 @@ a figure it didn't read there.
     - An entry is cited by its heading's whole text, never by its line.
       Found by line, an entry inserted above it returned another entry.
     - `own_prose()` has no `last=`: the ledger grows, so a last match would
-      move to whatever a later entry repeats.
+      move to whatever a later entry repeats. It holds the headings first,
+      as `own_entry()` does.
     - An earlier entry is corrected by a later one, never edited.
     - A commit of the site's own that a page cites goes through
-      `facts.own_commit()`, which refuses one that main doesn't hold. A
-      squashed parcel's commits are like that.
+      `facts.own_commit()`, by its hash. It refuses a commit that the commit
+      being built doesn't descend from, such as a squashed parcel's. On the
+      desktop an unpushed commit passes; CI, which clones GitHub's main,
+      refuses any commit GitHub doesn't have.
+    - The build refuses a text source that holds a carriage return. git
+      calls a CRLF copy unchanged, but its hash isn't the committed file's.
 
 16. **The spec names Wally on Home and on About; decision 16 allows the name
     on one page only,** the Preservation thread's. The local-only stage

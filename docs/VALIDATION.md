@@ -1295,3 +1295,97 @@ doesn't draw, and the map no longer drawing an edge a dossier lists.
   bullets. It now says "one of these places".
 
 `--control` caught 215 of 215.
+
+## 2026-09-29 - verifier-seam: NOT READY on main and on wave2-prep; each finding fixed, and seven records corrected
+
+verifier-seam read `2b5c292` and `0176ce4` together, then re-checked
+`wave2-prep` at `71c82fe`. It said NOT READY on both. It confirmed the
+site itself everywhere it looked:
+
+- the merges took exactly the verified commits;
+- `6c163dd`'s tree is `bdbac1f`'s, byte for byte;
+- no file in main's history holds the author address;
+- the live site is `public/` at `2b5c292`, byte for byte, apart from
+  `BUILD`.
+
+What failed was gates and records. Each finding, and what changed:
+
+**Text put together past the email and Wally checks.** A comment, a
+zero-width space, a soft hyphen or an SVG `<tspan>` inside the word, CSS
+`content` built from two strings, an IDN domain, a non-ASCII top-level
+domain, and an address literal each passed every stage. Now:
+
+- `build.readings` removes comments and inline tags, and drops characters a
+  browser draws as nothing.
+- `build.INLINE` and `build.BREAKING` place every allowed tag. The import
+  refuses a tag in neither set.
+- The address pattern takes any script, a quoted local part and an address
+  literal. A PNG's text chunks are read.
+- Local-only refuses an HTML comment, a processing instruction and a CDATA
+  section, none of which the build writes.
+- A stylesheet string that holds a letter or a digit is refused unless
+  `build.CSS_STRINGS` lists it.
+- The README states what is left: text put together by layout alone, a
+  name in look-alike letters from another script, and an address spelled
+  out for a person. A font's compressed tables aren't read.
+
+**A map class on another element.** verifier-seam gave Verify's source
+labels the narrow map's class, and at one width they vanished. Each entry
+in `css_hides.json` now names the elements its class may be on. The
+numbers stage refuses the class anywhere else: `div>svg` is a div holding
+one svg and nothing else.
+
+**A Connections item written another way.** An item with a parenthesis
+before its colon was never parsed, so its false edge passed. A Connections
+section must now be one list, and each item an edge as the dossiers write
+it.
+
+**`own_commit` took any name.** `HEAD~1`, a tag and `ff23593^2` were each
+printed as the figure. `HEAD~1` then moved to another commit as history
+grew. `own_commit` now takes 7 to 40 hex digits only, and ignores
+replacement refs.
+
+**A CRLF copy.** On the desktop a CRLF copy of a source passed the gate
+with a clean `git status`, and a fresh checkout then failed. The build now
+refuses a text source that holds a carriage return.
+
+**Side notes, acted on:**
+
+- A GitHub `#L` link into a Markdown file opens the rendered view at its
+  top. Links to a line of a Markdown file now carry `?plain=1`
+  (`facts.line_anchor`), and the links stage refuses one without it.
+- A StoryDocs directory with fewer bends than nodes lost edges silently in
+  `zip()`. The build now refuses it.
+- The invariant in the controls that compared two functions and reported
+  itself as a control is gone. Its one real plant stays: the dossiers
+  rendered from relations.json alone, which the links stage refuses.
+- The footer now names this site's own ledger among the places a figure
+  is read again.
+- The ten CSS load controls were each satisfied by any problem. After the
+  string rule, two were caught by it rather than their own rule. Each now
+  needs its own rule's words.
+
+**Corrections to earlier entries, found by verifier-seam:**
+
+1. "Live at https://loganw.dev" says the resolvers gave "GitHub Pages' four
+   A records". Today the authoritative server, Google, Cloudflare and Quad9
+   return three. Whether four were returned at 19:50 isn't known.
+2. The wave 1 fold says verify.html's unquoted sentences were "Fixed at
+   `5128ce6`, by quoting". Two of the three were cut, not quoted.
+3. The same entry says verifier-P3 "reported both, and nothing else in P3's
+   work". It also flagged sentences in P3's work as borderline. That is
+   what the lead then asked P3 to quote.
+4. "The site's own ledger becomes a source" says `own_prose` requires every
+   heading to be dated at its start. Only `own_entry` did. `own_prose` does
+   from this commit.
+5. The P0.2 READY entry says local-only's control-character rule "is also
+   the CSS specification's own set". It isn't: the rule also refuses the
+   form feed and the carriage return, which CSS reads as line breaks.
+6. `6c163dd`'s commit message credits only the lead's model. P2's commits,
+   which it squashes, were made on Sonnet 5. It also had no CI run of its
+   own: it was pushed with `edff2b0`, whose run deployed both.
+7. CLAUDE.md said `own_commit` refuses a commit "that main doesn't hold".
+   It refuses one the commit being built doesn't descend from, and CLAUDE.md
+   now says so.
+
+`--control` caught 245 of 245.

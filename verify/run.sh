@@ -196,11 +196,11 @@ RA=""; [ "$REQUIRE_ALL" = 1 ] && RA="--require-all"
 # THE STAGES. One `stage` line each; the description stays on the line.
 # ======================================================================
 stage build "public/ is exactly what the pins render; needs every pinned clone, private ones too" -- "$PY" "$B" --check
-stage manifest "public/ is file for file what its MANIFEST lists, and pins.json and the snapshot are what the build read" -- "$PY" "$B" --manifest
-stage facts "every published figure read again, at its pin or from the committed snapshot; a private one is skipped by name" -- "$PY" "$B" --verify-facts $RA
+stage manifest "public/ is file for file what its MANIFEST lists, and pins.json, the snapshot, the site's own ledger and every file under site/ are what the build read" -- "$PY" "$B" --manifest
+stage facts "every published figure read again, at its pin, from the committed snapshot or from the site's own ledger, and read at the same place; a private one is skipped by name" -- "$PY" "$B" --verify-facts $RA
 stage numbers "every numeral on a page sits in a figure's mark, and every mark is its own fact's text" -- "$PY" "$B" --numbers
-stage links "every relative link names a published file exactly, and every #anchor exists" -- "$PY" "$B" --links
-stage local-only "only allowed elements and attributes, the policy on every page, and no load from another host" -- "$PY" "$B" --local-only
+stage links "every relative link names a published file exactly, every #anchor exists, and each dossier's Connections are the map's edges" -- "$PY" "$B" --links
+stage local-only "only allowed elements and attributes, the policy on every page, no load from another host, no email address but the contact, and Wally only on the game thread's page" -- "$PY" "$B" --local-only
 stage docs "the documents' links and anchors resolve, and none states the runner's stage count" -- "$PY" "$B" --docs
 stage privacy "nothing a push would publish, history included, names a private repository the site does not read" -- "$PY" "$B" --privacy
 stage github "every pin is a commit GitHub has now, as the snapshot recorded; asked of GitHub itself" -- "$PY" "$B" --github

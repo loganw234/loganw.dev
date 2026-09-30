@@ -159,6 +159,11 @@ def _storydocs_edges():
         nodes = cfg["nodes"]
         bend = cfg.get("bend", 0)
         bends = bend if isinstance(bend, list) else [bend] * len(nodes)
+        if len(bends) != len(nodes):
+            # zip() would drop the edges past the shorter list, silently, and
+            # the map and the dossiers read this one list (verifier-seam).
+            raise Refusal("relations.json's storydocs_projects entry for %s gives %d bends for its %d nodes; give "
+                          "one each" % (d, len(bends), len(nodes)))
         for node, b in zip(nodes, bends):
             out.append(dict(tail="StoryDocs", head=node, kind="documents", bend=b, repo="StoryDocs", path=path, v=v))
     return out

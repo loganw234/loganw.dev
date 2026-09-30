@@ -1,11 +1,14 @@
 """The site's facts: every figure it prints, and where each was read.
 
-A figure is read from one of three places, and from nowhere else:
+A figure is read from one of four places, and from nowhere else:
 
   * a repository at the commit pins.json names - `git show` and `git log`
     at that SHA, never a working tree, where another session may be
     mid-round (docs/SPEC.md, decision 3);
   * the GitHub snapshot pins.json names, taken once by snapshot_github.py;
+  * this site's own record: its ledger, docs/VALIDATION.md, read from the
+    tree being built, and its own commits (own_prose, own_entry,
+    own_commit, below);
   * someone's word, which is rendered as STATED, with who said it and when,
     and never as sourced.
 
@@ -315,6 +318,16 @@ def _checkout(name, d):
     return cached
 
 
+def line_anchor(path, line):
+    """The end of a GitHub link to a line. GitHub renders a Markdown file, and
+    its rendered view ignores #L: the link opens at the top of the page. With
+    ?plain=1 it shows the source, scrolled to the line and highlighted
+    (verifier-seam: a ledger link landed 8529 px above its entry)."""
+    if not line:
+        return ""
+    return ("?plain=1" if path.lower().endswith((".md", ".markdown")) else "") + "#L%d" % line
+
+
 class Pin:
     def __init__(self, name):
         cfg = PINS["repos"].get(name)
@@ -371,9 +384,7 @@ class Pin:
         u = "https://github.com/%s/%s/%s/%s" % (self.owner, self.ghname, "blob" if path else "tree", self.full)
         if path:
             u += "/" + path
-        if line:
-            u += "#L%d" % line
-        return u
+        return u + line_anchor(path, line)
 
     def src(self, kind, where, detail="", path="", line=0):
         return Src(kind, "%s %s %s" % (self.name, self.short, where) if where else "%s %s" % (self.name, self.short),
@@ -933,7 +944,7 @@ def own_text(path):
 
 def own_src(path, line, detail=""):
     return Src("file", "this site's %s:%d" % (path, line), detail,
-               "%s/blob/main/%s#L%d" % (OWN_REPO, path, line))
+               "%s/blob/main/%s%s" % (OWN_REPO, path, line_anchor(path, line)))
 
 
 @fact
@@ -941,7 +952,9 @@ def own_prose(path, pattern, display=None, num=False):
     """prose(), for this site's own record: the file, the line, and the words,
     under the same rules, except that the pattern must always match once.
     The ledger grows, so "the last match" would move to whatever a later
-    entry repeats (verifier-seam); here a second match refuses by name."""
+    entry repeats (verifier-seam); here a second match refuses by name. The
+    ledger's headings are held first: each must be dated at its start."""
+    own_entries(path)
     text = own_text(path)
     ms = list(re.finditer(pattern, text, re.M))
     if not ms:
@@ -999,15 +1012,20 @@ def own_commit(sha, what):
     """A commit in this site's own history, by its hash: one the commit being
     built descends from, so GitHub has it once this build is on main. A
     commit that only a local branch holds, such as a squashed parcel's, is
-    refused. A shallow checkout can't show either, and is skipped by name."""
+    refused. A shallow checkout can't show either, and is skipped by name.
+    Only a hash is taken: a name such as HEAD~1 or a tag would print as the
+    figure and point at another commit as history moved (verifier-seam). A
+    replacement ref is ignored, since GitHub never has one."""
+    if not re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        raise Refusal("%r is not a commit hash; cite a commit by 7 to 40 lower-case hex digits" % sha)
     if _git(ROOT, "rev-parse", "--is-shallow-repository").strip() == "true":
         raise Unavailable("this checkout is shallow, so this site's own history can't be read; "
                           "fetch it whole (fetch-depth: 0)")
-    r = _git(ROOT, "rev-parse", "--verify", "-q", sha + "^{commit}", ok=(0, 1))
+    r = _git(ROOT, "--no-replace-objects", "rev-parse", "--verify", "-q", sha + "^{commit}", ok=(0, 1))
     if r.returncode != 0:
         raise Refusal("this site's history has no commit %s" % sha)
     full = r.stdout.decode().strip()
-    if _git(ROOT, "merge-base", "--is-ancestor", full, "HEAD", ok=(0, 1)).returncode != 0:
+    if _git(ROOT, "--no-replace-objects", "merge-base", "--is-ancestor", full, "HEAD", ok=(0, 1)).returncode != 0:
         raise Refusal("%s is a commit here, but the commit being built does not descend from it, "
                       "so it is not on main" % sha)
     return V(sha, Src("git", "this site's commit %s" % sha, what, "%s/commit/%s" % (OWN_REPO, full)),
