@@ -3,7 +3,7 @@
  "facts": [
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
     "when": "2026-09-29",
@@ -19,7 +19,7 @@
    "raw": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
    "said": "",
    "text": "I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said.",
-   "where": "drafted from Logan's words of 2026-09-29, not yet approved"
+   "where": "stated by Logan, 2026-09-29"
   },
   {
    "args": {

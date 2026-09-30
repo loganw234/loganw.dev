@@ -121,7 +121,9 @@ where they were longer.
     other projects. **nextpnr-xilinx** (the fork) and **Microscope-Stacker**
     are listed but not explained in depth.
 14. **The biography:** Logan will approve a draft. The contact address is
-    `logan@loganw.dev` "for now".
+    `logan@loganw.dev` "for now". The lead's draft, taken from the spec's own
+    words, was approved on 2026-09-29: "Biography is good". Logan also said
+    then that the round is "clear to begin" once the verifier finishes.
 15. **The first version** gives full dossiers to cft-fp256, Quantum-Film,
     cft-rebound, and the two methods (HonestFramework and ParcelRound).
 16. **Wally** is Logan's Discord username. It appears only on the game

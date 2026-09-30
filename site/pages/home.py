@@ -31,8 +31,8 @@ AI_USE = "every project here was AI-driven, and the co-author line was not alway
 
 # Drafted by the lead from the spec's own words (docs/SPEC.md, section 1: "carpenter
 # since fifteen", "no formal training", "agents write essentially all the lines",
-# "gates decide what's true"). Logan approves a draft (decision 14); until then
-# the page says it is a draft.
+# "gates decide what's true"), and approved by Logan on 2026-09-29: "Biography is
+# good" (decision 14). Until then the page labelled it a draft.
 WHO = ("I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. "
        "AI agents have written essentially all of the code in these projects; gates decide what is true, and the "
        "record keeps what they said.")
@@ -223,7 +223,7 @@ def prints():
 
 
 def render_page(ctx):
-    who = facts.stated(WHO, "Logan", "2026-09-29", draft=True)
+    who = facts.stated(WHO, "Logan", "2026-09-29")
     cap = LEDGER_CAP + render(["Logan's word is that ", S(AI_USE), "."])
     return ('<div class="measure"><p class="lede">%s</p></div>'
             '<h2><small>I</small>Where each project came from</h2>%s'

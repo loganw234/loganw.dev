@@ -418,3 +418,20 @@ Three more, found by the lead reading its own gates:
 Each is planted in `--control` and caught, 87 of 87.
 `bash verify/run.sh --require-all` on this tree passed 10 of 10, with
 nothing skipped.
+
+## 2026-09-29 - the biography approved
+
+Logan, 2026-09-29: "Biography is good, once the verifier finishes you are
+clear to begin".
+
+- **The biography.** Home's biography is the lead's draft, built from the
+  spec's own words. Its label no longer calls it a draft. It now reads
+  "stated by Logan, 2026-09-29". SPEC decision 14 records the approval in
+  Logan's words.
+- **The round.** Once verifier-P0 reports READY, the lead may:
+  - merge;
+  - create the public repository;
+  - push, which deploys (decision 7);
+  - begin the round.
+
+  Logan gave this clearance in the same message.
