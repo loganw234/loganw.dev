@@ -105,7 +105,7 @@ def printed(body):
     it is found however its attribute is cased or its id encoded, exactly as
     that stage finds it. A mark whose id isn't plain digits, or that no
     logged fact has, is refused."""
-    import build   # as corrections.py and method.py do: build imports the pages
+    import build   # here, not at the top: build imports the pages
     p = build._Marks()
     p.feed(body)
     p.close()
