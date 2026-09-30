@@ -23,7 +23,8 @@
 #             facts stage fetches every public pin from GitHub, which fails
 #             on a commit GitHub does not have);
 #   facts     skips each figure from a private repository;
-#   controls  skips drift and stale-pin, which render.
+#   controls  skips drift and stale-pin, which render, and github, which needs
+#             the owner's login.
 # Everything else runs in CI: manifest, numbers, links, local-only, docs, the
 # other controls, and the runner's own control.
 #

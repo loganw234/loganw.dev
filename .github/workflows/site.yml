@@ -10,7 +10,7 @@
 #     owner's private repositories (here `facts` fetches every public pin from
 #     GitHub, which fails on a commit GitHub does not have);
 #   - each figure from a private repository, inside `facts`;
-#   - the drift and stale-pin controls, inside `controls`.
+#   - the drift, stale-pin and github controls, inside `controls`.
 # Everything else runs:
 #   - `manifest`, which holds public/ to its MANIFEST, so a deleted page, or
 #     a page edited without its MANIFEST line, fails here;
