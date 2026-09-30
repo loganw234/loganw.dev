@@ -65,7 +65,7 @@ What that doesn't cover:
 
   Local-only refuses the shapes this build knows of in which a reading of
   the text and a browser's could part:
-  - a control character other than a line feed or a tab;
+  - an ASCII control character other than a line feed or a tab;
   - a string or a comment left open;
   - a comment marker inside a string;
   - a malformed `url()`;

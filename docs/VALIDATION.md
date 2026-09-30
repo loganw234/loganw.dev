@@ -959,3 +959,39 @@ for the dependency.
   from the file.
 
 `--control` now catches 168 of 168.
+
+## 2026-09-29 - verifier-P0: READY on p0.2 at ed990fb
+
+verifier-P0 re-checked `ed990fb` and reported **READY**. Every item on its
+list is now either held by a gate it watched fail on a fault of its own
+choosing, or stated as a limit where the claim is made. Every fault it
+built that passes the gates lands inside a stated limit.
+
+**What it ran:**
+
+- **The desktop.** `bash verify/run.sh --require-all` passed 11 of 11 stages,
+  with nothing skipped, and the controls caught 168.
+- **Simulated CI.**
+  - build, privacy and github were skipped by name;
+  - facts read 153 figures again and skipped 19;
+  - the controls caught 165 and skipped 3;
+  - both cross-checks ran.
+
+**The backstop, watched working.** In a copy, it undid both form-feed fixes
+and published its plant. The hand-written checks let it through. The
+tinycss2 cross-check failed the gate and named the block: `.src` read as
+`['content']` in this build and as `['content', 'display', 'x']` in
+tinycss2.
+
+**Its one side note, a wording fix, is made.**
+
+- Local-only refuses ASCII control characters, which is also the CSS
+  specification's own set.
+- The README's sentence and the check's sentence now say "an ASCII control
+  character".
+- It is the only change after `ed990fb`.
+- `bash verify/run.sh --require-all` passed 11 of 11 again after it.
+
+**For the push.** The verifier could not test the deploy job itself: its
+four action versions, and Pages set to deploy from Actions, run only on the
+first push to main. That run is watched.

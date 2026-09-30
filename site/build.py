@@ -943,7 +943,7 @@ def css_problems(css):
     """A stylesheet's loads. Comments go first, then anything that could spell
     a load in another case or through an escape is refused outright. So are
     the shapes this build knows of in which a reading of the text and a
-    browser's can part: a control character other than a line feed or a tab
+    browser's can part: an ASCII control character other than a line feed or a tab
     (a form feed ends a string in a browser), a string left open at the end
     of its line, a comment left open, a comment marker inside a string, and a
     malformed url() - one whose unquoted address holds a quote, a space, '(',
@@ -952,7 +952,7 @@ def css_problems(css):
     out = []
     ctl = sorted({"U+%04X" % ord(c) for c in css if (ord(c) < 32 and c not in "\n\t") or ord(c) == 127})
     if ctl:
-        out.append("a control character other than a line feed or a tab: %s" % ", ".join(ctl))
+        out.append("an ASCII control character other than a line feed or a tab: %s" % ", ".join(ctl))
     for kind, text, flaw in css_tokens(css):
         if flaw == "open":
             out.append("a %s left open: %r" % (kind, text[:40]))

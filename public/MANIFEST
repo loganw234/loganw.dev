@@ -2,7 +2,7 @@
 # pins: PrettyCloud@5161daa atlas-darkroom@c1b9b6e atlas-optical@dbccafe atlas-film@be1d674 atlas-engine@867c57a cft-fp256@77b8440 cft-rebound@039e3c3 ParcelRound@8767e23 HonestFramework@65447fd Quantum-Film@a7f02db binary-sites@dacdcb8 StoryDocs@673148c Mercenaries2@e51dcbe Merc2-Mods-Exp@0ec1db2 mercs2-lua-essentials@3430c0b Mercenaries-Fan-Build/mercs2-modkit@3a4d888 Mercenaries-Fan-Build/mercs2-qol-mods@6f1fc59 Mercenaries-Fan-Build/mercs2-wad-simulator@fdf3597 Mercenaries-Fan-Build/notes-on-the-released-game@b8c3958
 # source pins.json 8fe0df9f91211d73ff430814bc7783f2305c03c34a0a9e276f63e4e4acac131c
 # source sources/github-2026-09-29-1621.json af76b8cd18c376edd9d0edd9f0a794449659fde2fceb052a62c1cc8e78b953bb
-# source site/build.py 5ce52b96f05a03e7501a437adeedd9a2ed6436d54ba9ec9a447cf3bd62b172a5
+# source site/build.py 9694b2a5935ca94593cc34256aeca11a2c7bf733cee935bd6c8d841ea4cd080e
 # source site/data/css_hides.json 0111961ef49b793f45e75b7b1436a9c508b3c3db9dadcec0e8777ae33be905fa
 # source site/data/numeral_names.json daf0c962b473bbe1254f990dab997998d6b1487e71325d80d63efddea8611cd4
 # source site/data/relations.json 13f9d0deaa976b58561fa16b45814fd9e6c478c283b6881595220119fa9660ec
