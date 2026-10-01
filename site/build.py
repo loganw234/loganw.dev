@@ -59,6 +59,34 @@ MANIFEST_HEAD = ("# sha256 of every file in public/ except BUILD, which the depl
                  "repositories: pins.json, the snapshot, the site's own ledger, and every file under site/.")
 
 
+# The front page, and the page that holds the map and the ledger (SPEC
+# decisions 29 and 30). The checks that read the map read it on MAP_PAGE, and
+# only FRONT_PAGE may give its sources once, in a note in its footer.
+FRONT_PAGE = "index.html"
+MAP_PAGE = "map-ledger.html"
+# The site footer's own figures, printed bare under its sentence: each pin's
+# commit, a private pin's visibility, and the snapshot's date. No other
+# figure may go without its source in a footer: the front page's note sits
+# in its footer, and a bare figure there passed every stage (verifier-front).
+FOOTER_FIGURES = {"facts.pin_commit", "facts.api_visibility", "facts.snapshot_date"}
+# The people a statement on this site may quote, by the name its label gives:
+# a reviewed list, as numeral_names.json is. A name anywhere else in a
+# statement's label let "stated by HonestFramework README.md" pass as a
+# statement that read as a source (verifier-front).
+SPEAKERS = {"Logan"}
+# The paths in a pinned repository that a figure's label may name: a
+# reviewed list, as SPEAKERS is. A page that quotes a new file has it added
+# here, or the numbers stage refuses the label by name. Every form rule tried
+# before it let a name through as a path - "Logan", then "Logan." with one
+# full stop (verifier-front) - so the paths are listed, not guessed at.
+SOURCE_PATHS = {
+    ".gitmodules", "CASE-STUDY-2.md", "CASE-STUDY-3.md", "CASE-STUDY-4.md", "CASE-STUDY.md", "CLAUDE.md",
+    "CONFORMANCE.md", "LICENSE", "METHOD.md", "README.md", "docs/DETERMINISM.md", "docs/HOSTAPI.md",
+    "docs/PARCEL-ROUNDS.md", "docs/README.md", "docs/TRANSCENDENTALS.md", "docs/VALIDATION.md",
+    "docs/VERIFICATION.md", "docs/prints/pauli-print.png", "docs/prints/poisson-print.png",
+    "docs/prints/trix-print.png", "host/include/cft.h", "projects/method/README.md", "verify/run.sh"}
+
+
 def sha256(b):
     return hashlib.sha256(b).hexdigest()
 
@@ -104,6 +132,16 @@ def validate(mods):
         if hasattr(m, "NUMERAL_NAMES"):
             raise Refusal("%s allows names of its own; a name with a numeral goes in site/data/numeral_names.json, "
                           "which the lead reviews" % m.__name__)
+        if hasattr(m, "footer_note") and m.PAGE["file"] != FRONT_PAGE:
+            raise Refusal("%s gives a note in its footer; only the front page, %s, may (decision 29)"
+                          % (m.__name__, FRONT_PAGE))
+    for label, want in (("Home", FRONT_PAGE), ("Map & Ledger", MAP_PAGE)):
+        got = [m.PAGE["file"] for m in mods if m.PAGE["nav"] == label]
+        if got and got != [want]:
+            raise Refusal("navigation entry %r publishes %s; the checks read it as %s" % (label, got, want))
+    for label, want in (("Home", FRONT_PAGE), ("Map & Ledger", MAP_PAGE)):
+        if not any(m.PAGE["nav"] == label for m in mods):
+            raise Refusal("no page claims navigation entry %r; the checks read it as %s" % (label, want))
 
 
 def collect_extras(m, ctx, text):
@@ -173,7 +211,8 @@ def render_all():
     for m in mods:
         ctx = {"built": built, "pages": pages_by_nav}
         body = m.render_page(ctx)
-        text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"])
+        note = m.footer_note(ctx) if hasattr(m, "footer_note") else ""
+        text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"], note)
         for dest, repo, path in getattr(m, "ASSETS", []):
             data = facts.pin(repo).show(path, binary=True)
             check_asset(dest, data)
@@ -350,6 +389,7 @@ class _Marks(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.stack, self.marks, self.loose, self.attr_text, self.problems = [], [], [], [], []
+        self.footers = 0       # a page has one footer, the site's own
         self.last = None       # the figure that just closed, until anything but its label follows it
 
     def _mark(self):
@@ -373,7 +413,9 @@ class _Marks(html.parser.HTMLParser):
         self._attrs(tag, attrs)
         if tag in VOID:
             return
-        cls, f = (a.get("class") or "").split(), a.get("data-f")
+        if tag == "footer":
+            self.footers += 1
+        cls, f = classes(a.get("class")), a.get("data-f")
         if f is None and tag == "span" and set(cls) & {"fig", "q", "stated", "src"}:
             self.problems.append("a span of class %r has no fact id" % " ".join(cls))
         if f is not None and self._mark() is not None:
@@ -382,7 +424,8 @@ class _Marks(html.parser.HTMLParser):
             self._mark()["href"] = a.get("href", "")
         inside = lambda t, c=None: tag == t or any(n["tag"] == t and (c is None or c in n["cls"]) for n in self.stack)
         node = dict(tag=tag, cls=cls, f=f, buf=[], href=None, beside=False, footer=inside("footer"),
-                    svg=inside("svg"), evidence=any(n["tag"] == "details" and "evidence" in n["cls"] for n in self.stack))
+                    svg=inside("svg"), evidence=any(n["tag"] == "details" and "evidence" in n["cls"] for n in self.stack),
+                    note="sources" in cls or any("sources" in n["cls"] for n in self.stack))
         # A label opening straight after its own figure is the label beside it.
         if f is not None and "src" in cls and self.last is not None and self.last["f"] == f:
             self.last["beside"] = True
@@ -420,6 +463,13 @@ class _Marks(html.parser.HTMLParser):
             tick = bool(self.stack) and self.stack[-1]["tag"] == "text" and "tick" in self.stack[-1]["cls"] \
                 and any(n["tag"] == "svg" for n in self.stack)
             self.loose.append((data, tick))
+
+
+def classes(value):
+    """An element's classes, split on HTML's own whitespace, as a browser
+    splits them: str.split() also splits on a no-break space, and two readers
+    of class="sources&#160;x" parted (verifier-front)."""
+    return [c for c in re.split("[%s]+" % re.escape(HTML_SPACE), value or "") if c]
 
 
 def dupes(attrs):
@@ -771,7 +821,7 @@ class _Holders(html.parser.HTMLParser):
             for r in self.stack:
                 if r is not None:
                     r["marks"].add(f)
-        hit = set((dict(attrs).get("class") or "").split()) & self.classes
+        hit = set(classes(dict(attrs).get("class"))) & self.classes
         rec = dict(tag=tag, classes=hit, children=[], text=False, marks=set()) if hit else None
         if rec:
             self.found.append(rec)
@@ -869,6 +919,79 @@ def hiding_in(rules):
     return out
 
 
+def label_problems(recs):
+    """Every figure's source is written in one of the shapes the build writes,
+    and only a statement's reads as someone's word, both ways round.
+    - A statement's label is exactly what facts.stated writes: "stated by
+      WHO, DATE", or "drafted from WHO's words of DATE, not yet approved".
+    - Any other figure's label is exactly one of the source shapes facts.py
+      writes, in ASCII: a pinned repository and a commit, then a path and its
+      lines, two paths, `git log` (of a path), or `ls-tree`; "this site's
+      commit SHA", or this site's path and lines; "GitHub snapshot DATE",
+      with a fork's fixed text; or a bare path.
+    A list of spellings to refuse fell twice to the next spelling (small
+    capitals, a braille blank: verifier-front), so the shapes are allowed,
+    not refused. The front page's note matches labels by their text, and the
+    check on Logan's words reads a record's kind; this holds the two
+    together. No slot takes a bare word:
+    - WHO is one of SPEAKERS, a reviewed list;
+    - a bare path, or this site's path, names a file or folder git tracks
+      in this repository, matched case by case, never with a ".." segment
+      (verifier-front labelled a non-statement "Logan");
+    - a repository's path is one of SOURCE_PATHS, a reviewed list
+      (verifier-front labelled one "cft-fp256 77b8440 Logan", then
+      "Logan." when the rule was a form).
+    Whether a listed path names a file at a given pin is not read here,
+    since that would need every clone. A label's shape shows its form, not
+    that its fact read that source: the facts stage re-runs each fact's own
+    code, and that code stays with review."""
+    import mapgen
+    repo = "(?:%s)" % "|".join(re.escape(n) for n in sorted(facts.PINS["repos"], key=len, reverse=True))
+    sha, date = r"[0-9a-f]{7,40}", r"[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    path, lines = r"[A-Za-z0-9_.][A-Za-z0-9_./-]*", r"(?::[0-9]+(?:-[0-9]+)?)?"
+    rpath = "(?:%s)" % "|".join(re.escape(p) for p in sorted(SOURCE_PATHS, key=len, reverse=True))
+    who = "|".join(re.escape(n) for n in sorted(SPEAKERS))
+    stated = re.compile(r"stated by (?:%s), %s|drafted from (?:%s)'s words of %s, not yet approved"
+                        % (who, date, who, date))
+    source = re.compile("|".join([
+        r"%s %s(?: %s%s| %s and %s| git log(?: -- %s)?| ls-tree)?" % (repo, sha, rpath, lines, rpath, rpath, rpath),
+        r"this site's commit %s" % sha,
+        r"GitHub snapshot %s(?:%s)?" % (date, re.escape(mapgen.FORK_CREATED)),
+    ]))
+    own = re.compile(r"(?:this site's )?(%s)%s" % (path, lines))
+    tracked = set(subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
+                                 check=True).stdout.decode("utf-8").split("\0")) - {""}
+    folders = {p.rsplit("/", 1)[0] + "/" for p in tracked if "/" in p}
+    folders |= {f[:i + 1] for f in list(folders) for i, c in enumerate(f) if c == "/"}
+
+    def in_tree(p):
+        return ".." not in p.split("/") and (p in tracked or p in folders or p + "/" in folders)
+    # A refused label is printed with ascii(): it may hold any character, and
+    # an invisible one is shown by its code point, not printed as itself.
+    out = []
+    for r in recs:
+        w = r["where"]
+        if r["kind"] == "stated":
+            if not stated.fullmatch(w):
+                out.append("facts.json: fact %d is a statement, and its label %s isn't a statement's, by a "
+                           "speaker this site may quote" % (r["id"], ascii(w)))
+            # A printed label is its source part, then any quoted words, and it
+            # may be a link. facts.stated writes neither of the last two, and a
+            # statement carrying them read as a source (verifier-front).
+            if r.get("said") or r.get("href"):
+                out.append("facts.json: fact %d is a statement, and its label carries a quote or a link, which "
+                           "facts.stated never writes" % r["id"])
+        elif not source.fullmatch(w):
+            m = own.fullmatch(w)
+            if not m:
+                out.append("facts.json: fact %d's label %s isn't one the build writes for a source"
+                           % (r["id"], ascii(w)))
+            elif not in_tree(m.group(1)):
+                out.append("facts.json: fact %d's label %s names %s, which git doesn't track here"
+                           % (r["id"], ascii(w), ascii(m.group(1))))
+    return out
+
+
 def check_numbers(root=PUBLIC, names=None):
     """Every numeral a page prints sits inside a mark (data-f) for a fact whose
     text is exactly the mark's text; every source label is its own fact's
@@ -886,8 +1009,9 @@ def check_numbers(root=PUBLIC, names=None):
         return ["facts.json is missing"], None
     recs = json.loads(fj.read_text(encoding="utf-8"))["facts"]
     by_id = {r["id"]: r for r in recs}
+    problems = label_problems(recs)
     names = numeral_names() if names is None else names
-    allowed, problems, n_marks = {}, [], 0
+    allowed, n_marks = {}, 0
     for n in sorted(names):
         if not any(n in r["text"] or n in r["raw"] for r in recs):
             problems.append("%s allows %r, and no fact's text holds it" % (NAMES_FILE.name, n))
@@ -931,17 +1055,29 @@ def check_numbers(root=PUBLIC, names=None):
             # second, unlabelled copy of a figure passed it (verifier-P0).
             # The footer's own pins and date are printed bare, and its
             # sentence says so.
+            if p.footers != 1:
+                problems.append("%s has %d footers; a page has one, the site's own" % (rel, p.footers))
             in_list = {m["f"] for m in p.marks if "src" in m["cls"] and m["evidence"]}
+            # The front page gives its sources once, in a note in its footer
+            # (decision 29): a figure there may name its source in that note
+            # instead, if the note gives a label of exactly its own fact's.
+            # No other page may carry such a note.
+            in_note = {facts.label(by_id[int(m["f"])]) for m in p.marks if "src" in m["cls"] and m["note"]
+                       and m["footer"] and m["f"].isdigit() and int(m["f"]) in by_id}
+            if any(m["note"] for m in p.marks) and rel != FRONT_PAGE:
+                problems.append("%s: only the front page may give its sources in a note" % rel)
             for m in p.marks:
                 rec = by_id.get(int(m["f"])) if m["f"].isdigit() else None
-                if not rec or "src" in m["cls"] or m["footer"] or not rec["text"]:
+                if not rec or "src" in m["cls"] or not rec["text"] or (
+                        m["footer"] and not m["note"] and rec["method"] in FOOTER_FIGURES):
                     continue
                 if m["svg"] and m["f"] not in in_list:
                     problems.append("%s: fact %s is drawn in the map, and the list under the map does not give "
                                     "its source" % (rel, m["f"]))
-                elif not m["svg"] and not m["beside"]:
-                    problems.append("%s: fact %s is printed above the footer without its source beside it"
-                                    % (rel, m["f"]))
+                elif not m["svg"] and not m["beside"] and not (rel == FRONT_PAGE and facts.label(rec) in in_note):
+                    problems.append("%s: fact %s is printed %s without its source beside it"
+                                    % (rel, m["f"], "in a footer, and is not one of the footer's own figures,"
+                                       if m["footer"] else "above the footer"))
             for text, tick in p.loose:
                 problems += _loose_problems(rel, text, tick, names, allowed)
             for t in p.attr_text:
@@ -1630,7 +1766,7 @@ def check_links(root=PUBLIC):
     return problems + check_connections(root)
 
 
-# The map on Home and each dossier's Connections, read as they are
+# The map on Map & Ledger and each dossier's Connections, read as they are
 # published: a dossier lists exactly the edges the map draws that touch its
 # project. verifier-seam dropped an edge where each is rendered, and the
 # control then in place, which compared two functions, said they agreed.
@@ -1644,9 +1780,10 @@ _CONNECTION_LIST = re.compile(r"<ul>((?:<li>.*?</li>)+)</ul>", re.S)
 
 
 def check_connections(root=PUBLIC):
-    home = root / "index.html"
+    home = root / MAP_PAGE
     if not home.is_file():
-        return []
+        dossiers = [r for r in published(root) if r.startswith("work-") and r.endswith(".html")]
+        return ["%s is missing, so no dossier's Connections can be held to the map" % MAP_PAGE] if dossiers else []
     kinds = json.loads((SITE / "data" / "relations.json").read_text(encoding="utf-8"))["kinds"]
     labels = sorted({label for _, label in kinds}, key=len, reverse=True)
     item = re.compile(r"<li><code>([^<]*)</code> (%s) <code>([^<]*)</code>: (?:(?!<li>).)*</li>"
@@ -1662,7 +1799,7 @@ def check_connections(root=PUBLIC):
                 drawn.add((tail, label, head))
                 break
         else:
-            problems.append("index.html draws an edge titled %r, of no kind relations.json names" % title)
+            problems.append("%s draws an edge titled %r, of no kind relations.json names" % (MAP_PAGE, title))
     nodes = {n for t, _, h in drawn for n in (t, h)}
     for rel in sorted(published(root)):
         if not (rel.startswith("work-") and rel.endswith(".html")):
@@ -1671,7 +1808,7 @@ def check_connections(root=PUBLIC):
         node = next((n for n in nodes if n.lower() == stem), None)
         sec = _CONNECTIONS.search((root / rel).read_text(encoding="utf-8"))
         if node is None:
-            problems.append("%s is a dossier for %r, which the map on index.html doesn't draw" % (rel, stem))
+            problems.append("%s is a dossier for %r, which the map on %s doesn't draw" % (rel, stem, MAP_PAGE))
             continue
         if sec is None:
             problems.append("%s has no Connections section" % rel)
@@ -2094,7 +2231,7 @@ def controls():
     with tempfile.TemporaryDirectory() as d:
         root = pathlib.Path(d)
         shutil.copytree(PUBLIC, root, dirs_exist_ok=True)
-        page = root / "index.html"
+        page = root / MAP_PAGE
         t = page.read_text(encoding="utf-8")
 
         def planted(name, what, new, check, want=None):
@@ -2113,7 +2250,7 @@ def controls():
         # the manifest: a page deleted, and a page edited by hand
         page.unlink()
         found = check_manifest(root)
-        report("manifest", any("index.html" in f for f in found), "index.html deleted: %s" % (found[0] if found else "passed"))
+        report("manifest", any(MAP_PAGE in f for f in found), "%s deleted: %s" % (MAP_PAGE, found[0] if found else "passed"))
         src_txt = root / "fonts" / "SOURCES.txt"
         saved_src = src_txt.read_text(encoding="utf-8")
         for what, new, want in (("a font size changed", re.sub(r"(newsreader-normal-latin\.woff2\s+)\d+", r"\g<1>132001",
@@ -2143,7 +2280,7 @@ def controls():
             found = [f for f in check_manifest(root) if want in f]
             report("manifest", bool(found), "%s: %s" % (what, found[0] if found else "passed"))
         mf.write_text(saved_mf, encoding="utf-8", newline="\n")
-        planted("manifest", "a byte of index.html changed", t.replace("Ledger", "Ledgeг", 1), check_manifest, "index.html")
+        planted("manifest", "a byte of %s changed" % MAP_PAGE, t.replace("Ledger", "Ledgeг", 1), check_manifest, MAP_PAGE)
 
         # numbers: a typed figure, a figure copied with its text changed, a
         # number word, a figure span with no fact, and a source label changed
@@ -2152,7 +2289,7 @@ def controls():
         # first of its method in facts.json: a page that sorts before
         # home.py logs the same method first (P4 found it, with corrections.py).
         agent = next((r for r in data["facts"] if r["method"] == "facts.agents" and r["args"]["name"] == "cft-fp256"
-                      and 'data-f="%d"' % r["id"] in t), {"id": 0, "text": "(none on index.html)"})
+                      and 'data-f="%d"' % r["id"] in t), {"id": 0, "text": "(none on %s)" % MAP_PAGE})
         mark = '<span class="fig" data-f="%d">%s</span>' % (agent["id"], agent["text"])
         if mark not in t:
             report("numbers", False, "could not plant: %r is not in the page" % mark)
@@ -2195,6 +2332,111 @@ def controls():
             planted("numbers", "a figure allowed as a name because a fact holds it",
                     t.replace("</footer>", "<p>%s</p></footer>" % held, 1),
                     lambda r: check_numbers(r, names={held: "planted"}), "not the shape of a name")
+
+            # The front page gives its sources once, in a note in its footer
+            # (decision 29). A figure there whose label the note doesn't give,
+            # and the note without the label of a figure the page prints, are
+            # each refused by name; so is such a note on any other page.
+            front = root / FRONT_PAGE
+            ft = front.read_text(encoding="utf-8")
+
+            def front_plant(what, new, want):
+                if new == ft:
+                    report("numbers", False, "could not plant %s: the front page does not have what it replaces" % what)
+                    return
+                front.write_text(new, encoding="utf-8", newline="\n")
+                try:
+                    hit = [f for f in check_numbers(root)[0] if want in f]
+                    report("numbers", bool(hit), "%s: %s" % (what, hit[0] if hit else "passed"))
+                finally:
+                    front.write_text(ft, encoding="utf-8", newline="\n")
+
+            front_plant("a ledger figure on the front page, whose label its note doesn't give",
+                        ft.replace("<footer>", "<p>%s</p><footer>" % mark, 1),
+                        "%s: fact %d is printed above the footer without its source beside it" % (FRONT_PAGE, agent["id"]))
+            # The note gives a label once for every figure that carries it,
+            # through any fact with that label, so the plant removes the
+            # first figure's label by its text, not by its fact's id.
+            first = re.search(r'<span class="stated" data-f="([0-9]+)">', ft)
+            rec = next((r for r in data["facts"] if first and r["id"] == int(first.group(1))), None)
+            label = None
+            for n in re.findall(r'<p class="sources">.*?</p>', ft, re.S) if rec else []:
+                label = label or re.search(r'<span class="src" data-f="[0-9]+"> %s</span>'
+                                           % re.escape(render.esc(facts.label(rec)).replace("/", "/<wbr>")), n)
+            if label:
+                front_plant("the front page's note without the label of the first figure it prints",
+                            ft.replace(label.group(0), "", 1),
+                            "%s: fact %s is printed above the footer without its source beside it"
+                            % (FRONT_PAGE, first.group(1)))
+            else:
+                report("numbers", False, "could not plant: the front page has no note giving its first figure's label")
+            src_span = re.search(r'<span class="src" data-f="%d">.*?</span>' % agent["id"], t, re.S)
+            planted("numbers", "a note giving sources in the footer of a page other than the front page",
+                    t.replace("<footer>", '<footer><p class="sources">%s</p>' % src_span.group(0), 1) if src_span else t,
+                    check_numbers, "%s: only the front page may give its sources in a note" % MAP_PAGE)
+
+            # A footer is no place to hide a figure's source: only the
+            # footer's own figures go bare there, a page has one footer, and
+            # the front page's note holds what it prints to the note's rule
+            # (verifier-front put a bare figure in the note, and one in a
+            # footer of a page's own).
+            in_footer = "%%s: fact %d is printed in a footer, and is not one of the footer's own figures," % agent["id"]
+            front_plant("a ledger figure printed bare inside the front page's note",
+                        ft.replace('<p class="sources">', '<p class="sources">%s ' % mark, 1), in_footer % FRONT_PAGE)
+            planted("numbers", "a ledger figure printed bare in the site's footer", t.replace(
+                "</footer>", "<p>%s</p></footer>" % mark, 1), check_numbers, in_footer % MAP_PAGE)
+            planted("numbers", "a footer of the page's own, holding a bare ledger figure",
+                    t.replace("<h1>", "<footer><p>%s</p></footer><h1>" % mark, 1), check_numbers,
+                    "footers; a page has one, the site's own")
+            forged = next((r for r in data["facts"] if r["kind"] != "stated"), None)
+            fjp_n = root / "facts.json"
+            saved_fj = fjp_n.read_text(encoding="utf-8")
+            statement = next((r for r in data["facts"] if r["kind"] == "stated"), None)
+            if forged and statement:
+                # Every spelling verifier-front passed while the rule listed
+                # what to refuse, and the converse: a statement labelled like a
+                # source. Non-ASCII letters are built with chr(), never typed
+                # as escapes (trap 8).
+                small_caps = "".join(chr(c) for c in (0xA731, 0x1D1B, 0x1D00, 0x1D1B, 0x1D07, 0x1D05)) \
+                    + " " + chr(0x299) + chr(0x28F)
+                for fact_id, label, want in [
+                        (forged["id"], x, "fact %d's label" % forged["id"]) for x in (
+                            "stated by Logan, 2026-09-30", "Stated by Logan, 2026-09-30",
+                            "stated" + chr(0xA0) + "by Logan, 2026-09-30", " as stated by Logan",
+                            "Drafted from Logan's words of 2026-09-30, not yet approved",
+                            small_caps + " Logan, 2026-09-30", "stated" + chr(0x2800) + "by Logan, 2026-09-30",
+                            "said by Logan, 2026-09-30", "st" + chr(0x251) + "ted by Logan, 2026-09-30",
+                            "Logan", "this site's Logan", "HonestFramework 65447fd README.md and Logan",
+                            "cft-fp256 77b8440 Logan", "../work", "PINS.JSON", ".cache",
+                            "cft-fp256 77b8440 Logan.", "HonestFramework 65447fd README.md and Logan.")] + [
+                        (statement["id"], x, "fact %d is a statement, and its label" % statement["id"]) for x in (
+                            "cft-fp256 77b8440 README.md:3", "stated by HonestFramework README.md, 2026-09-30",
+                            "stated by pins.json, 2026-09-30")]:
+                    bad = json.loads(saved_fj)
+                    next(r for r in bad["facts"] if r["id"] == fact_id)["where"] = label
+                    fjp_n.write_text(json.dumps(bad), encoding="utf-8", newline="\n")
+                    try:
+                        hit = [f for f in check_numbers(root)[0] if want in f]
+                    finally:
+                        fjp_n.write_text(saved_fj, encoding="utf-8", newline="\n")
+                    report("numbers", bool(hit), "fact %d relabelled %s: %s"
+                           % (fact_id, ascii(label), hit[0] if hit else "passed"))
+                # A statement's printed label given a quoted part, or a link,
+                # each naming a source (verifier-front).
+                for field, value in (("said", "cft-fp256 77b8440 README.md:3"),
+                                     ("href", "https://github.com/loganw234/cft-fp256/blob/77b8440/README.md#L3")):
+                    bad = json.loads(saved_fj)
+                    next(r for r in bad["facts"] if r["id"] == statement["id"])[field] = value
+                    fjp_n.write_text(json.dumps(bad), encoding="utf-8", newline="\n")
+                    try:
+                        hit = [f for f in check_numbers(root)[0]
+                               if "fact %d is a statement, and its label carries" % statement["id"] in f]
+                    finally:
+                        fjp_n.write_text(saved_fj, encoding="utf-8", newline="\n")
+                    report("numbers", bool(hit), "a statement given a %s, %s: %s"
+                           % (field, ascii(value), hit[0] if hit else "passed"))
+            else:
+                report("numbers", False, "could not plant: facts.json lacks a statement or a fact that is not one")
             css = root / "style.css"
             saved_css = css.read_text(encoding="utf-8")
             for what, rule, want in (("a figure in CSS generated content", '.stamp::after{content:" 3397 tests"}', "'3397'"),
@@ -2314,8 +2556,8 @@ def controls():
                             ("split by markup", "<p>Wal<b>ly</b> made this</p>"),
                             ("as a character reference", "<p>&#87;ally made this</p>"),
                             ("in an attribute", '<p title="by Wally">made</p>')):
-            planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
-                    check_local_only, "index.html: names Wally")
+            planted("local-only", "Wally on Map & Ledger, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
+                    check_local_only, MAP_PAGE + ": names Wally")
         # An address in each shape a browser or a parser decodes, as
         # verifier-seam published one past the first version of the gate.
         for what, shape in (("as a character reference", "<p>write to someone&#64;example.com</p>"),
@@ -2324,13 +2566,22 @@ def controls():
                             ("split by a word-break tag", "<p>someone@<wbr>example.com</p>"),
                             ("split by inline markup", "<p>some<span>one</span>@example.com</p>")):
             planted("local-only", "an email address on a page, %s" % what,
-                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, "index.html: an email address")
+                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, MAP_PAGE + ": an email address")
         for what, shape in (("percent-encoded", "planted%40example.org "),
                             ("as a JSON escape", "planted" + chr(92) + "u0040example.org ")):
             fjp.write_text(saved_fj.replace('"about": "', '"about": "' + shape, 1), encoding="utf-8", newline="\n")
             found = [f for f in check_local_only(root) if f.startswith("facts.json") and "an email address" in f]
             report("local-only", bool(found), "an email address in facts.json, %s: %s" % (what, found[0] if found else "passed"))
         fjp.write_text(saved_fj, encoding="utf-8", newline="\n")
+
+        # The map's page gone, with dossiers still published: check_connections
+        # says so, rather than passing with no map to hold them to.
+        page.unlink()
+        try:
+            found = [f for f in check_connections(root) if "%s is missing" % MAP_PAGE in f]
+        finally:
+            page.write_text(t, encoding="utf-8", newline="\n")
+        report("links", bool(found), "%s deleted, with dossiers published: %s" % (MAP_PAGE, found[0] if found else "passed"))
 
         # A dossier's Connections against the map, as published.
         dossier = root / "work-cft-rebound.html"
@@ -2403,7 +2654,7 @@ def controls():
                             ("as an address literal", "<p>someone@[192.0.2.1]</p>"),
                             ("with a quoted local part", '<p>"some one"@example.com</p>')):
             planted("local-only", "an email address on a page, %s" % what,
-                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, "index.html: an email address")
+                    t.replace("</footer>", shape + "</footer>", 1), check_local_only, MAP_PAGE + ": an email address")
         for what, shape in (("split by a comment", "<p>Wal<!-- -->ly</p>"),
                             ("split by a soft hyphen", "<p>Wal&shy;ly</p>"),
                             ("split by a zero-width space", "<p>W&#8203;ally</p>"),
@@ -2414,8 +2665,8 @@ def controls():
                              "<p>Wal%sly</p>" % chr(0x2065)),
                             ("in fullwidth letters",
                              "<p>%s</p>" % "".join(chr(c) for c in (0xFF37, 0xFF41, 0xFF4C, 0xFF4C, 0xFF59)))):
-            planted("local-only", "Wally on Home, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
-                    check_local_only, "index.html: names Wally")
+            planted("local-only", "Wally on Map & Ledger, %s" % what, t.replace("</footer>", shape + "</footer>", 1),
+                    check_local_only, MAP_PAGE + ": names Wally")
         # A text a page declares ONLY_HERE, printed on another page: refused
         # there, and not on the page that declares it. A stand-in declared
         # here, with punctuation and Logan's spelling "wouldnt" in it, so
@@ -2437,7 +2688,7 @@ def controls():
                 ("with its comma dropped", t.replace("</footer>", "<p>%s</p></footer>" % stand_in.replace(",", ""), 1)),
                 ("with an apostrophe its source doesn't have",
                  t.replace("</footer>", "<p>%s</p></footer>" % stand_in.replace("wouldnt", "wouldn&#x27;t"), 1))):
-            found = only_here_problems("index.html", new.encode(), declared) if new != t else []
+            found = only_here_problems(MAP_PAGE, new.encode(), declared) if new != t else []
             # The first case also holds the other side: the same text on its
             # own page passes.
             at_home = only_here_problems("method.html", new.encode(), declared) if what == "as it is" else []
@@ -2446,7 +2697,7 @@ def controls():
                       "; on its own page: %s" % (at_home or "passed, as it must") if what == "as it is" else ""))
         planted("local-only", "an email address on a page, with a fullwidth at sign",
                 t.replace("</footer>", "<p>someone%sexample.com</p></footer>" % chr(0xFF20), 1), check_local_only,
-                "index.html: an email address")
+                MAP_PAGE + ": an email address")
         # The HTML subset (PARENTS), in each shape a browser repairs another
         # way than this check's parser reads it (verifier-seam).
         for what, shape, want in (
@@ -2483,11 +2734,11 @@ def controls():
                  "not a <head> and then a <body>"),
                 ("a name written backwards between override references",
                  t.replace("</footer>", "<p>&#x202E;yllaW&#x202C;</p></footer>", 1),
-                 "index.html: a character a browser draws as nothing, or a control character: U+202C, U+202E"),
+                 MAP_PAGE + ": a character a browser draws as nothing, or a control character: U+202C, U+202E"),
                 ("Wally with a digit after it", t.replace("</footer>", "<p>ask Wally2</p></footer>", 1),
-                 "index.html: names Wally"),
+                 MAP_PAGE + ": names Wally"),
                 ("Wally with an underscore after it", t.replace("</footer>", "<p>ask Wally_</p></footer>", 1),
-                 "index.html: names Wally")):
+                 MAP_PAGE + ": names Wally")):
             planted("local-only", what, new, check_local_only, want)
         # A character a browser draws as nothing, refused wherever it is.
         for what, cp in (("a soft hyphen", 0xAD), ("U+2065, unassigned", 0x2065), ("U+FFF0, unassigned", 0xFFF0),
@@ -2495,7 +2746,7 @@ def controls():
             # Named by file and code point: a carriage return a restore left
             # in MANIFEST once satisfied all five, on Windows.
             planted("local-only", "on a page, %s" % what, t.replace("</footer>", "<p>a%sb</p></footer>" % chr(cp), 1),
-                    check_local_only, "index.html: a character a browser draws as nothing, or a control character: "
+                    check_local_only, MAP_PAGE + ": a character a browser draws as nothing, or a control character: "
                                       "U+%04X" % cp)
         fjp.write_text(saved_fj.replace('"about": "', '"about": "Wal' + chr(0xAD) + 'ly ', 1), encoding="utf-8", newline="\n")
         found = [f for f in check_local_only(root) if f.startswith("facts.json") and "draws as nothing" in f and "U+00AD" in f]
@@ -2515,7 +2766,7 @@ def controls():
                     t.replace(narrow.group(0), narrow.group(0).replace(mark_in_narrow.group(0), "", 1), 1),
                     check_numbers, "draw different figures")
         else:
-            report("numbers", False, "could not plant: index.html has no narrow map with a figure in it")
+            report("numbers", False, "could not plant: %s has no narrow map with a figure in it" % MAP_PAGE)
         for what, shape, want in (("an HTML comment", "<p>a<!-- b -->c</p>", "an HTML comment"),
                                   ("a CDATA section in SVG text", "<svg><text>Wal<![CDATA[ly]]></text></svg>", "CDATA"),
                                   ("a processing instruction", "<?xml-stylesheet href=x?>", "a processing instruction")):
@@ -2677,9 +2928,17 @@ def controls():
     fake = lambda f, nav, idx=None: types.SimpleNamespace(
         __name__="planted." + f, render_page=lambda ctx: "",
         PAGE=dict(file=f, nav=nav, title="t", description="d", **({} if idx is None else {"index": idx})))
-    for what, mods in (("a nested page", [fake("work/x.html", "Work")]),
-                       ("two section pages", [fake("threads.html", "Threads", True), fake("thread-a.html", "Threads", True)])):
-        refused("seam", what, lambda mods=mods: validate(mods))
+    for what, mods, want in (("a nested page", [fake("work/x.html", "Work")], "a flat, lower-case .html name"),
+                             ("two section pages", [fake("threads.html", "Threads", True),
+                                                    fake("thread-a.html", "Threads", True)], "it needs exactly one"),
+                             ("no front page", [fake("x.html", "Work")], "no page claims navigation entry 'Home'"),
+                             ("the front page published under another name",
+                              [fake("home.html", "Home"), fake(MAP_PAGE, "Map & Ledger")], "the checks read it as index.html")):
+        refused("seam", what, lambda mods=mods: validate(mods), want)
+    m = fake("work-x.html", "Work")
+    m.footer_note = lambda ctx: ""
+    refused("seam", "a note in the footer of a page other than the front page",
+            lambda m=m: validate([m, fake(FRONT_PAGE, "Home"), fake(MAP_PAGE, "Map & Ledger")]), "only the front page")
     m = fake("x.html", "Work")
     m.NUMERAL_NAMES = ["4096 tests"]
     refused("seam", "a page module allowing names of its own", lambda m=m: validate([m]), "numeral_names.json")
@@ -2966,13 +3225,13 @@ def controls():
             skip(name, "needs every pinned clone: %s" % e)
     if text is not None:
         abi = next((r for r in facts.LOG if r["method"] == "facts.macros"
-                    and '<span class="fig" data-f="%d">' % r["id"] in text["index.html"]),
-                   {"id": 0, "text": "(none on index.html)"})
+                    and '<span class="fig" data-f="%d">' % r["id"] in text[MAP_PAGE]),
+                   {"id": 0, "text": "(none on %s)" % MAP_PAGE})
         needle = '<span class="fig" data-f="%d">%s</span>' % (abi["id"], abi["text"])
         with tempfile.TemporaryDirectory() as d:
             root = pathlib.Path(d)
             write(text, binary, root)
-            page = root / "index.html"
+            page = root / MAP_PAGE
             t = page.read_text(encoding="utf-8")
             if needle not in t:
                 report("drift", False, "could not plant: %r is not in the page" % needle)

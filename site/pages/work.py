@@ -1,6 +1,6 @@
-"""Work: every project on Home's ledger (docs/SPEC.md, "Work"). The first five
-(decision 15) get a full nine-section dossier; the rest are listed as Home
-already lists them, so the two pages never carry two descriptions of one
+"""Work: every project in Map & Ledger's ledger (docs/SPEC.md, "Work"). The
+first five (decision 15) get a full nine-section dossier; the rest are listed
+as Map & Ledger already lists them, so the two pages never carry two descriptions of one
 project that could drift apart.
 """
 import copy
@@ -49,7 +49,7 @@ def render_page(ctx):
             out.append("<li>%s</li>" % render(r["project"]))
     if thread is not None:
         out.append("</ul>")
-    lede = ("<div class=\"measure\"><p class=\"lede\">Every project on Home's ledger is here. "
+    lede = ("<div class=\"measure\"><p class=\"lede\">Every project in the ledger on Map &amp; Ledger is here. "
             "%s of them carry a full dossier: what each is, what it is not, its contract, what has "
             "verified it, the failures it kept, how to test it, how to try to prove it wrong, what it "
             "connects to and where every figure on its page was read.</p></div>"

@@ -42,6 +42,13 @@ letters of another script (CLAUDE.md trap 14). A short declaration could
 turn up by chance in other text; local-only would then refuse it loudly,
 never pass it silently, so declare whole sentences.
 
+The front page alone (index.html, decision 29) may define footer_note(ctx)
+-> HTML for a note at the top of its footer, which gives the page's sources
+once: it prints each figure with render.fig(v, src=False), and the note
+gives each label, with render.source(v). The numbers stage passes a figure
+there without a label beside it only if the note gives a label of exactly
+its own fact's, and the build refuses footer_note on any other page.
+
 The module also defines:
   controls() (optional) -> [(name, caught, how)]: the page's own negative
       controls, run by `build.py --control`. Each plants a fault the page's

@@ -105,6 +105,13 @@ class Axis:
 # never typed, mapped to node(s) by relations.json's storydocs_projects.
 # ---------------------------------------------------------------------------
 
+# The rest of a fork's label after the snapshot's date: one fixed text, so the
+# numbers stage can hold every label to a shape the build writes
+# (build.label_problems reads it from here).
+FORK_CREATED = (": created (a fork - dated by GitHub's record of when the fork itself was made, in UTC, never by a "
+                "commit, since its earliest commit belongs to the project it forked)")
+
+
 @facts.fact
 def api_created(name):
     """A fork's day of creation on GitHub, in UTC (the API gives no author's
@@ -117,9 +124,7 @@ def api_created(name):
         raise Refusal("%s is not a fork; facts.born or facts.api_born places one that isn't" % name)
     iso = meta["createdAt"]
     pub = facts.is_public(name)
-    where = ("GitHub snapshot %s: created (a fork - dated by GitHub's record of when the fork itself was made, "
-             "in UTC, never by a commit, since its earliest commit belongs to the project it forked)"
-             % facts.snapdate())
+    where = "GitHub snapshot %s%s" % (facts.snapdate(), FORK_CREATED)
     return facts.V(iso[:10], facts.Src("api", where, "%s: createdAt %s" % (name, iso),
                                        meta["url"] if pub else "", not pub), raw=iso[:10], num=True)
 
@@ -493,7 +498,7 @@ def lane_slice(lane_index):
     """One thread's slice of the map: that lane's nodes, and every edge that
     leaves or enters it (the other end may sit in another lane); the rest of
     the map is still drawn, behind it, so a reader sees the same whole map
-    Home does, pushed back rather than removed. Same two layouts, same
+    Map & Ledger does, pushed back rather than removed. Same two layouts, same
     parity check, as block()."""
     M = build()
     wide_svg, wide_n, wide_e = svg_wide(M, dim_lane=lane_index)
@@ -505,7 +510,7 @@ def lane_slice(lane_index):
     in_lane = [n for n in order if n["lane"] == lane_index]
     # Both layouts still draw the rest of the map too, dimmed rather than
     # removed (site/styles/map.css), so every node, every edge and the
-    # family are covered here exactly as block() covers them for Home - the
+    # family are covered here exactly as block() covers them for Map & Ledger - the
     # numbers stage holds a dimmed figure to the same rule as a bright one.
     ev = "".join('<li><b>%s</b> %s <b>%s</b>: %s</li>' % (esc(e["tail"]), esc(KIND[e["kind"]]), esc(e["head"]), fig(e["v"]))
                 for e in M["edges"])
@@ -517,7 +522,7 @@ def lane_slice(lane_index):
               for n in order if n["note"]]
     cap = ("This thread's part of the map (site/data/relations.json), the rest of it still drawn behind: every node "
           "in this lane, and every edge that leaves or enters it, wherever the other end sits. Both layouts draw "
-          "the same nodes and edges as each other and as the full map on Home (the same check holds them equal); "
+          "the same nodes and edges as each other and as the full map on Map &amp; Ledger (the same check holds them equal); "
           "one is shown at a time, chosen by your screen's width. This lane's own nodes: %s."
           % ", ".join(esc(n["name"]) for n in in_lane))
     return ('<figure class="map slice"><div class="map-wide">%s</div><div class="map-narrow">%s</div>'

@@ -1,4 +1,6 @@
-"""Home: the current truth, on one page (docs/SPEC.md, "Home").
+"""Map & Ledger: the current truth, on one page (docs/SPEC.md, "Home"). The
+spec's Home moved here when the front page took its place, one click before
+it, and its biography went with the front page (decisions 29 and 30).
 
 Everything here is read at the pins through facts.py, or said to be stated.
 The ledger's rows are the projects the site covers so far; the round adds the
@@ -11,7 +13,7 @@ from facts import V, fact
 import mapgen
 from render import C, L, SOURCE_REPO, esc, render
 
-PAGE = {"file": "index.html", "nav": "Home", "title": "Logan W. — loganw.dev",
+PAGE = {"file": "map-ledger.html", "nav": "Map & Ledger", "title": "Map & Ledger — loganw.dev",
         "description": "Logan W.'s projects, and the record behind every figure about them."}
 
 PRINTS = [("pauli-print.png", "Pauli"), ("poisson-print.png", "Poisson"), ("trix-print.png", "TRI-X")]
@@ -28,15 +30,6 @@ LEDGER_CAP = ("Each figure names where it was read: a repository at the commit i
 # are honest, and they are not a measure of how much of a project an agent did.
 # Logan's words are recorded in docs/SPEC.md (decision 23); this is their meaning.
 AI_USE = "every project here was AI-driven, and the co-author line was not always added to its commits"
-
-# Drafted by the lead from the spec's own words (docs/SPEC.md, section 1: "carpenter
-# since fifteen", "no formal training", "agents write essentially all the lines",
-# "gates decide what's true"), and approved by Logan on 2026-09-29: "Biography is
-# good" (decision 14). Until then the page labelled it a draft.
-WHO = ("I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. "
-       "AI agents have written essentially all of the code in these projects; gates decide what is true, and the "
-       "record keeps what they said.")
-
 
 def S(text, **kw):
     return facts.stated(text, "Logan", "2026-09-29", **kw)
@@ -224,19 +217,18 @@ def prints():
 
 
 def render_page(ctx):
-    who = facts.stated(WHO, "Logan", "2026-09-29")
     cap = LEDGER_CAP + render(["Logan's word is that ", S(AI_USE), "."])
-    return ('<div class="measure"><p class="lede">%s</p></div>'
+    return ('<h1>Map &amp; Ledger</h1>'
             '<h2><small>I</small>Where each project came from</h2>%s'
             '<h2><small>II</small>Ledger</h2><div class="table-wrap">%s</div><p class="cap">%s</p>'
             '<div class="measure"><h2><small>III</small>Check it yourself</h2><div class="cta"><p>Don\'t trust this page.</p>%s</div>'
             '<h2><small>IV</small>The film thread</h2>%s'
             '<h2><small>V</small>Not here</h2>%s</div>'
-            % (render(who), mapgen.block(), ledger_table(), cap, checks(), prints(), not_here()))
+            % (mapgen.block(), ledger_table(), cap, checks(), prints(), not_here()))
 
 
 def controls():
-    """A red run, planted in the snapshot: Home shows it as an open regression,
+    """A red run, planted in the snapshot: Map & Ledger shows it as an open regression,
     and a run with no verdict is passed over. atlas-film is public, so this runs
     wherever its pin can be fetched."""
     out = []

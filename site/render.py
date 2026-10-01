@@ -16,9 +16,10 @@ import html
 import facts
 from facts import V, Src, Refusal, fact
 
-# The navigation, in the spec's order (docs/SPEC.md). A page module declares
-# which of these it is; an entry with no page is shown and not linked.
-NAV = ["Home", "Threads", "Work", "Method", "Record", "Verify", "Corrections", "Propose", "About"]
+# The navigation, in the spec's order (docs/SPEC.md), with Map & Ledger right
+# after Home (decision 30). A page module declares which of these it is; an
+# entry with no page is shown and not linked.
+NAV = ["Home", "Map & Ledger", "Threads", "Work", "Method", "Record", "Verify", "Corrections", "Propose", "About"]
 
 SOURCE_REPO = "https://github.com/%s/loganw.dev" % facts.OWNER
 
@@ -85,6 +86,18 @@ def fig(v, href=None, src=True):
             label = '<a href="%s">%s</a>' % (esc(rec["href"]), label)
         out += '<span class="src" data-f="%d"> %s</span>' % (v.id, label)
     return out
+
+
+def source(v):
+    """A figure's source alone, for the one note that gives a page's sources
+    once (the front page's, decision 29). Its figure is printed elsewhere on
+    the page with fig(v, src=False); the numbers stage holds each such figure
+    to a label of exactly its own fact's in that note."""
+    rec = checked(v)
+    label = esc(facts.label(rec)).replace("/", "/<wbr>")
+    if rec["href"]:
+        label = '<a href="%s">%s</a>' % (esc(rec["href"]), label)
+    return '<span class="src" data-f="%d"> %s</span>' % (v.id, label)
 
 
 def render(segs):
@@ -167,7 +180,10 @@ def stamp():
                    pages_built(), " pages built · a figure whose source stops matching stops the build"])
 
 
-def footer():
+def footer(note=""):
+    """The site's footer. note is a page's own note, printed first: the front
+    page's gives its sources once (decision 29), and the sentence after it
+    says so in place of "beside it"."""
     li = []
     for name in facts.PINS["repos"]:
         c = facts.pin_commit(name)
@@ -176,9 +192,12 @@ def footer():
                                                      fig(facts.api_visibility([name]), src=False)))
         else:
             li.append('<li>%s %s</li>' % (esc(name), fig(c, href=c.src.href, src=False)))
+    where = ("beside it, or, for Logan's words on this page, in the note above, which gives each of their sources "
+             "once." if note else
+             "beside it, or, for what the map draws, in the list under the map.")
     return (
-        '<p>Every figure above this footer names where it was read: beside it, or, for what the map draws, in the '
-        'list under the map. The commits below are the ones pins.json '
+        note +
+        '<p>Every figure above this footer names where it was read: ' + where + ' The commits below are the ones pins.json '
         'names, and <a href="facts.json">facts.json</a> lists every figure on the page, with where it was read. '
         '<code>python site/build.py --verify-facts</code>, in a clone of <a href="%s">this site\'s repository</a>, '
         'reads each one again: from its repository at the commit below, from the committed GitHub snapshot of '
@@ -189,8 +208,9 @@ def footer():
         % (SOURCE_REPO, fig(facts.snapshot_date(), src=False), "".join(li)))
 
 
-def page(title, current, built, body, description):
-    """Home's heading is the name; every other page's is its own, in its body."""
+def page(title, current, built, body, description, note=""):
+    """Home's heading is the name; every other page's is its own, in its body.
+    note is the page's own footer note, if it has one."""
     tag = "h1" if current == "Home" else "p"
     return ('<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
             '<meta http-equiv="Content-Security-Policy" content="%s">'
@@ -200,4 +220,4 @@ def page(title, current, built, body, description):
             '<body><main>'
             '<header><div class="site">loganw.dev</div><%s class="name">Logan W.</%s><nav>%s</nav>'
             '<p class="stamp">%s</p></header>\n%s\n<footer>%s</footer></main></body></html>\n'
-            % (esc(CSP), esc(title), esc(description), tag, tag, nav(current, built), stamp(), body, footer()))
+            % (esc(CSP), esc(title), esc(description), tag, tag, nav(current, built), stamp(), body, footer(note)))

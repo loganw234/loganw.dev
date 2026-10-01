@@ -29,7 +29,7 @@ def account():
         "atlas-film underlies Quantum-Film, ",
         P("Quantum-Film", "README.md", r"^\*\*(Film stocks whose crystals are laid by quantum circuits)"),
         ", checked at ", facts.stage_count("Quantum-Film", "verify/run.sh"), " runner stages — the prints on "
-        "Home are its output."]))
+        "Map & Ledger are its output."]))
     paras.append(render([
         "StoryDocs, ", P("StoryDocs", "README.md", r"^Books and papers compiled from (Markdown manifests)",
                          display="a book-and-paper pipeline built from Markdown manifests"),

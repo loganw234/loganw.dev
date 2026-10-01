@@ -21,6 +21,41 @@ read. If the build can't read a figure from its source, it stops and names
 the figure. The `numbers` stage refuses a numeral on a page that isn't inside
 a figure's mark, and any mark whose text isn't exactly its own fact's.
 
+Each figure names its source beside it, except in the places below, and the
+`numbers` stage holds each of them:
+
+- a figure the map draws names its source in the list under the map;
+- the footer's own figures (each pin's commit, a private pin's visibility,
+  and the snapshot's date) are printed bare in the footer, which says where
+  they were read, and no other figure may go bare in a footer, of which a
+  page has one;
+- the front page, a lighter landing space in Logan's own words, gives the
+  sources of his words once, in a note in its footer, as SPEC.md records. A
+  figure there passes without its source beside it only if the note gives a
+  label of exactly its own fact's, and no other page may carry such a note.
+  Each of Logan's paragraphs there is still a figure, held to his approved
+  words, as About's are.
+
+Every figure's label is written in one of the shapes the build writes for
+its kind, and the stage refuses any other.
+
+- A statement's label reads "stated by" someone, or "drafted from" their
+  words, and that someone is on the site's reviewed list of speakers
+  (`build.SPEAKERS`, Logan alone today).
+- Every other label names a source in ASCII: a pinned repository and
+  commit, with a path from the reviewed list of paths labels may name
+  (`build.SOURCE_PATHS`); this site's own commit; the GitHub snapshot; or a
+  path, alone or as this site's, that names a file or folder git tracks in
+  this repository, matched case by case.
+
+A statement's label carries no quoted words and no link, since
+`facts.stated` writes neither. So a source can't be labelled as someone's
+word, and someone's word can't be labelled as a source. A label's shape
+shows its form, not that its fact read that source, or that its quoted
+words and link are that source's. Whether a listed path names a file at a given pin
+isn't read by this stage. The facts stage re-runs each fact's own code,
+and that code stays with review.
+
 What that doesn't cover:
 
 - **Digits inside names.** Digits written straight after a letter are read

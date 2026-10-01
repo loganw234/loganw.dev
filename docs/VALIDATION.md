@@ -1828,3 +1828,208 @@ Each is answered above. Its side notes:
 after wave 1 was dispatched.
 
 `--control` caught 330 of 330.
+
+## 2026-09-30 - a front page in Logan's own words, and Map & Ledger one click on
+
+**What Logan asked for** (SPEC decisions 29 and 30): a lighter landing page
+for a general reader, before the dense one. The lead asked two rounds of
+questions first, drafted the page from the answers, and Logan approved the
+draft as written. Before it shipped, the lead found three phrases in it that
+claimed more than the site does, and Logan approved narrower ones. Map &
+Ledger prints one number as Logan's word, so its figures "name where they
+came from" rather than all being "read from their source". And other pages
+print plain sentences too, so the front page is the one that gives its
+sources "in one note instead of beside each figure". The message that
+proposed those phrases wasn't kept in the session's record, so Logan
+confirmed them as printed ("Confirmed, add the carpenter credit, keep the
+link"). His footer note now also credits PrettyCloud's about page for the
+carpenter paragraph.
+
+**What changed:**
+
+- `index.html` is now the front page (`site/pages/front.py`). It holds
+  Home's biography and Logan's approved words. Its one link in its body is
+  to Map & Ledger, and its footer's note links the PrettyCloud page it
+  retells.
+- The old Home is now Map & Ledger (`map-ledger.html`): its map, ledger,
+  checks, prints and "Not here". It comes right after Home in the
+  navigation, and every entry in the navigation has a page.
+- Three sentences on other pages that put the map, the ledger or the
+  prints on Home now put them on Map & Ledger. The checks that read the map
+  read it there.
+
+**The front page's sources.** At Logan's word, its paragraphs print without
+a source beside each one, and a note in its footer gives every source once.
+
+- Each paragraph is still a `stated()` figure. The same check as About's
+  holds it to Logan's approved words, who and when. That check now lives in
+  one place, `pages/_settled.py`, for both pages.
+- The numbers stage holds the note. A figure on the front page passes
+  without its source beside it only if the note gives a label of exactly
+  its own fact's. No other page may carry such a note, and the build
+  refuses `footer_note` on any other page.
+- The footer's own sentence says where the front page's sources are:
+  beside each figure, or, for Logan's words, in the note.
+
+**Controls:**
+
+- The front page's own: in each of its eight blocks, a statement planted
+  before its content and one after it, and every shape verifier-close
+  found on About.
+- Three for the note, each refused by name:
+  - a ledger figure on the front page, whose label the note doesn't give;
+  - the note without the label of the first figure the page prints;
+  - a note on Map & Ledger.
+- Measured at unit level, on in-memory copies of `pages/_settled.py`: each
+  of eight sabotages fails at least one control, on About and on the front
+  page alike.
+
+**verifier-front** checked the first version, which was not pushed, and
+said NOT READY. Every finding is accepted:
+
+1. The numbers stage let any mark inside a footer go bare, an exemption
+   meant for the footer's own pins and date. The front page's note sits in
+   its footer, so a bare figure there passed every stage. Now only the
+   footer's own figures go bare: each pin's commit, a private pin's
+   visibility, and the snapshot's date.
+2. The same exemption let any page print a bare figure inside a footer of
+   its own, in its body. That was true before this change too. A page now
+   has one footer, the site's.
+3. The three narrowed phrases had no record of the message proposing
+   them. Logan has confirmed them as printed.
+4. The front page's footer sentence said every figure above it names its
+   source in the note, but the header's figures name theirs beside them.
+   It now says both.
+5. README's sentence left out the standing exceptions: the list under the
+   map, and the footer's own figures. It now lists them with the front
+   page's note.
+
+Its side notes, each taken:
+
+- A class is now split on HTML's own whitespace, as a browser splits it.
+  `str.split()` also splits on a no-break space.
+- A label must take one of the shapes the build writes, both ways round.
+  The front page's note matches labels by their text. The rule is
+  described under verifier-front's third verdict below.
+- `validate()` now requires a front page and a Map & Ledger page. A
+  missing map page is now held by a control.
+- The note now also credits PrettyCloud for the carpenter paragraph.
+- Two sentences here and in `front.py` said the page leads to one page
+  only, and a comment said the build reads PrettyCloud's about page. All
+  three are corrected.
+
+**New controls,** each refused by name:
+
+- a ledger figure printed bare in the front page's note;
+- the same in the site footer of Map & Ledger;
+- a footer of a page's own, in its body;
+- a figure that is not a statement, labelled as Logan's word;
+- the map's page deleted, with dossiers still published;
+- no front page;
+- the front page published under another name;
+- a footer note on a page other than the front page.
+
+Two existing seam controls now name the rule they exercise.
+
+**verifier-front again,** on the second version, which was not pushed:
+NOT READY, one finding, accepted. The rule on a statement's label read
+two exact prefixes. "Stated by", and a no-break space after "stated",
+each published a sentence Logan never said on About, labelled as his
+word, and every stage passed.
+
+- The label was then read folded: compatibility form, case, and every
+  kind of whitespace as one space, with either phrase anywhere in it
+  making it a statement's label.
+
+**verifier-front's third verdict,** on that folded rule, also not pushed:
+NOT READY, both findings accepted.
+
+1. Small capitals, and a braille blank in place of the space, still
+   passed. Unicode folds neither to "stated by". So the rule refused a
+   list of spellings, and it fell to the next spelling, as such lists have
+   all round.
+2. The converse passed too, and it predates this change: a statement
+   wearing a label that looked like a citation of a repository.
+
+**The rule now allows shapes, both ways round** (`build.label_problems`):
+
+- A statement's label is exactly what `facts.stated` writes: "stated by
+  WHO, DATE", or "drafted from WHO's words of DATE, not yet approved".
+- Every other label is exactly one of the source shapes `facts.py`
+  writes, in ASCII:
+  - a pinned repository and a commit, then a path and its lines, two
+    paths, `git log` (of a path), or `ls-tree`;
+  - "this site's commit", or this site's path and lines;
+  - "GitHub snapshot" and a date, with a fork's fixed text, which
+    `mapgen.FORK_CREATED` now holds;
+  - a bare path.
+- Every one of the site's 1737 labels fits.
+- "Said by", small capitals, a braille blank, a Latin alpha, and "Logan's
+  word" are all refused, as is a statement labelled as a source.
+- The control plants ten labels and refuses each by name: nine on a
+  figure that is not a statement, among them every spelling
+  verifier-front used, and one on a statement.
+
+**verifier-front's fourth verdict,** on that allowlist, also not pushed:
+NOT READY, one finding, accepted. Two of the shapes had a free slot:
+
+- **A bare path.** A figure that is not a statement labelled "Logan" read
+  as Logan's word.
+- **The name in a statement's label.** "stated by HonestFramework
+  README.md" read as a source.
+
+Both slots are closed:
+
+- A bare path, or this site's path, must name a file or folder in the
+  tree being built. All five the site uses do.
+- The name in a statement's label must be on `build.SPEAKERS`, a
+  reviewed list. Logan is the only name on it.
+- README now states the limit verifier-front noted: a label's shape
+  shows its form, not that its fact read that source.
+- The control now plants fourteen labels, the new shapes among them,
+  and refuses each by name.
+
+**verifier-front's fifth verdict,** on that version, also not pushed:
+NOT READY, one finding, accepted. The version claimed no slot was free,
+but a repository's path still was. "(cft-fp256 77b8440 Logan)", and
+"README.md and Logan" after a repository and commit, read as Logan's
+word.
+
+- A repository's path must now look like a path: it holds a dot or a
+  slash, or is `LICENSE`. All 23 such paths in today's labels do.
+- Whether that path names a file at its pin isn't read by the numbers
+  stage, since that would need every clone. README says so.
+- This site's own paths are now held to the files git tracks here,
+  matched case by case and never through a ".." segment. Before, they
+  were held to this machine's folder, where `../work`, `PINS.JSON` and
+  the ignored `.cache` all passed: verifier-front's side note.
+- The control now plants nineteen labels and refuses each by name.
+
+**verifier-front's sixth verdict,** on that version, also not pushed:
+NOT READY, one finding, accepted. The form rule fell to one more
+character: "(cft-fp256 77b8440 Logan.)", with a full stop, passed every
+stage. Every form rule has been walked past by the next spelling, so a
+repository's path is now one of a reviewed list, `build.SOURCE_PATHS`,
+kept as `SPEAKERS` is. It holds the 23 paths today's labels name.
+
+- A page that quotes a new file has its path added to the list, or the
+  numbers stage refuses the label by name.
+- "Logan.", "Logan/", ".Logan", "Logan.said" and "Logan.md" are all
+  refused.
+- The control now plants twenty-one labels and refuses each by name.
+
+**verifier-front's seventh verdict,** on that version, also not pushed:
+NOT READY, one finding, accepted. A printed label is its source part,
+then any quoted words, and it may be a link, but the rule read only the
+source part. A statement carried a source's citation in its quoted part,
+and another's label linked to a source, and every stage passed.
+
+- A statement's record may now carry no quoted part and no link.
+  `facts.stated` writes neither, and no statement on the site has either.
+- Two more controls plant one of each on a statement, and each is
+  refused by name.
+- README's limit now also says that a label's quoted words and link
+  aren't checked against its source.
+
+`bash verify/run.sh --require-all`: 11 passed, nothing skipped.
+`--control` caught 386 of 386.

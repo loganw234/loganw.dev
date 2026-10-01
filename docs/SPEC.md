@@ -185,6 +185,86 @@ where they were longer.
     statement, so the site doesn't claim it as sourced.
 28. **Logan's pronouns.** In Logan's words, on 2026-09-30: "He/his is
     fine" (CLAUDE.md trap 18).
+29. **The front page.** In Logan's words, on 2026-09-30: "I think the
+    landing page may be a bit "too much" in terms of its density and
+    presentation upfront, I was considering something like a landing page,
+    giving a brief overview of what I do, how I do it, and why in general."
+    The lead asked two rounds of questions before drafting a word. Logan's
+    answers about the page:
+    - where it sits: "Own page, single click from the existing page";
+    - who it is for: "General audience, something that explains why the
+      next page is so aggressively thorough without immediately scaring off
+      less "technical" people";
+    - pictures: "Same style as the site, just text, no images needed";
+    - where it leads: "new page only leads there, the front page is
+      intended to serve as a lighter "landing space" to brief new users on
+      what and why the rest of the site is";
+    - its sources: "The front page can be light on the "stated by" and
+      direct pins, being a "lighter" page, it can still clarify that in the
+      footer, along with other notes, but aim to keep the landing page very
+      "approachable" from a general viewers perspective, not a technical
+      brief as thats what it leads to directly, and thats where the
+      verifiability matters most."
+
+    His answers that the page's words were drafted from:
+    - "I work alongside AI to create verifiable systems and unusual
+      experiments. The first major one being an experiment in how far one
+      untrained individual can take an engineering project when the barrier
+      of expertise has been lifted by AI capability."
+    - On cft-fp256: "a goal to go from silicon to numerical contract on open
+      processes and toolchains, with a dedication to IEEE 754 conformance
+      and determinism, to see how far the methods can take a serious
+      engineering endeavor".
+    - The beginning: "The mercenaries one". And on the how: "having a
+      massive workforce potential with incredibly low accountability, the
+      tests are a way to remove accountability from their
+      responsibilities".
+    - On his role: "The owner does not need implementation-level expertise
+      in every subject. They need enough systems-level understanding to
+      define intent, recognize consequences, and govern the project, while
+      specialist agents provide the fine-grained expertise needed to make
+      those decisions informed rather than arbitrary".
+    - On the thoroughness: "The goal of the thoroughness is to never allow
+      "Trust me" to be an acceptable answer".
+    - Why: "When things interest me, I end up drawn to them, like pulling a
+      thread, hence the example. When work doesnt pull me, I lose interest
+      or focus, its both a positive and negative trait".
+    - The unusual experiment: "Atlas-film is a good example, recreating film
+      stock at a grain level realistically benefits no one, it was a part of
+      the larger Atlas-darkroom experiment."
+
+    The lead's draft, its footer note included, was approved as written:
+    "Approved, and yes, Map & Ledger right after Home". Before it shipped,
+    the lead found three phrases in it that claimed more than the site
+    does:
+    - on the page, "every number is read from its source" became "every
+      number names where it came from", because Map & Ledger prints one
+      number as Logan's word;
+    - in the note, "every figure there is read from its source" became
+      "every figure there names where it came from", for the same reason;
+    - in the note, "the one page here without a source beside each
+      sentence" became "the one page here that gives its sources in one
+      note instead of beside each figure", since other pages print plain
+      sentences too.
+
+    Logan approved the three: "Approved, go ahead with those three
+    changes". The message that proposed them was not kept in the session's
+    record, so the lead asked him to confirm them as printed, and asked two
+    more questions. The note credited PrettyCloud's about page only for the
+    lines on how it started, though the carpenter paragraph retells it too.
+    And that page, which the note links, shows his full surname and an
+    email address. His answer: "Confirmed, add the carpenter credit, keep
+    the link". So:
+    - `index.html` is the front page, in Logan's approved words
+      (`site/pages/front.py`).
+    - The spec's Home, with its map, ledger, checks, prints and "Not here",
+      is now Map & Ledger (`map-ledger.html`). Its biography opens the
+      front page.
+    - The front page prints each statement without its source, and gives
+      every source once, in a note in its footer. It is the only page that
+      may.
+30. **The navigation.** Map & Ledger comes right after Home: "Map & Ledger
+    right after Home" (Logan, 2026-09-30).
 
 ---
 
