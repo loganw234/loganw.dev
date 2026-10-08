@@ -53,12 +53,13 @@ and Work, at Logan's word of 2026-09-29, "a revision-7 round is under way
 off main", held to cft-fp256 at `77b8440`; and Verify, at its CONFORMANCE.md
 pattern. P0 then met two more on Verify (below).
 
-**What the move changes, in all.** Every fact call in `public/facts.json`,
+**What the move changes, in all.** Every fact in `public/facts.json`,
 before the round (`43c36a2`) and after P0 (`05413b2`), matched by its method
 and arguments: 27 read different text, all by reading their sources again;
 5 are gone; 77 are new. So the round's real work is not the build's
 refusals. It is the text: the pages describe the projects as round 1's pins
-had them, and every quote on them still stands, so every gate passes.
+had them, and once P0 had requoted Verify's three, every quote on them
+stands at the new pins, so every gate passes.
 
 ## Logan's decisions (2026-10-08)
 
@@ -191,7 +192,8 @@ of it. What it does:
     "lint, formal", where cft-fp256's sentence goes on to newer legs. P1 owns
     what the page should say.
 - **HonestHarness on Map & Ledger**, in the Determinism lane: its row (what
-  it is, its state, last verified, the agent-credited count, and a check),
+  it is, its state, last verified, the agent-credited count, and, since it
+  has no gate of its own, a link to its requirements document as its check),
   and its node and three edges in `site/data/relations.json`, each naming the
   words in its README at the pin that make it. It has no workflow and no
   ledger, so "last verified" is a dash with its reason, as SPEC.md section 4
@@ -221,6 +223,12 @@ lists, page by page:
 On "go", it builds, rebuilds `public/` on its branch, runs the checks and its
 controls (below), commits, and reports.
 
+Every "What moved" value below was read at the pins, by
+`git -C <repos>/<clone> log --oneline <old pin>..<new pin>` and the new
+ledger headings in `git -C <repos>/<clone> diff <old pin> <new pin> --
+docs/VALIDATION.md`; the same commands give the same lines while the pins
+stay put.
+
 **The checks every parcel runs,** each in seconds: `python site/build.py`,
 then its `--numbers`, `--links`, `--local-only`, `--check` and
 `--verify-facts` modes. The full gate is the lead's.
@@ -228,7 +236,7 @@ then its `--numbers`, `--links`, `--local-only`, `--check` and
 **The controls every parcel runs**, each built in a copy under its scratch
 directory, never in its worktree, with its output reported:
 - a figure on one of its pages typed by hand where a fact was: the numbers
-  stage, or `fig()`, refuses it by name;
+  stage, or `render.render()`, refuses it by name;
 - a label on one of its pages naming a path `build.SOURCE_PATHS` does not
   list: the numbers stage refuses it;
 - one of its new `prose()` patterns given its source's old words: the build
@@ -261,6 +269,9 @@ property is held.
   now says was closed, a "Test it" step whose cost changed.
 - **Its own control, besides the three:** a dossier row citing a ledger line
   that is not an entry's heading is refused by name (`_dossier._entry_at`).
+- **The regression it is most likely to cause:** a quote cut short so that
+  the sentence around it claims more than its source, as Verify's `gate`
+  budget now ends at "lint, formal".
 
 ### P2: the two methods
 
@@ -280,6 +291,8 @@ property is held.
   method gateless.
 - **Its own control, besides the three:** a citation of `CASE-STUDY-7.md`,
   which is not at the pin, is refused by name.
+- **The regression it is most likely to cause:** a round statistic taken
+  over a different set of case studies than the sentence around it says.
 
 ### P3: Quantum-Film and the Film thread
 
@@ -298,6 +311,9 @@ property is held.
   claims more than its source.
 - **Its own control, besides the three:** a copy of the print with a text
   chunk added is refused by the build's asset check.
+- **The regression it is most likely to cause:** a caption or a sentence
+  that names the wrong device, or the hardware's agreement without its
+  shortfall.
 
 ### P4: the Preservation thread
 
@@ -310,6 +326,8 @@ property is held.
   not stated.
 - **Its own control, besides the three:** an email address, and the name
   Wally, each planted in a copy of another page: local-only refuses both.
+- **The regression it is most likely to cause:** a credit lost or merged,
+  or a sentence that says what a person did beyond what the commits show.
 
 ### What no parcel touches
 
@@ -345,7 +363,8 @@ reading:
 - **The key.** Its SHA-256 goes in the lead's ledger file before that
   verifier is dispatched, and the key itself after the last planted-copy
   verifier has reported. The plants never reach `round2`: the lead merges the
-  parcel's own commit, by its SHA.
+  parcel's own commit, by its SHA. The plant branches are local, are never
+  pushed (only main is), and are deleted at the round's end.
 - **The limit.** A verifier that left its clone for the parcel's own branch
   could find the plants by a diff. Its brief forbids that, and the yield is
   read with that limit: it measures what a verifier finds by reading, as far
@@ -396,9 +415,10 @@ fault lands inside that limit. "Found nothing" is an acceptable answer.
 **The lead's own rule for this round,** not the method's: each verifier has
 up to three passes, a re-check scoped to the diff since its previous pass. If
 a third pass still finds a wrong answer, the lead records it and asks Logan
-before going on. The reason: round 1's front page took eight versions to
-READY, and a light round should put a long loop in front of its owner rather
-than run it on. The lead re-checks every Haiku finding against the records
+before going on. The reason: the front page of 2026-09-30, made after round
+1 had closed, went past its verifier seven times NOT READY before its push
+(`docs/VALIDATION.md`, its entry of that date), and a light round should put
+a long loop in front of its owner rather than run it on. The lead re-checks every Haiku finding against the records
 before acting on it (decision 35).
 
 ## The ledger

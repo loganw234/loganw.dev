@@ -291,8 +291,9 @@ first four at 13:32 and the last two at 14:18:
 35. **The verifiers' model:** "Haiku for every verifier": "Every verifier on
     Haiku, the lead's work included; decision 24 stays as round 1's rule.
     The lead re-checks each Haiku finding against the records before
-    acting." With the request's "Sonnet models for the parcels", round 2's
-    parcels are on Sonnet and every one of its verifiers on Haiku.
+    acting." *The lead's reading,* with the request's "Sonnet models for the
+    parcels": round 2's parcels are on Sonnet, and every one of its
+    verifiers on Haiku.
 36. **His stated lines, once a pin overtakes them:** "Sourced reading; ask
     me otherwise": "Where a stated line of yours is overtaken, it may be
     replaced by a figure read from the source, recorded in the ledger;
