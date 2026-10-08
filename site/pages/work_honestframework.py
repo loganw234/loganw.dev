@@ -122,7 +122,7 @@ def _sections(built):
                r"(its controls, its key and both audit reports all\s+landed in \*\*one commit\*\*)\.", num=True),
          ".” “",
          prose(NAME, "METHOD.md",
-               r"(There is no state of the repository in which the\s+controls exist without the key)"), " — so "
+               r"(There is no state of the repository in which the\s+controls exist without the key)"), "” — so "
          "the blinding was never verifiable from the record. ",
          prose(NAME, "METHOD.md",
                r"### (Make the blinding a property of the record, not of your working tree)"),
@@ -134,7 +134,7 @@ def _sections(built):
     test_it = S("Test it", [_dossier.list_([
         [C("python tools/check_claims.py"), ": ", prose(NAME, "README.md",
          r"\[tools/check_claims\.py\]\(tools/check_claims\.py\)[^|]*\|\s*(This repo's own gate)\."), " — links, "
-         "the mechanism count and the case-study total, all re-checked in under a second."],
+         "the mechanism count and the case-study total are among what it re-checks."],
         ["Recompute ", C("CASE-STUDY.md"), "'s per-repository table by hand: the same arithmetic ",
          case_total, " already shows, done again with nothing but the table."],
     ], ordered=True)])

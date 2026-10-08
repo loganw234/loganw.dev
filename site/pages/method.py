@@ -16,8 +16,8 @@ from pages._p5 import page_link
 from render import C, L, esc, render
 
 PAGE = {"file": "method.html", "nav": "Method", "title": "Method — loganw.dev",
-        "description": "How the work gets made: the ratio Logan states, HonestFramework and ParcelRound, this "
-                       "round's own numbers, and the co-authorship statement, kept in one place."}
+        "description": "How the work gets made: the ratio Logan states, HonestFramework and ParcelRound, the "
+                       "rounds' own numbers, and the co-authorship statement, kept in one place."}
 
 
 def S(text, **kw):
@@ -54,7 +54,10 @@ def methods_block(ctx):
               r"ever rests on the AI's judgement\*\*)\."),
         ". ", prose("HonestFramework", "METHOD.md",
                     r"because (a safeguard nobody has tested is just another claim)\."),
-        " ", page_link(ctx, "Work", "work-honestframework.html", "Its dossier"), " has the rest."
+        " Its README lists its gate: “",
+        prose("HonestFramework", "README.md",
+              r"\| (This repo's own gate\. It refuses a broken link or a stated line count that has drifted)\. \|"),
+        ".” ", page_link(ctx, "Work", "work-honestframework.html", "Its dossier"), " has the rest."
     ])
     pr = render([
         prose("ParcelRound", "README.md",
@@ -62,14 +65,19 @@ def methods_block(ctx):
               r"the pieces failing to meet)\."),
         " ", prose("ParcelRound", "METHOD.md",
                    r"\*\*(Exactly one file owns each shared fact; everyone else includes it)\.\*\*"),
-        " ", page_link(ctx, "Work", "work-parcelround.html", "Its dossier"), " has the rest."
+        " Its README lists its gate: “",
+        prose("ParcelRound", "README.md",
+              r"\| (The front door: `python tools/check_method\.py` says whether the method still holds together);"),
+        ".” ", page_link(ctx, "Work", "work-parcelround.html", "Its dossier"), " has the rest."
     ])
     return '<div class="measure"><p>%s</p><p>%s</p></div>' % (hf, pr)
 
 
 # ---------------------------------------------------------------------------
-# III. This round, in numbers: send-backs and planted faults, ParcelRound's
-# and this site's own, each naming its round and its source.
+# III. The rounds, in numbers: send-backs and planted faults, ParcelRound's
+# and this site's own, each naming its round and its source. Each figure is one
+# round's own count: none is a total across rounds, and none is taken from
+# a set of case studies other than the one its sentence names.
 # ---------------------------------------------------------------------------
 
 CONTROL_COUNT = re.compile(r"`--control` caught (\d+ of \d+)\.")
@@ -109,14 +117,38 @@ def stats_block():
         render(["Its fourth round found a miss, too: ",
                 prose("ParcelRound", "CASE-STUDY-4.md",
                       r"\*\*(equality with the authority passed 10 of 11 planted certificate faults)\*\*"), "."]),
-        render(["This site's own round, P3's verifier: ",
+        render(["Its fifth round was this site's own first. This site's ledger, on P3's verifier: ",
                 facts.own_prose("docs/VALIDATION.md",
                                 r"(The lead's control on the verifier\s+caught 2 of 2)\."), "."]),
-        render(["This site's own round, as a whole, in the newest entry that records the controls: ",
+        render(["ParcelRound's case study of that round: ",
+                prose("ParcelRound", "CASE-STUDY-5.md",
+                      r"\d+\. \*\*(Planted controls caught 2 of 2, twice\. The second could have been\s+passed by "
+                      r"a diff\.)\*\*", num=True), " Its models: “",
+                prose("ParcelRound", "CASE-STUDY-5.md", r"\*\*(The parcels and their verifiers ran on Sonnet 5)\*\*",
+                      num=True), ".”"]),
+        render(["Its sixth round, run on ParcelRound itself: ",
+                prose("ParcelRound", "CASE-STUDY-6.md",
+                      r"so (no parcel went\s+back; the round's one wrong answer was the lead's \(obs 4\))\.",
+                      num=True), "."]),
+        render(["Its sixth round's planted faults: ",
+                prose("ParcelRound", "CASE-STUDY-6.md", r"\*\*Planted faults: (ten of ten caught, from the sources)\.\*\*",
+                      num=True), ". Its own reading of that figure: ",
+                prose("ParcelRound", "CASE-STUDY-6.md",
+                      r"(A verifier that\s+read the design first could have found every plant by comparison\s+alone)"
+                      r"\."), ". Its models, read from its transcripts: “",
+                prose("ParcelRound", "CASE-STUDY-6.md",
+                      r"read from the transcripts: (the lead and every verifier on\s+Opus 5\.5, the five parcels on "
+                      r"Sonnet 5\.5)\.", num=True), ".”"]),
+        render(["Its sixth round's gate, against the faults its verifier built on the first pass: ",
+                prose("ParcelRound", "CASE-STUDY-6.md",
+                      r"(Of its 84 faults, 47 caught; of the 37 that passed, 25 lay outside every limit the gate "
+                      r"stated)\.", num=True), "."]),
+        render(["This site's own build, in the newest ledger entry that records its controls: ",
                 newest_control_count("docs/VALIDATION.md"), "."]),
     ]
     note = ("Each figure is as of its source's repository at its pin, or of this site's own ledger as read in "
-           "the commit being built — never live.")
+           "the commit being built — never live. Each is the count its own source makes, of one round or one "
+           "gate; none is a total across rounds.")
     return ('<div class="measure"><ul class="plain">%s</ul><p class="cap">%s</p></div>'
            % ("".join("<li>%s</li>" % i for i in items), esc(note)))
 
@@ -204,11 +236,11 @@ def coauthor_block():
 
 def render_page(ctx):
     return (
-        '<div class="measure"><p class="lede">A ratio Logan states, the methods behind it, this round\'s own '
+        '<div class="measure"><p class="lede">A ratio Logan states, the methods behind it, the rounds\' own '
         'numbers, and the co-authorship statement, kept in one place.</p></div>'
         '<h2><small>I</small>The ratio</h2>%s'
         '<h2><small>II</small>HonestFramework and ParcelRound</h2>%s'
-        '<h2><small>III</small>This round, in numbers</h2>%s'
+        '<h2><small>III</small>The rounds, in numbers</h2>%s'
         '<h2><small>IV</small>Co-authorship</h2>%s'
         % (ratio_block(), methods_block(ctx), stats_block(), coauthor_block())
     )
