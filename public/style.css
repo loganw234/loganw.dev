@@ -120,6 +120,11 @@ tr.signature td{font-style:italic;color:var(--muted)}
 .map .node.dim rect{opacity:.3}
 .map .node.dim text{opacity:.32}
 .map .edge.dim{opacity:.16}
+/* P3, round 2: the Film thread's one IBM print (docs/SPEC.md, decision 34). Its figure is one print under a
+   caption that names the device, the job and the rule that laid it; the lead's .prints grid is three across. */
+.print-one{margin:1.5em 0 1.8em;max-width:42rem}
+.print-one img{display:block;width:440px;max-width:100%;height:auto}
+.print-one figcaption{font:italic 15px/1.5 var(--serif);color:var(--muted);margin:.7em 0 0}
 /* One stylesheet per parcel or page, added here and concatenated by the build after
  * site/style.css in name order, so no two parcels edit the same stylesheet. */
 /* P2: the Threads section pages. Most of the look comes free from
