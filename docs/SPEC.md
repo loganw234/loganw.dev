@@ -3,7 +3,7 @@
 This file holds four things in order:
 
 1. **The spec**, word for word as Logan gave it on 2026-09-29.
-2. **Logan's decisions**, that day and on 2026-09-30.
+2. **Logan's decisions**, that day, on 2026-09-30 and on 2026-10-08.
 3. **Where the repositories corrected the spec**, measured.
 4. **The definitions the build uses.**
 
@@ -78,7 +78,7 @@ spec itself is left untouched, so the original stays readable.
 
 ---
 
-## 2. Decisions (Logan, 2026-09-29 and 2026-09-30)
+## 2. Decisions (Logan, 2026-09-29, 2026-09-30 and 2026-10-08)
 
 Each decision is given in Logan's words where they were brief, and summarised
 where they were longer.
@@ -265,6 +265,32 @@ where they were longer.
       may.
 30. **The navigation.** Map & Ledger comes right after Home: "Map & Ledger
     right after Home" (Logan, 2026-09-30).
+
+**Round 2, the update round (2026-10-08).** Logan asked for it in these
+words: "Some projects have gotten updated a bit, I'd like to do an update
+round against the new information, but since this is a lightweight round in
+terms of 'complexity', utilize Sonnet models for the parcels and Haiku as
+verifiers. We have also started to track metrics a bit deeper, keeping
+totals on parcels, agents, token use, time, etc." The plan is
+[ROUND2.md](ROUND2.md). His answers to the lead's questions, verbatim:
+
+31. **HonestHarness:** "Row and map node now": "Pin GitHub's main; add it to
+    Map & Ledger and the map beside ParcelRound and HonestFramework. A full
+    dossier waits until round 1 lands on main."
+32. **The round's case study:** "In loganw.dev itself": "In this repo's
+    docs/, with the ledger and cost scripts archived beside it, as
+    HonestHarness keeps its own."
+33. **The push:** "Push when verified": "Push, check the live deploy byte for
+    byte, then report."
+34. **An IBM print:** "Yes, one hardware print": "One IBM print beside the
+    existing prints, read from the pin like the others, with its source
+    beside it." The question asked whether the Film thread should show one;
+    the lead reads the answer as one print on the Film thread's page, with
+    Map & Ledger's three prints left as they are.
+35. **The round's models and metrics:** parcels on Sonnet and verifiers on
+    Haiku, every verifier of the round included; and the round's totals
+    kept, per agent and in all, read from the transcripts (ROUND2.md, "The
+    metrics").
 
 ---
 

@@ -213,6 +213,7 @@ private repository, which it can't read.
 | [docs/SPEC.md](docs/SPEC.md) | The spec as given, the decisions made about it, and where the repositories corrected it. |
 | [docs/VALIDATION.md](docs/VALIDATION.md) | The ledger. It is append-only: every run, failures included. |
 | [docs/ROUND1.md](docs/ROUND1.md) | The plan for the parcel round that builds the rest of the site. |
+| [docs/ROUND2.md](docs/ROUND2.md) | The plan for round 2, which brings the site up to the projects as they stood on 2026-10-08. |
 | [design/](design/) | The design experiments, and the one that was chosen. |
 
 ## Licence

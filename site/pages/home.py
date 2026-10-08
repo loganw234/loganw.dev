@@ -7,6 +7,7 @@ The ledger's rows are the projects the site covers so far; the round adds the
 threads and work pages that explain them.
 """
 import datetime
+import re
 
 import facts
 from facts import V, fact
@@ -52,6 +53,47 @@ def fork_agents(name):
                                             "commits, so none is given"), raw="", num=True)
 
 
+# A repository's newest ledger entry, for its state cell. It took the place of
+# Logan's word of 2026-09-29, "a revision-7 round is under way off main", held
+# to cft-fp256 at 77b8440: a statement has to be said again by hand at every
+# pin move, and this reading moves with the pin (docs/ROUND2.md, P0).
+def _newest(name, path):
+    """The last heading in an append-only ledger is its newest entry. A ledger
+    in which an earlier heading carries a later date is refused by name rather
+    than read, since its last heading would then not be its newest."""
+    _, ents = facts.entries(name, path)
+    if not ents:
+        raise facts.Refusal("%s %s: no ledger entries" % (name, path))
+    e = ents[-1]
+    later = [x for x in ents if x["date"] > e["date"]]
+    if later:
+        raise facts.Refusal("%s %s:%d: the last heading is dated %s, and line %d is dated %s, so the last entry "
+                            "is not the newest" % (name, path, e["line"], e["date"], later[0]["line"],
+                                                   later[0]["date"]))
+    return e
+
+
+@fact
+def newest_date(name, path):
+    e = _newest(name, path)
+    return V(e["date"], facts.pin(name).src("file", "%s:%d" % (path, e["line"]),
+                                            "the newest entry's own date (%s)" % e["how"], path, e["line"]),
+             raw=e["date"], num=True)
+
+
+@fact
+def newest_subject(name, path):
+    """The newest entry's heading, from after its date to its first colon."""
+    e = _newest(name, path)
+    m = re.match(r"\d{4}-\d{2}-\d{2} - ([^:]+):", e["title"])
+    if not m:
+        raise facts.Refusal("%s %s:%d: the newest heading has no subject before a colon: %r"
+                            % (name, path, e["line"], e["title"][:70]))
+    return V(m.group(1), facts.pin(name).src("file", "%s:%d" % (path, e["line"]),
+                                             "the newest entry's heading, to its first colon", path, e["line"]),
+             raw=m.group(1))
+
+
 def row(thread, name, what, state, check):
     pinned = name in facts.PINS["repos"]
     meta = facts.repo_meta(name)
@@ -83,7 +125,8 @@ def rows():
                    [P("cft-fp256", "README.md", r"^\*\*(A math coprocessor that gets the same answer everywhere)\.\*\*")],
                    ["ABI ", facts.macros("cft-fp256", "host/include/cft.h",
                                          ["CFT_ABI_VERSION_MAJOR", "CFT_ABI_VERSION_MINOR"]),
-                    " on main; ", S("a revision-7 round is under way off main", holds_at={"cft-fp256": "77b8440"})],
+                    " on main; its newest ledger entry, of ", newest_date("cft-fp256", "docs/VALIDATION.md"),
+                    ", is “", newest_subject("cft-fp256", "docs/VALIDATION.md"), "”"],
                    [C("make verify-quick"), ", ",
                     P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True)]))
     out.append(row(T, "cft-rebound",
@@ -107,7 +150,7 @@ def rows():
                       r"^(A method for splitting one body of work across several coding agents\s+at\s+once)")],
                    [facts.count_paths("ParcelRound", r"CASE-STUDY(-\d+)?\.md", "CASE-STUDY*.md files at the pin"),
                     " rounds recorded; METHOD.md last changed ", facts.last_change("ParcelRound", "METHOD.md")],
-                   [L(facts.pin("ParcelRound").href("CASE-STUDY-4.md"), facts.exists("ParcelRound", "CASE-STUDY-4.md"))]))
+                   [C("python " + facts.exists("ParcelRound", "tools/check_method.py").text)]))
     out.append(row(T, "HonestFramework",
                    [P("HonestFramework", "README.md",
                       r"^(A way to lay out a project so that an AI can write nearly all of it\s+and\s+"
@@ -115,6 +158,14 @@ def rows():
                    [P("HonestFramework", "README.md", r"The (\w+) mechanisms\. Start here"),
                     " mechanisms, and a gate of its own"],
                    [C("python " + facts.exists("HonestFramework", "tools/check_claims.py").text)]))
+    out.append(row(T, "HonestHarness",
+                   [P("HonestHarness", "README.md",
+                      r"^(A harness for running \[ParcelRound\]\([^)]*\)\s+and \[HonestFramework\]\([^)]*\) on\s+"
+                      r"open-weight models)\.")],
+                   [P("HonestHarness", "README.md", r"^\*\*Status: (research)\.\*\*"), ", with ",
+                    P("HonestHarness", "README.md", r"\*\* There is (no code yet)\."), " on main"],
+                   [L(facts.pin("HonestHarness").href("Research/open-weight-harness-requirements.md"),
+                      facts.exists("HonestHarness", "Research/open-weight-harness-requirements.md"))]))
     T = "Film & photography"
     for name in ("CanonBracketTool", "Microscope-Stacker"):
         out.append(row(T, name, [facts.api_description(name)], [S("a beginning project, from before the method")],

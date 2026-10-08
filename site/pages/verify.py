@@ -25,9 +25,9 @@ def _lede():
     return render([
         "cft-fp256's contract: an ",
         P("cft-fp256", "CONFORMANCE.md",
-          r"(implementation can be built and proven without this repository's RTL\s+or library - a different "
-          r"chip, a different process, a different\s+language - and still be interchangeable with them bit "
-          r"for bit)"),
+          r"(implementation\s+can\s+be\s+built\s+and\s+proven\s+without\s+this\s+repository's\s+RTL\s+or\s+"
+          r"library\s+-\s+a\s+different\s+chip,\s+a\s+different\s+process,\s+a\s+different\s+language\s+-\s+"
+          r"and\s+still\s+be\s+interchangeable\s+with\s+them\s+bit\s+for\s+bit)"),
         ". The checks below are how a reader confirms that directly, without taking this site's word for it, "
         "cheapest first.",
     ])
@@ -61,13 +61,15 @@ def checks():
         P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True), ". ",
         "`quick` is ",
         P("cft-fp256", "docs/VERIFICATION.md",
-          r"`quick` is (the\s+`docs`, `generated`, `buildargs` and `sweepjudge` checks, the\s+model-versus-C "
-          r"stages, the GPU's photograph, the bindings, the language\s+legs, the soak spot check, the "
-          r"workloads, the demos and the remote\s+backend)"),
+          r"`quick` is (the\s+`docs`, `generated`, `buildargs`, `sweepjudge`, `innerskips` and\s+`ensurevectors` "
+          r"checks, the\s+model-versus-C stages, the language's compiler \(`lang`, about two\s+and a half minutes "
+          r"run directly on a quiet desktop since its routines'\s+legs left it on 2026-10-02\), the GPU's "
+          r"photograph, the bindings, the language\s+legs, the soak spot check, the workloads, the demos and the "
+          r"remote\s+backend)"),
         "; it does not run ",
         P("cft-fp256", "docs/VERIFICATION.md",
           r"`gate` adds (the golden\s+suite, the vectors, the library replay, the transcendentals, MPFR, the\s+"
-          r"C\+\+ replay, lint and formal)"),
+          r"C\+\+ replay, lint, formal), the C auditor's gate"),
         " - those need ", C("make verify-gate"), ". And, ",
         P("cft-fp256", "README.md", r"\*\*(CI's green tick does not cover synthesis, timing or silicon)\.\*\*"),
         ".",
