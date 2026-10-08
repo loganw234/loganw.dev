@@ -275,7 +275,9 @@ totals on parcels, agents, token use, time, etc. See the new case studies
 for examples, particularly in HonestHarness as thats the most 'tracked'
 examples currently." The plan is [ROUND2.md](ROUND2.md). His answers to the
 lead's questions, verbatim, the first four at 13:32, the next two at 14:18,
-and the last at 15:24:
+and a second answer for decision 34 at 15:24. Each answer is the option he
+chose, in the words the lead wrote for that option; his choice is his
+word.
 
 31. **HonestHarness:** "Row and map node now": "Pin GitHub's main; add it to
     Map & Ledger and the map beside ParcelRound and HonestFramework. A full
@@ -288,9 +290,14 @@ and the last at 15:24:
 34. **An IBM print:** "Yes, one hardware print": "One IBM print beside the
     existing prints, read from the pin like the others, with its source
     beside it." The three existing prints are on Map & Ledger, in its
-    section headed "The film thread", so the lead asked again where: "The
-    Film thread's own page": "One print on thread-film.html, as P3 is
-    designing now; Map & Ledger's three stay as they are."
+    section headed "The film thread", so the lead asked again: "On the IBM
+    print you said "One IBM print beside the existing prints". The three
+    existing prints sit on Map & Ledger, in its section headed "The film
+    thread"; I had read your answer as the Film thread's own page
+    (thread-film.html). Where should the IBM print go?" - "The Film
+    thread's own page": "One print on thread-film.html, as P3 is designing
+    now; Map & Ledger's three stay as they are." The second answer governs
+    where the print goes.
 35. **The verifiers' model:** "Haiku for every verifier": "Every verifier on
     Haiku, the lead's work included; decision 24 stays as round 1's rule.
     The lead re-checks each Haiku finding against the records before

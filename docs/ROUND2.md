@@ -63,9 +63,10 @@ stands at the new pins, so every gate passes.
 
 ## Logan's decisions (2026-10-08)
 
-Through the question tool, verbatim, question and then answer. The lead's
-reading of each, where one is needed, follows it, marked as the lead's.
-SPEC.md keeps them as decisions 31 to 36.
+Through the question tool, verbatim, question and then answer. Each answer
+is the option Logan chose, in the words the lead wrote for that option; his
+choice is his word. The lead's reading of each, where one is needed, follows
+it, marked as the lead's. SPEC.md keeps them as decisions 31 to 36.
 
 1. "HonestHarness is public, but its GitHub main is still the research stage
    ... How should the site carry it in this round?" - "Row and map node now
@@ -87,10 +88,15 @@ SPEC.md keeps them as decisions 31 to 36.
    - "Yes, one hardware print (Recommended)": "One IBM print beside the
    existing prints, read from the pin like the others, with its source beside
    it."
-   - Asked again at 15:24, since the existing prints sit on Map & Ledger
-     under a section headed "The film thread" (verifier-P0's reading): "The
-     Film thread's own page": "One print on thread-film.html, as P3 is
-     designing now; Map & Ledger's three stay as they are."
+   - The lead had read this as the Film thread's own page. verifier-P0 read
+     it as possibly Map & Ledger's section headed "The film thread", where
+     the three prints are, so Logan was asked again, at 15:24: "On the IBM
+     print you said "One IBM print beside the existing prints". The three
+     existing prints sit on Map & Ledger, in its section headed "The film
+     thread"; I had read your answer as the Film thread's own page
+     (thread-film.html). Where should the IBM print go?" - "The Film
+     thread's own page": "One print on thread-film.html, as P3 is designing
+     now; Map & Ledger's three stay as they are." This answer governs.
 5. "Decision 24 (round 1) kept the verifier of the shared core on the lead's
    model, because it checks code. You asked for Haiku as verifiers. Which
    model verifies the lead's own work this round ...?" - "Haiku for every
