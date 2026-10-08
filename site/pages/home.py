@@ -83,7 +83,9 @@ def newest_date(name, path):
 
 @fact
 def newest_subject(name, path):
-    """The newest entry's heading, from after its date to its first colon."""
+    """The newest entry's heading, from after its date to its first colon. A
+    stated limit: the cut is at the first colon even inside brackets, which
+    no heading at the pin has (verifier-P0)."""
     e = _newest(name, path)
     m = re.match(r"\d{4}-\d{2}-\d{2} - ([^:]+):", e["title"])
     if not m:
@@ -200,7 +202,7 @@ def rows():
                    [C("Ess"), ", ", P("mercs2-lua-essentials", "README.md",
                                       r"^`Ess` — (the foundational Lua library for Mercenaries 2 modding)")],
                    ["one of ", facts.family("(mercs2-|merc2-|wad-simulator)", ["Merc2-Mods-Exp"]),
-                    " public mercs2 repositories"],
+                    " public mercs2 repositories on Logan's own account"],
                    [L(facts.repo_meta("mercs2-lua-essentials")["url"], "repository")]))
     return out
 

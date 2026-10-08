@@ -45,7 +45,7 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 VIII. Connections
 
 - cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1665]
-- HonestFramework underlies HonestHarness: and HonestFramework [fact 1667]
+- HonestFramework underlies HonestHarness: A harness for running ParcelRound and HonestFramework on open-weight models [fact 1667]
 - StoryDocs documents HonestFramework: HonestFramework and ParcelRound [fact 1675]
 
 IX. Provenance

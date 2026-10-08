@@ -17,7 +17,8 @@ THREADS = [
      "A print engine, split apart, and a quantum-grown film stock — and the paper pipeline the print engine "
      "grew into."),
     ("Preservation", "thread-preservation.html",
-     "A Mercenaries2 revival, its modding tooling, and everyone who has committed to it, credited directly."),
+     "A Mercenaries2 revival, its modding tooling, and the contributors to the repositories it reads, credited "
+     "directly."),
 ]
 
 

@@ -80,12 +80,14 @@ SPEAKERS = {"Logan"}
 # before it let a name through as a path - "Logan", then "Logan." with one
 # full stop (verifier-front) - so the paths are listed, not guessed at.
 SOURCE_PATHS = {
-    ".gitmodules", "CASE-STUDY-2.md", "CASE-STUDY-3.md", "CASE-STUDY-4.md", "CASE-STUDY.md", "CLAUDE.md",
-    "CONFORMANCE.md", "LICENSE", "METHOD.md", "README.md", "Research/open-weight-harness-requirements.md",
-    "docs/DETERMINISM.md", "docs/HOSTAPI.md", "docs/PARCEL-ROUNDS.md", "docs/README.md", "docs/TRANSCENDENTALS.md",
-    "docs/VALIDATION.md", "docs/VERIFICATION.md", "docs/prints/pauli-print.png", "docs/prints/poisson-print.png",
-    "docs/prints/trix-print.png", "host/include/cft.h", "projects/method/README.md", "tools/check_method.py",
-    "verify/run.sh"}
+    ".gitmodules", "ADOPTION.md", "CASE-STUDY-2.md", "CASE-STUDY-3.md", "CASE-STUDY-4.md", "CASE-STUDY-5.md",
+    "CASE-STUDY-6.md", "CASE-STUDY.md", "CLAUDE.md", "CONFORMANCE.md", "LICENSE", "METHOD.md", "README.md",
+    "Research/open-weight-harness-requirements.md", "docs/CERTIFICATES.md", "docs/DETERMINISM.md",
+    "docs/HARDWARE-RESULTS.md", "docs/HOSTAPI.md", "docs/LANGUAGE.md", "docs/PARCEL-ROUNDS.md",
+    "docs/PREREGISTRATION.md", "docs/README.md", "docs/TRANSCENDENTALS.md", "docs/VALIDATION.md",
+    "docs/VERIFICATION.md", "docs/prints/ibm-kingston-pauli-4x4-print.png", "docs/prints/ibm-kingston-pauli-4x4.json",
+    "docs/prints/pauli-print.png", "docs/prints/poisson-print.png", "docs/prints/trix-print.png",
+    "host/include/cft.h", "projects/method/README.md", "tools/check_method.py", "verify/run.sh"}
 
 
 def sha256(b):

@@ -3027,7 +3027,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -3036,9 +3036,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -3048,19 +3048,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 175,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -17798,7 +17798,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -17807,9 +17807,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -17819,19 +17819,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 999,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -19707,7 +19707,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -19716,9 +19716,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -19728,19 +19728,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1106,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -21474,7 +21474,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -21483,9 +21483,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -21495,19 +21495,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1205,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -26657,7 +26657,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -26666,9 +26666,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -26678,19 +26678,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1499,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -28300,7 +28300,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -28309,9 +28309,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -28321,19 +28321,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1588,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -29758,7 +29758,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -29767,9 +29767,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -29779,19 +29779,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1667,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -31142,7 +31142,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -31151,9 +31151,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -31163,19 +31163,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1742,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {
@@ -32635,7 +32635,7 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(A harness for running \\[ParcelRound\\]\\(https://github\\.com/loganw234/ParcelRound\\))$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
    "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
@@ -32644,9 +32644,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "A harness for running ParcelRound",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "A harness for running ParcelRound",
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "where": "HonestHarness b310f82 README.md:3"
   },
   {
@@ -32656,19 +32656,19 @@
     "name": "HonestHarness",
     "num": false,
     "path": "README.md",
-    "pattern": "^(and \\[HonestFramework\\]\\(https://github\\.com/loganw234/HonestFramework\\)) on$"
+    "pattern": "^(A harness for running \\[ParcelRound\\]\\([^)]*\\)\\s+and \\[HonestFramework\\]\\([^)]*\\) on\\s+open-weight models)\\."
    },
    "detail": "",
-   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L4",
+   "href": "https://github.com/loganw234/HonestHarness/blob/b310f823928fab32a6e37486107594dd90d98892/README.md?plain=1#L3",
    "id": 1823,
    "kind": "file",
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "and HonestFramework",
+   "raw": "A harness for running ParcelRound and HonestFramework on open-weight models",
    "said": "",
-   "text": "and HonestFramework",
-   "where": "HonestHarness b310f82 README.md:4"
+   "text": "A harness for running ParcelRound and HonestFramework on open-weight models",
+   "where": "HonestHarness b310f82 README.md:3"
   },
   {
    "args": {

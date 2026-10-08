@@ -41,7 +41,7 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 VIII. Connections
 
 - cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 1739]
-- ParcelRound underlies HonestHarness: A harness for running ParcelRound [fact 1741]
+- ParcelRound underlies HonestHarness: A harness for running ParcelRound and HonestFramework on open-weight models [fact 1741]
 - StoryDocs documents ParcelRound: HonestFramework and ParcelRound [fact 1750]
 
 IX. Provenance
