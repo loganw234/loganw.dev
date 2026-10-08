@@ -87,9 +87,10 @@ SPEC.md keeps them as decisions 31 to 36.
    - "Yes, one hardware print (Recommended)": "One IBM print beside the
    existing prints, read from the pin like the others, with its source beside
    it."
-   - *The lead's reading:* the existing prints are on Map & Ledger, and the
-     question was about the Film thread, so the IBM print goes on the Film
-     thread's page, and Map & Ledger's three prints stay as they are.
+   - Asked again at 15:24, since the existing prints sit on Map & Ledger
+     under a section headed "The film thread" (verifier-P0's reading): "The
+     Film thread's own page": "One print on thread-film.html, as P3 is
+     designing now; Map & Ledger's three stay as they are."
 5. "Decision 24 (round 1) kept the verifier of the shared core on the lead's
    model, because it checks code. You asked for Haiku as verifiers. Which
    model verifies the lead's own work this round ...?" - "Haiku for every

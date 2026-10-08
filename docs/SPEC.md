@@ -271,9 +271,11 @@ words: "Some projects have gotten updated a bit, I'd like to do an update
 round against the new information, but since this is a lightweight round in
 terms of 'complexity', utilize Sonnet models for the parcels and Haiku as
 verifiers. We have also started to track metrics a bit deeper, keeping
-totals on parcels, agents, token use, time, etc." The plan is
-[ROUND2.md](ROUND2.md). His answers to the lead's questions, verbatim, the
-first four at 13:32 and the last two at 14:18:
+totals on parcels, agents, token use, time, etc. See the new case studies
+for examples, particularly in HonestHarness as thats the most 'tracked'
+examples currently." The plan is [ROUND2.md](ROUND2.md). His answers to the
+lead's questions, verbatim, the first four at 13:32, the next two at 14:18,
+and the last at 15:24:
 
 31. **HonestHarness:** "Row and map node now": "Pin GitHub's main; add it to
     Map & Ledger and the map beside ParcelRound and HonestFramework. A full
@@ -285,9 +287,10 @@ first four at 13:32 and the last two at 14:18:
     byte, then report."
 34. **An IBM print:** "Yes, one hardware print": "One IBM print beside the
     existing prints, read from the pin like the others, with its source
-    beside it." The question asked whether the Film thread should show one;
-    the lead reads the answer as one print on the Film thread's page, with
-    Map & Ledger's three prints left as they are.
+    beside it." The three existing prints are on Map & Ledger, in its
+    section headed "The film thread", so the lead asked again where: "The
+    Film thread's own page": "One print on thread-film.html, as P3 is
+    designing now; Map & Ledger's three stay as they are."
 35. **The verifiers' model:** "Haiku for every verifier": "Every verifier on
     Haiku, the lead's work included; decision 24 stays as round 1's rule.
     The lead re-checks each Haiku finding against the records before
