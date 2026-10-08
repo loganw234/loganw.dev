@@ -272,7 +272,8 @@ round against the new information, but since this is a lightweight round in
 terms of 'complexity', utilize Sonnet models for the parcels and Haiku as
 verifiers. We have also started to track metrics a bit deeper, keeping
 totals on parcels, agents, token use, time, etc." The plan is
-[ROUND2.md](ROUND2.md). His answers to the lead's questions, verbatim:
+[ROUND2.md](ROUND2.md). His answers to the lead's questions, verbatim, the
+first four at 13:32 and the last two at 14:18:
 
 31. **HonestHarness:** "Row and map node now": "Pin GitHub's main; add it to
     Map & Ledger and the map beside ParcelRound and HonestFramework. A full
@@ -287,10 +288,19 @@ totals on parcels, agents, token use, time, etc." The plan is
     beside it." The question asked whether the Film thread should show one;
     the lead reads the answer as one print on the Film thread's page, with
     Map & Ledger's three prints left as they are.
-35. **The round's models and metrics:** parcels on Sonnet and verifiers on
-    Haiku, every verifier of the round included; and the round's totals
-    kept, per agent and in all, read from the transcripts (ROUND2.md, "The
-    metrics").
+35. **The verifiers' model:** "Haiku for every verifier": "Every verifier on
+    Haiku, the lead's work included; decision 24 stays as round 1's rule.
+    The lead re-checks each Haiku finding against the records before
+    acting." With the request's "Sonnet models for the parcels", round 2's
+    parcels are on Sonnet and every one of its verifiers on Haiku.
+36. **His stated lines, once a pin overtakes them:** "Sourced reading; ask
+    me otherwise": "Where a stated line of yours is overtaken, it may be
+    replaced by a figure read from the source, recorded in the ledger;
+    anything that needs new words of yours, or drops one of your spec's
+    choices (such as a Corrections gap), comes to you." The first such line
+    was Map & Ledger's "a revision-7 round is under way off main", which
+    the build refused once cft-fp256's pin moved; it now reads cft-fp256's
+    newest ledger entry.
 
 ---
 

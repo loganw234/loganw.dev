@@ -18,18 +18,22 @@ METHOD.md as it stands at `f42242e`, the method as practised after its round
 [HonestFramework](https://github.com/loganw234/HonestFramework). Round 1's
 plan is [ROUND1.md](ROUND1.md).
 
+Draft 1 went past verifier-plan, which found eight defects; this draft
+answers them. The ledger records each finding and how the lead checked it.
+
 ## What moved
 
 Measured on 2026-10-08 by `gh api .../compare/<pin>...<default branch>` for
-every pin in [pins.json](../pins.json). Every pin not listed is identical to
-its default branch.
+every pin in [pins.json](../pins.json); the same command re-run gives the
+same counts while the projects stand still. Every pin not listed is
+identical to its default branch.
 
 | repository | pin | GitHub's main | commits ahead |
 |---|---|---|---:|
 | cft-fp256 | `77b8440` | `ab51655` | 381 |
 | ParcelRound | `8767e23` | `f42242e` | 37 |
 | Quantum-Film | `a7f02db` | `3a73823` | 171 |
-| StoryDocs | `673148c` | `8548802` | 1 |
+| StoryDocs (private) | `673148c` | `8548802` | 1 |
 | Mercenaries-Fan-Build/mercs2-modkit | `3a4d888` | `9acb750` | 5 |
 | Mercenaries-Fan-Build/mercs2-wad-simulator | `fdf3597` | `d18af76` | 409 |
 | Mercenaries-Fan-Build/notes-on-the-released-game | `b8c3958` | `dac773d` | 70 |
@@ -43,22 +47,24 @@ its default branch.
   5 and 6, not 7.
 
 **The trial.** In a scratch worktree of main at `43c36a2`, the lead moved the
-seven pins, took a snapshot there, and rendered each page on its own. The
-workflow and pin checks passed. Three pages refused, each at its first
-refusal:
-- Map & Ledger and Work: Logan's word of 2026-09-29, "a revision-7 round is
-  under way off main", is held to cft-fp256 at `77b8440`, and the pin moved;
-- Verify: its CONFORMANCE.md pattern no longer matches, because the same
-  words are rewrapped at `ab51655`.
+seven pins, took a snapshot there, and rendered each page on its own. Each
+page stops at its first refusal, so the trial saw one a page: Map & Ledger
+and Work, at Logan's word of 2026-09-29, "a revision-7 round is under way
+off main", held to cft-fp256 at `77b8440`; and Verify, at its CONFORMANCE.md
+pattern. P0 then met two more on Verify (below).
 
-Every other page rendered, and 17 figures read differently, all by reading
-their sources again. So the round's real work is not the build's refusals:
-it is the text. The pages describe the projects as they were on 2026-09-29.
+**What the move changes, in all.** Every fact call in `public/facts.json`,
+before the round (`43c36a2`) and after P0 (`05413b2`), matched by its method
+and arguments: 27 read different text, all by reading their sources again;
+5 are gone; 77 are new. So the round's real work is not the build's
+refusals. It is the text: the pages describe the projects as round 1's pins
+had them, and every quote on them still stands, so every gate passes.
 
 ## Logan's decisions (2026-10-08)
 
 Through the question tool, verbatim, question and then answer. The lead's
 reading of each, where one is needed, follows it, marked as the lead's.
+SPEC.md keeps them as decisions 31 to 36.
 
 1. "HonestHarness is public, but its GitHub main is still the research stage
    ... How should the site carry it in this round?" - "Row and map node now
@@ -83,18 +89,30 @@ reading of each, where one is needed, follows it, marked as the lead's.
    - *The lead's reading:* the existing prints are on Map & Ledger, and the
      question was about the Film thread, so the IBM print goes on the Film
      thread's page, and Map & Ledger's three prints stay as they are.
+5. "Decision 24 (round 1) kept the verifier of the shared core on the lead's
+   model, because it checks code. You asked for Haiku as verifiers. Which
+   model verifies the lead's own work this round ...?" - "Haiku for every
+   verifier (Recommended)": "Every verifier on Haiku, the lead's work
+   included; decision 24 stays as round 1's rule. The lead re-checks each
+   Haiku finding against the records before acting."
+6. "Your 2026-09-29 line on Map & Ledger, "a revision-7 round is under way
+   off main", is no longer true ... How should stale lines of yours be
+   handled?" - "Sourced reading; ask me otherwise (Recommended)": "Where a
+   stated line of yours is overtaken, it may be replaced by a figure read
+   from the source, recorded in the ledger; anything that needs new words of
+   yours, or drops one of your spec's choices (such as a Corrections gap),
+   comes to you."
 
-And, from the request: **parcels on Sonnet, verifiers on Haiku.** The lead
-reads "verifiers" as every verifier in the round: the plan's, P0's, each
+So: **parcels on Sonnet; every verifier on Haiku**, the plan's, P0's, each
 parcel's, the integration verifier and the case study's.
 
 ## Rules carried into this round
 
-Each is a standing rule, with the date it was given.
+Each is a standing rule, with where it was given.
 
 - The full gate, `bash verify/run.sh --require-all` under the Python
   `.python-version` names, before every push. A push to main deploys
-  (Logan, 2026-09-29).
+  (Logan, 2026-09-29; CLAUDE.md).
 - Only main is ever pushed, never `git push --all` (CLAUDE.md, trap 17).
 - The shared core first, then a verifier on it, then the round (decision
   18). And the lead's seam commits, merges and records go past a verifier
@@ -104,70 +122,87 @@ Each is a standing rule, with the date it was given.
   large run is the full gate, which is the lead's.
 - Only a regression or a wrong answer sends work back. Anything else merges
   as a recorded known limit, and a sentence that claims more than is true is
-  restated at the merge (METHOD.md section 6, the send-back rule).
+  restated at the merge (METHOD.md section 6).
+- **Logan's words.** About and the front page are his approved words
+  (decisions 26 and 29), every `stated()` figure is his statement (CLAUDE.md
+  trap 12), and the spec's choices are his (section 1 of SPEC.md). They
+  change only at his word, except that a stated line a pin has overtaken may
+  be replaced by a figure read from its source, recorded in the ledger
+  (decision 36). Anything that needs new words of his, or drops one of the
+  spec's choices, goes to him.
 - Logan's pronouns are he and his (2026-09-30, trap 18). Anyone else the
   site names is written by name unless their pronouns are stated.
 - No published file holds an email address but `logan@loganw.dev` (trap
-  14). The name Wally appears only on the Preservation thread's page (trap
-  16).
+  14). The name Wally appears only on the Preservation thread's page and in
+  `facts.json`'s record of Logan's statement there (trap 16).
 - Other repositories are read only at commits, through `git show`, never
   from their working trees, and no agent switches a branch in them (trap 1).
   Other sessions are working in cft-fp256 and HonestHarness.
-- Logan's own words on the site (About, the front page, every `stated`
-  figure) change only at his word.
 
 ## The shape
 
 1. **This plan goes past a verifier**, and the lead answers its findings in a
-   new draft, before Logan approves it.
-2. **P0, the lead's,** on the branch `round2`, then a verifier on it.
+   new draft, which the verifier re-checks, before Logan approves it.
+2. **P0, the lead's,** on the branch `round2`, then verifier-P0 on it.
 3. **Wave 1: P1 to P4 in parallel, each designing first.** Each parcel reads
    its pages against the new pins, writes a design, and stops. The lead
    reviews the four designs, then makes one seam commit adding every new
-   source path the designs need to `build.SOURCE_PATHS`. That commit goes
-   past P0's verifier, scoped to it, and then each parcel gets "go".
+   source path and numeral name the designs need. That commit goes past
+   verifier-P0, scoped to it, and then each parcel gets "go" with its SHA.
+   No parcel has built anything when it lands, so each takes it by a
+   fast-forward before building.
 4. **Each parcel's verifier** works on a copy of the parcel's work that may
    hold planted faults (below).
-5. **Merges onto `round2`**, one at a time, the gate after each, and the
-   lead's restates after each.
-6. **The integration verifier** on the lead's own work: its merges, made
+5. **Merges onto `round2`**, one at a time. Before each, the lead reads every
+   author's file in the ledger; after each, the full gate, whose links,
+   numbers and connections stages read every page together and are the
+   round's seam test; then the lead's restates.
+6. **The verifiers' side notes** get a step of their own after the last
+   merge, and the lead appends the round's entry to the site's own ledger,
+   `docs/VALIDATION.md`.
+7. **The integration verifier** on the lead's own work: its merges, made
    again from their parents with `git merge-tree`, its restates, its
    records.
-7. **Main moves to `round2`'s tip** after the full gate and the integration
+8. **Main moves to `round2`'s tip** after the full gate and the integration
    verifier's READY, and is pushed. The lead checks the live deploy byte for
    byte.
-8. **The case study and the archived ledger**, past their own verifier, then
+9. **The case study and the archived ledger**, past their own verifier, then
    pushed.
 
 ## P0: the lead's
 
-On `round2`, from `43c36a2`. The full gate passes on both sides of it.
+On `round2`, from `43c36a2`, at `05413b2`. The full gate passes on both sides
+of it. What it does:
 
 - **pins.json:** the seven pins above, moved to GitHub's main; HonestHarness
   added at `b310f82`, read from the owner's clone (`"dir": "HonestHarness"`,
   `"workflows": {}`).
-- **The snapshot:** a new one, taken with the new pins, and pins.json pointed
-  at it by its exact name.
-- **The two refusals**, fixed only as far as the build needs:
-  - the revision-7 statement on Map & Ledger is replaced by a figure read
-    from cft-fp256's own ledger at its pin, so no word of Logan's is changed
-    or needed;
-  - Verify's CONFORMANCE.md pattern reads the same words, with any whitespace
-    between them. P1 owns the rest of that page.
-- **HonestHarness on Map & Ledger**, in the Determinism lane, with ParcelRound
-  and HonestFramework: its row (what it is, its state, last verified, the
-  agent-credited count, and a check), and its node and edges in
-  `site/data/relations.json`, each edge naming the file at the pin that makes
-  it. Work lists it with the other projects that have no dossier, since Work
-  reads Map & Ledger's rows.
-- **ParcelRound's row:** its "check it" link names the method's own gate at
-  the pin, `tools/check_method.py`, where it named case study 4.
-- **SPEC.md:** Logan's four decisions, and the models, as decisions 31 to 35.
-- **The ledger**, at `<repos>/loganw-dev-r2-ledger/`, already exists, with its
-  README, the lead's file and the metrics script.
+- **The snapshot:** `sources/github-2026-10-08-1345.json`, taken with the new
+  pins, and pins.json pointed at it by its exact name.
+- **The refusals**, fixed only as far as the build needs:
+  - Logan's revision-7 line is replaced, under decision 36, by cft-fp256's
+    newest ledger entry at the pin, its date and its subject
+    (`home.newest_date`, `home.newest_subject`). Work reads Map & Ledger's
+    rows, so the one change clears both pages.
+  - Verify had three: its CONFORMANCE.md pattern reads the same words with
+    any whitespace between them; its `quick` budget is quoted as cft-fp256
+    now writes it, which names `innerskips`, `ensurevectors` and the
+    language's compiler; and its `gate` budget is quoted only as far as
+    "lint, formal", where cft-fp256's sentence goes on to newer legs. P1 owns
+    what the page should say.
+- **HonestHarness on Map & Ledger**, in the Determinism lane: its row (what
+  it is, its state, last verified, the agent-credited count, and a check),
+  and its node and three edges in `site/data/relations.json`, each naming the
+  words in its README at the pin that make it. It has no workflow and no
+  ledger, so "last verified" is a dash with its reason, as SPEC.md section 4
+  defines it. Work lists it with the projects that have no dossier.
+- **ParcelRound's row:** its check is the method's own gate,
+  `python tools/check_method.py`, where it linked to case study 4.
+- **`build.SOURCE_PATHS`:** the two paths P0's new labels name.
+- **SPEC.md:** Logan's decisions of 2026-10-08, 31 to 36.
 
-**verifier-P0** reads P0's commits against this plan and the tree, and picks
-its own faults.
+**verifier-P0** reads P0 against this plan and the tree, and picks its own
+faults.
 
 ## Wave 1
 
@@ -178,10 +213,32 @@ lists, page by page:
   source line at the new pin that shows it;
 - every new thing at the new pin that the page should say, with its source;
 - every repository path its new labels would name that `build.SOURCE_PATHS`
-  does not list.
+  does not list, and every name with a numeral that
+  `site/data/numeral_names.json` would need;
+- any line of Logan's it finds overtaken, for the lead to take under
+  decision 36 or to Logan.
 
-On "go", it builds, rebuilds `public/` on its branch, runs the checks below,
-commits, and reports.
+On "go", it builds, rebuilds `public/` on its branch, runs the checks and its
+controls (below), commits, and reports.
+
+**The checks every parcel runs,** each in seconds: `python site/build.py`,
+then its `--numbers`, `--links`, `--local-only`, `--check` and
+`--verify-facts` modes. The full gate is the lead's.
+
+**The controls every parcel runs**, each built in a copy under its scratch
+directory, never in its worktree, with its output reported:
+- a figure on one of its pages typed by hand where a fact was: the numbers
+  stage, or `fig()`, refuses it by name;
+- a label on one of its pages naming a path `build.SOURCE_PATHS` does not
+  list: the numbers stage refuses it;
+- one of its new `prose()` patterns given its source's old words: the build
+  refuses it by name.
+
+**What no gate holds, stated as a limit:** whether a sentence is the current
+truth at the pin, rather than only true at it. That is the round's subject,
+and the gates cannot read it. Each parcel's verifier reads every sentence on
+its pages against the newest entries at the pin, and that reading is how the
+property is held.
 
 ### P1: cft-fp256 and the Determinism thread
 
@@ -192,10 +249,18 @@ commits, and reports.
 - **What moved:** cft-fp256's ledger runs from revision 7 through the
   certificate plan's steps, the fixes round, the language round, and step 6
   to its close on 2026-10-06, with revision 8's first hardware images. Its ABI
-  went from 0.15 to 0.18.
-- **The trap:** a dossier row that is still true at the new pin but no longer
-  the current truth, such as "Verified" rows that stop at 2026-09-29, or a
-  "Where I'd attack first" gap the record now says was closed.
+  went from 0.15 to 0.18. The Determinism thread also quotes ParcelRound's
+  README, whose quoted sentence is unchanged.
+- **Logan's, and staying:** the Determinism door; the rules of engagement on
+  Corrections; and the "where I'd attack first" gaps' names, which are the
+  spec's. The quotes under each gap are cft-fp256's, and are P1's to re-read.
+  A gap the record now says was closed goes to Logan through the lead
+  (decision 36).
+- **The trap:** a section still true at the new pin but no longer the
+  current truth: "Verified" rows that stop at 2026-09-29, a gap the record
+  now says was closed, a "Test it" step whose cost changed.
+- **Its own control, besides the three:** a dossier row citing a ledger line
+  that is not an entry's heading is refused by name (`_dossier._entry_at`).
 
 ### P2: the two methods
 
@@ -204,10 +269,17 @@ commits, and reports.
 - **What moved:** ParcelRound's round 6 brought METHOD.md to the method as
   practised, added ADOPTION.md and a gate of its own
   (`tools/check_method.py`), recompiled the templates, and added case studies
-  5 and 6. HonestFramework's pin did not move.
-- **The trap:** the Method page's round statistics and the dossier's
-  "Verified" section read case studies by line or pattern; a pattern that
-  still matches can now describe the method's past rather than its present.
+  5 and 6. HonestFramework's pin did not move. The Method page also quotes
+  Quantum-Film's README, whose pin moved; its quotes still match.
+- **Logan's, and staying:** the ratio, the co-authorship statement, and every
+  `stated()` line; and the three thread doors that propose.py renders, which
+  are P1's, P3's and P4's pages' and Logan's words (propose.py's own control
+  needs "workloads" in the Determinism door).
+- **The trap:** a statistic still true of case studies 1 to 4 presented as
+  the method's record, now that 5 and 6 exist; a dossier that calls the
+  method gateless.
+- **Its own control, besides the three:** a citation of `CASE-STUDY-7.md`,
+  which is not at the pin, is refused by name.
 
 ### P3: Quantum-Film and the Film thread
 
@@ -215,20 +287,29 @@ commits, and reports.
   with the one IBM print as an asset of the Film thread's page.
 - **What moved:** Quantum-Film's round 3 ran the shelf's Pauli law on three
   IBM Heron r2 devices, as pre-registered, laid each device's run as film, and
-  revised the paper, the poster and the web demo. StoryDocs moved by one
-  commit.
+  revised the paper, the poster and the web demo. StoryDocs, which is
+  private, moved by one commit.
+- **Logan's, and staying:** the Film thread's door.
 - **The trap:** a print is image content, which no gate reads. Its caption
-  and source must say which device, which job, and which rule laid it, from
-  the pin, not from the file's name.
+  must say which device, which job, and which rule laid it, from the pin, not
+  from the file's name. And `docs/HARDWARE-RESULTS.md` says both that the
+  devices carry the law's signatures and that all three fall short of their
+  noise models' predictions; a page that says the first without the second
+  claims more than its source.
+- **Its own control, besides the three:** a copy of the print with a text
+  chunk added is refused by the build's asset check.
 
 ### P4: the Preservation thread
 
 - **Owns:** `site/pages/thread_preservation.py`.
 - **What moved:** the organisation's three pinned repositories, by 5, 409 and
   70 commits. Its contributor counts already re-read.
+- **Logan's, and staying:** its door, and "@Wally is my discord username".
 - **The trap:** the page names people. Each is credited by name, as
   decision 10 says, and no pronoun is written for anyone whose pronouns are
-  not stated. Wally stays on this page alone.
+  not stated.
+- **Its own control, besides the three:** an email address, and the name
+  Wally, each planted in a copy of another page: local-only refuses both.
 
 ### What no parcel touches
 
@@ -236,23 +317,39 @@ The seams and the shared pages are the lead's: `site/facts.py`,
 `site/render.py`, `site/build.py`, `site/mapgen.py`, `site/style.css`,
 `site/data/`, `pins.json`, `sources/`, `site/pages/home.py`,
 `site/pages/work.py`, `site/pages/threads.py`, `site/pages/record.py`,
-`site/pages/_dossier.py`, `site/pages/_settled.py`, `site/pages/front.py`,
-`site/pages/about.py`, and every document (README, CLAUDE.md, `docs/`). A
-stylesheet a parcel needs is a new file of its own under `site/styles/`.
-`public/` is generated: parcels rebuild it on their branches, and at each
-merge the lead rebuilds it rather than merging its text.
+`site/pages/_dossier.py`, `site/pages/_settled.py`, `site/pages/_p5.py`,
+`site/pages/front.py`, `site/pages/about.py`, and every document (README,
+CLAUDE.md, `docs/`). A stylesheet a parcel needs is a new file of its own
+under `site/styles/`. `public/` is generated: parcels rebuild it on their
+branches, and at each merge the lead rebuilds it rather than merging its
+text.
 
 ## Planted faults
 
 Planted faults stay light, as decision 20 has it: "can be light on this
-project". Each parcel's verifier is given a copy of the parcel's commit that
-may hold faults the lead planted: one commit, with the parcel's message,
-whose tree is the parcel's plus two plants. The plants are faults no stage of the gate
-reads, such as a sentence that claims more than its source, or a label's
-words that differ from the source they cite. The key's SHA-256 goes in the
-lead's ledger file before that verifier is dispatched, and the key itself
-after the last planted-copy verifier has reported. The plants never reach
-`round2`: the lead merges the parcel's own commit.
+project". This is how they are kept from being found by anything but
+reading:
+
+- **The copy.** One commit, with the parcel's own message and parent, whose
+  tree is the parcel's plus two plants, with `public/` rebuilt from it. The
+  lead runs the full gate on it before dispatch: every stage must pass, so no
+  stage points at a plant.
+- **The plants** are faults of the kind the gates cannot read: a sentence
+  that claims more than its source at the pin, a quote that is true at the pin
+  but overtaken by a newer entry, a caption that names the wrong source.
+- **The clone.** The verifier works in a clone of its own, under its scratch
+  directory, made with `git clone --no-local --single-branch` from a branch
+  that holds only `round2`'s history and the planted commit. The parcel's own
+  commit is not in it. Its brief puts every other branch and worktree of
+  loganw.dev out of bounds until it has reported.
+- **The key.** Its SHA-256 goes in the lead's ledger file before that
+  verifier is dispatched, and the key itself after the last planted-copy
+  verifier has reported. The plants never reach `round2`: the lead merges the
+  parcel's own commit, by its SHA.
+- **The limit.** A verifier that left its clone for the parcel's own branch
+  could find the plants by a diff. Its brief forbids that, and the yield is
+  read with that limit: it measures what a verifier finds by reading, as far
+  as it keeps to its brief.
 
 This measures what Haiku verifiers catch, beside round 6's Opus verifiers
 (ten of ten) and ParcelRound's case study 7's Sonnet verifiers.
@@ -260,7 +357,9 @@ This measures what Haiku verifiers catch, beside round 6's Opus verifiers
 ## The metrics
 
 Logan asked for totals on parcels, agents, token use and time. They are kept
-as ParcelRound's case studies 6 and 7 and HonestHarness's round 1 keep them.
+as ParcelRound's case studies 6 and 7 and HonestHarness's round 1 keep them,
+and like case study 6, they count the lead's own session (case study 7 left
+it out).
 
 - **In the ledger, as it happens:** every dispatch (the agent, its model as
   requested, the time), and every report (the time, and the runtime's own
@@ -270,11 +369,13 @@ as ParcelRound's case studies 6 and 7 and HonestHarness's round 1 keep them.
   `tools/round_metrics.py` in the ledger reads the session's transcripts. Per
   agent: its model, read from its own transcript; runs; minutes; tool uses;
   messages; output tokens; fresh tokens (input, cache writes and output); and
-  cache reads. The lead's own session is counted too, from the request at
+  cache reads. The lead's own session is counted from the request at
   13:16:10. Totals by class: parcels, verifiers, the lead.
-- **In the case study:** the per-agent table, the totals, the verifiers' share,
-  the wall clock split between the build phase and what came after it, and
-  the planted-fault yield by model.
+- **By hand, from the ledger:** the wall clock, split between the build phase
+  and what came after it, and the planted-fault yield by model. The script
+  doesn't make these.
+- **In the case study:** the per-agent table, the totals, the verifiers'
+  share, the wall-clock split, and the yield by model.
 
 ## Time and cost (an estimate, not a measurement)
 
@@ -292,9 +393,13 @@ a gate the verifier has watched fail on a fault it picked itself, or is
 stated as a limit where the claim is made, and the verifier's own evading
 fault lands inside that limit. "Found nothing" is an acceptable answer.
 
-Each verifier has up to three passes. A re-check is scoped to the diff since
-its previous pass. If a third pass still finds a wrong answer, the lead
-records it and asks Logan before going on.
+**The lead's own rule for this round,** not the method's: each verifier has
+up to three passes, a re-check scoped to the diff since its previous pass. If
+a third pass still finds a wrong answer, the lead records it and asks Logan
+before going on. The reason: round 1's front page took eight versions to
+READY, and a light round should put a long loop in front of its owner rather
+than run it on. The lead re-checks every Haiku finding against the records
+before acting on it (decision 35).
 
 ## The ledger
 
