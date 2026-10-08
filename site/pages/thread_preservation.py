@@ -17,8 +17,8 @@ import mapgen
 from render import C, L, esc, render
 
 PAGE = {"file": "thread-preservation.html", "nav": "Threads", "title": "Preservation — loganw.dev",
-        "description": "A Mercenaries2 revival, its modding tooling, and everyone who has committed to it: the "
-                       "thread's account, its part of the map, its credits and its door."}
+        "description": "A Mercenaries2 revival, its modding tooling, and the contributors to the repositories it "
+                       "reads: the thread's account, its part of the map, its credits and its door."}
 
 REPOS = ["Mercenaries2", "Merc2-Mods-Exp", "mercs2-lua-essentials",
         "Mercenaries-Fan-Build/mercs2-modkit", "Mercenaries-Fan-Build/mercs2-qol-mods",
@@ -129,32 +129,77 @@ def credits_block():
     cap = ("Every cell is a commit count read at the repository's pin, for one GitHub account, grouped by its "
           "noreply id+login pair, or by a hash of its email address (folded to one case first) - never by the "
           "address itself, and never by the name on the commit, since the same account can commit under several "
-          "names. A dash is zero commits there, not a missing figure. Logan goes by %s in this community. "
+          "names. A dash is zero commits there, not a missing figure. A commit count says how many commits an "
+          "account authored, not who or what wrote the lines in those commits. In Logan's words: %s. "
           "Direct links: %s." % (wally,
           ", ".join("<a href=\"https://github.com/%s\">%s</a>" % (esc(login_of(a)), esc(login_of(a)))
                     for a in others if login_of(a)) or "none derivable"))
     return table + '<p class="cap">%s</p>' % cap
 
 
+ORG = "Mercenaries-Fan-Build/"
+
+
+def org_items():
+    """The organisation's repositories this page credits, each as its own
+    README says what it is: [(repository, [segments])], in the table's order.
+    A repository is described by a sentence of its README at its pin, read
+    through facts.prose, so the words are the repository's own and carry the
+    pin and the line. The account's last sentence says the credits cover the
+    repositories listed here and no others, so a repository in REPOS that is
+    not described here is refused."""
+    P = facts.prose
+    m, q, w, n = ("%s%s" % (ORG, x) for x in ("mercs2-modkit", "mercs2-qol-mods", "mercs2-wad-simulator",
+                                              "notes-on-the-released-game"))
+    items = [
+        (m, [P(m, "README.md", r"^(A desktop mod manager for \*\*Mercenaries 2: World in Flames\*\*)"),
+             "; its README also says that ",
+             P(m, "README.md", r"(Mercenaries 2 is a 32-bit Windows game, so on macOS and Linux Modkit launches it"
+                               r"\s+through Wine or Proton)")]),
+        (q, [P(q, "README.md", r"^(A collection of quality-of-life mods for \*\*Mercenaries 2: World in Flames\*\* "
+                               r"\(PC\))")]),
+        (w, [P(w, "README.md", r"^(A Rust workspace for Mercenaries 2 WAD analysis, asset extraction, and "
+                               r"Xbox-to-PC conversion)"),
+             "; its ", C("qm"), " binary ",
+             P(w, "README.md", r"^(Lints and builds \*\*Shipments\*\*: the mod package format \(a `manifest\.yaml` "
+                               r"plus a `src/` directory\))", display="lints and builds Shipments, the mod package "
+                                                                      "format")]),
+        (n, [P(n, "README.md", r"^(Tooling, research notes, and a from-scratch engine for \*\*Mercenaries 2: World "
+                               r"in Flames\*\*)")]),
+    ]
+    if [repo for repo, _ in items] != [r for r in REPOS if r.startswith(ORG)]:
+        raise Refusal("the account describes %s, and the credits cover %s; the account says the credits cover the "
+                      "repositories it lists and no others"
+                      % ([r for r, _ in items], [r for r in REPOS if r.startswith(ORG)]))
+    return items
+
+
 def account():
     P = facts.prose
-    paras = []
-    paras.append(render([
+    revival = render([
         P("Mercenaries2", "README.md", r"^(A revival project for \*\*Mercenaries 2: World in Flames\*\*)"),
         ", with online play through ", P("Mercenaries2", "README.md", r"The public server at `(refesl\.live)`"),
         ". Its mod line continues in Merc2-Mods-Exp: ",
         P("Mercenaries2", "README.md", r"(For the mods developed during this phase of the project, visit "
                                        r"\[Merc2-Mods-Exp\])",
-          display="the project's own pointer to where that work moved")]))
-    paras.append(render([
-        ". The modding side runs on ", C("Ess"), ", ",
+          display="the project's own pointer to where that work moved"),
+        ". The same README points all further mods to the community Modkit: ",
+        P("Mercenaries2", "README.md", r"(For the community Modkit/Mod Manager that all further mods will be built "
+                                       r"around, visit \[mercs2-modkit\])",
+          display="the project's own pointer to mercs2-modkit"), "."])
+    ess = render([
+        C("Ess"), ", ",
         P("mercs2-lua-essentials", "README.md", r"^`Ess` — (the foundational Lua library for Mercenaries 2 "
                                                r"modding)"),
-        ", one of ", facts.family("(mercs2-|merc2-|wad-simulator)", ["Merc2-Mods-Exp"]),
-        " public mercs2 repositories under Logan's own account. The credits below name every contributor to "
-        "Mercenaries2, Merc2-Mods-Exp and mercs2-lua-essentials, and to the Mercenaries-Fan-Build organisation's "
-        "own repositories."]))
-    return "".join('<p>%s</p>' % p for p in paras)
+        ", is one of ", facts.family("(mercs2-|merc2-|wad-simulator)", ["Merc2-Mods-Exp"]),
+        " public mercs2 repositories under Logan's own account."])
+    org = "".join("<li>%s</li>" % render([repo.split("/")[-1], ": "] + segs + ["."]) for repo, segs in org_items())
+    return ("<p>%s</p><p>%s</p>"
+            "<p>The Mercenaries-Fan-Build organisation's repositories that this site pins, each in its own "
+            "README's words:</p><ul class=\"plain\">%s</ul>"
+            "<p>The credits below name every contributor to Mercenaries2, Merc2-Mods-Exp and mercs2-lua-essentials, "
+            "and to the organisation's repositories listed above; no other repository is covered.</p>"
+            % (revival, ess, org))
 
 
 def door():
@@ -220,4 +265,20 @@ def controls():
     out.append(("credits-case-fold", naive_n > real_n,
                "two case variants of one made-up address group to %d account(s) by account_of; a copy with the "
                "case-fold dropped from the plain-email branch alone shows %d" % (real_n, naive_n)))
+
+    # The account says the credits cover the organisation's repositories it
+    # lists and no others. A repository added to REPOS that the account does
+    # not describe must be refused by name, or that sentence would be false
+    # while every figure on the page read true.
+    saved = list(REPOS)
+    REPOS.append(ORG + "planted-repository")
+    try:
+        org_items()
+        said, caught = "not refused", False
+    except Refusal as e:
+        said, caught = str(e), "planted-repository" in str(e)
+    finally:
+        REPOS[:] = saved
+    out.append(("credits-scope", caught, "a repository added to the credits that the account does not describe: %s"
+                % said[:160]))
     return out
