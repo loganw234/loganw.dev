@@ -1,4 +1,6 @@
 """Dossier: cft-fp256 (docs/SPEC.md, "Work"; decision 15)."""
+import re
+
 from pages import _dossier
 import facts
 from facts import prose
@@ -9,6 +11,12 @@ PAGE = {"file": "work-cft-fp256.html", "nav": "Work",
         "title": "cft-fp256 — Work — loganw.dev",
         "description": "The dossier for cft-fp256: what it is, its contract, what has verified it, "
                         "the failures it kept, and how to try to prove it wrong."}
+
+
+def ws(text):
+    """A literal as a pattern in which every run of spaces may be any whitespace, so that a rewrap of the
+    document it quotes does not break the quote; every other character is matched exactly."""
+    return r"\s+".join(re.escape(w) for w in text.split())
 
 
 def _sections(built):
@@ -46,7 +54,19 @@ def _sections(built):
                        ".”"]),
         _dossier.para(["The README states the promise directly: “",
                        prose(NAME, "README.md", r"(That guarantee is the product)\."), ".” ",
-                       prose(NAME, "README.md", r"(The hardware only makes it faster)\."), "."])])
+                       prose(NAME, "README.md", r"(The hardware only makes it faster)\."), "."]),
+        _dossier.para(["The contract is versioned. CONFORMANCE.md opens with its profile, “",
+                       prose(NAME, "CONFORMANCE.md", r"^\*\*(Profile 3, 2026-10-05)\*\*", num=True), "” (",
+                       prose(NAME, "CONFORMANCE.md",
+                             r"\((profile 2 was 2026-10-02 and profile 1\s+2026-09-16); \"Versioning\" says why each "
+                             r"stepped\)", num=True),
+                       "), and says of the tree: “",
+                       prose(NAME, "CONFORMANCE.md",
+                             r"\*\*The tree is at profile 3\*\* \(2026-10-05\), (a major step: recorded\s+bits moved)\."),
+                       ".” A major step is “",
+                       prose(NAME, "CONFORMANCE.md",
+                             r"\*\*A major step\*\* is (a change to any recorded bit or flag, or to an\s+accepted "
+                             r"image's result, flags, STATUS or acceptance):"), ".”"])])
 
     verified = S("Verified", [
         _dossier.para(["Last verified: ", facts.last_verified(NAME), "."]),
@@ -55,6 +75,10 @@ def _sections(built):
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 7161))],
             [L(facts.pin(NAME).href("docs/VALIDATION.md", 13913),
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 13913))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18245),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18245))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18544),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18544))],
         ], ordered=False)])
 
     kept_failures = S("Kept failures", [_dossier.list_([
@@ -76,14 +100,28 @@ def _sections(built):
          L(facts.pin(NAME).href("docs/VALIDATION.md", 10803), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 10803)),
          ". Fixed by commit ",
          _dossier.kept_failure(NAME, "8b7dea1", "run_ok refuses any reserved MODE bit a build does not carry"), "."],
+        [prose(NAME, "CONFORMANCE.md", r"\*\*(exp2 at x = emin - p)\.\*\*"), ": ",
+         prose(NAME, "CONFORMANCE.md",
+               "(" + ws("Its exact value 2^(emin - p) is half the smallest subnormal, the tie between +0 and it, "
+                        "which IEEE 754's roundTiesToAway (rmm) rounds to the subnormal. The model rounded it as a "
+                        "quarter of the subnormal and gave +0") + ")"),
+         ". ", prose(NAME, "CONFORMANCE.md",
+                     "(" + ws("Step 6's design study M1 found it (its question 5), verifier-VM1 confirmed it") + ")"),
+         " — in the entry ",
+         L(facts.pin(NAME).href("docs/VALIDATION.md", 18203), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18203)),
+         ". Fixed by commit ",
+         _dossier.kept_failure(NAME, "ca43695", "exp2's tie goes to round_pack, as pow's and pown's exact branches "
+                                                "always did; the profile's major step to 3"), "."],
     ])])
 
     test_it = S("Test it", [_dossier.list_([
         [L(prose(NAME, "README.md", r"\*\*<(https://loganw234\.github\.io/cft-fp256/)>\*\*").raw,
            prose(NAME, "README.md", r"It (replays\s+the published conformance vectors in front of you)")),
          " — ", prose(NAME, "README.md", r"## (Try it without installing anything)"), "."],
-        [C("make golden"), ": ", prose(NAME, "README.md", r"^(The golden model's self-tests)"), " (needs only "
-         "Python and, optionally, mpmath)."],
+        [C("make golden"), ": ",
+         prose(NAME, "README.md",
+               r"^(The golden model's self-tests \(any Python 3\.10\+, mpmath optional but\s+recommended\)):"),
+         ", after “", prose(NAME, "README.md", r"^(pip install pytest mpmath)$"), "”."],
         ["the card: ", prose(NAME, "CONFORMANCE.md",
                               r"\*\*A device\.\*\* `host/tests/device_test\.c` (compares a device against\s+the "
                               r"software backend bit for bit across the elementwise operations)"), ", which needs "
@@ -96,12 +134,20 @@ def _sections(built):
             ["Open the web page above and hand it your own vector file: “",
              prose(NAME, "README.md", r"(Drop a vector file on it and it scores itself)\."), ".” Anything less "
              "than a perfect score is a disproof."],
-            [C("make golden"), " locally, against the same vector sets published in the repository's ",
-             L(facts.pin(NAME).href("vectors/SHA256SUMS"), facts.exists(NAME, "vectors/SHA256SUMS")), "."],
+            [C("make vectors"), " locally, then compare the digests it writes with the ones the repository "
+             "publishes in ", L(facts.pin(NAME).href("vectors/SHA256SUMS"), facts.exists(NAME, "vectors/SHA256SUMS")),
+             ", by the recipe CONFORMANCE.md gives; a differing line is a disproof. The record says this is a check "
+             "no gate makes: “",
+             prose(NAME, "CONFORMANCE.md",
+                   r"\*\*A known limit: (no gate compares a set's digest with\s+`vectors/SHA256SUMS`)\.\*\*"),
+             ".”"],
             ["Replay the identity protocol yourself in another language and compare its checksum line against the "
              "ones ", facts.exists(NAME, "docs/COMPATIBILITY.md"), " records; a differing hex value is a disproof."],
             ["Rebuild ", C("host/tools/mpfr_check.c"), " and widen its sweep past the campaign's own cases: the "
-             "independent oracle is only as good as the cases put to it."],
+             "independent oracle is only as good as the cases put to it. The record names one it lacks: “",
+             prose(NAME, "docs/VALIDATION.md",
+                   r"(\*\*The MPFR campaign's pool\*\* \(host/tools/mpfr_check\.c, `build_tpool`\) lacks the tie's "
+                   r"argument, so the gate's `mpfr` stage does not test the fix; XT-1's probe does)\."), ".”"],
         ], ordered=True)])
 
     connections = S("Connections", [_dossier.connections_block(NAME)])
