@@ -223,11 +223,15 @@ lists, page by page:
 On "go", it builds, rebuilds `public/` on its branch, runs the checks and its
 controls (below), commits, and reports.
 
-Every "What moved" value below was read at the pins, by
-`git -C <repos>/<clone> log --oneline <old pin>..<new pin>` and the new
-ledger headings in `git -C <repos>/<clone> diff <old pin> <new pin> --
-docs/VALIDATION.md`; the same commands give the same lines while the pins
-stay put.
+Every "What moved" value below was read at the pins: what a round did,
+from its commits' subjects and its new ledger headings, by
+`git -C <clone> log --oneline <old pin>..<new pin>` and
+`git -C <clone> diff <old pin> <new pin> -- docs/VALIDATION.md`; anything
+else, from the file each parcel's brief names (a README, `host/include/cft.h`,
+`docs/HARDWARE-RESULTS.md`). `<clone>` is the owner's clone under `<repos>`
+for a pin with a `dir`, and for the organisation's three, which have none,
+the site's own clone under `.cache/repos/` (trap 9). The same commands give
+the same lines while the pins stay put.
 
 **The checks every parcel runs,** each in seconds: `python site/build.py`,
 then its `--numbers`, `--links`, `--local-only`, `--check` and
@@ -236,7 +240,7 @@ then its `--numbers`, `--links`, `--local-only`, `--check` and
 **The controls every parcel runs**, each built in a copy under its scratch
 directory, never in its worktree, with its output reported:
 - a figure on one of its pages typed by hand where a fact was: the numbers
-  stage, or `render.render()`, refuses it by name;
+  stage refuses it by name;
 - a label on one of its pages naming a path `build.SOURCE_PATHS` does not
   list: the numbers stage refuses it;
 - one of its new `prose()` patterns given its source's old words: the build
@@ -286,7 +290,7 @@ property is held.
   `stated()` line; and the three thread doors that propose.py renders, which
   are P1's, P3's and P4's pages' and Logan's words (propose.py's own control
   needs "workloads" in the Determinism door).
-- **The trap:** a statistic still true of case studies 1 to 4 presented as
+- **The trap:** a statistic still true of case studies 2 to 4 presented as
   the method's record, now that 5 and 6 exist; a dossier that calls the
   method gateless.
 - **Its own control, besides the three:** a citation of `CASE-STUDY-7.md`,

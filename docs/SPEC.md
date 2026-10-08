@@ -298,10 +298,10 @@ first four at 13:32 and the last two at 14:18:
     me otherwise": "Where a stated line of yours is overtaken, it may be
     replaced by a figure read from the source, recorded in the ledger;
     anything that needs new words of yours, or drops one of your spec's
-    choices (such as a Corrections gap), comes to you." The first such line
-    was Map & Ledger's "a revision-7 round is under way off main", which
-    the build refused once cft-fp256's pin moved; it now reads cft-fp256's
-    newest ledger entry.
+    choices (such as a Corrections gap), comes to you." *The lead's note:*
+    the first such line was Map & Ledger's "a revision-7 round is under way
+    off main", which the build refused once cft-fp256's pin moved; it now
+    reads cft-fp256's newest ledger entry.
 
 ---
 
