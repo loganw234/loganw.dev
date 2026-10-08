@@ -202,7 +202,7 @@ def rows():
                    [C("Ess"), ", ", P("mercs2-lua-essentials", "README.md",
                                       r"^`Ess` — (the foundational Lua library for Mercenaries 2 modding)")],
                    ["one of ", facts.family("(mercs2-|merc2-|wad-simulator)", ["Merc2-Mods-Exp"]),
-                    " public mercs2 repositories on Logan's own account"],
+                    " public mercs2 repositories on Logan's own account besides Merc2-Mods-Exp"],
                    [L(facts.repo_meta("mercs2-lua-essentials")["url"], "repository")]))
     return out
 

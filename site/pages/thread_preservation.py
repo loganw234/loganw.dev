@@ -192,14 +192,19 @@ def account():
         P("mercs2-lua-essentials", "README.md", r"^`Ess` — (the foundational Lua library for Mercenaries 2 "
                                                r"modding)"),
         ", is one of ", facts.family("(mercs2-|merc2-|wad-simulator)", ["Merc2-Mods-Exp"]),
-        " public mercs2 repositories under Logan's own account."])
+        " public mercs2 repositories under Logan's own account besides Merc2-Mods-Exp."])
     org = "".join("<li>%s</li>" % render([repo.split("/")[-1], ": "] + segs + ["."]) for repo, segs in org_items())
+    # The repositories outside the organisation are named from REPOS, so the
+    # sentence can't name one the credits don't cover, or leave one out
+    # (verifier-P4's D4); org_items() holds the organisation's.
+    own = [r for r in REPOS if not r.startswith(ORG)]
+    named = ", ".join(own[:-1]) + " and " + own[-1] if len(own) > 1 else own[0]
     return ("<p>%s</p><p>%s</p>"
             "<p>The Mercenaries-Fan-Build organisation's repositories that this site pins, each in its own "
             "README's words:</p><ul class=\"plain\">%s</ul>"
-            "<p>The credits below name every contributor to Mercenaries2, Merc2-Mods-Exp and mercs2-lua-essentials, "
-            "and to the organisation's repositories listed above; no other repository is covered.</p>"
-            % (revival, ess, org))
+            "<p>The credits below name every contributor to %s, and to the organisation's repositories listed "
+            "above; no other repository is covered.</p>"
+            % (revival, ess, org, esc(named)))
 
 
 def door():
