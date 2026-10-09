@@ -28,7 +28,10 @@ _STATUSES = ("adopted in part", "adopted", "pending", "not adopted")
 def adoption_state(name):
     """ADOPTION.md's rows, counted by status at the pin. A status it does not
     know is refused by name, so a new kind of status cannot be left out of the
-    count; so is a file with no rows."""
+    count; so is a file with no rows. Stated limits (verifier-P2): a status that
+    only begins with a known word is counted as that word, and a row whose id is
+    not of the CS, B, R or S kinds is not read as a row; neither occurs at the
+    pin."""
     p = pin(name)
     rows = _ROW.findall(p.show("ADOPTION.md"))
     if not rows:
@@ -81,7 +84,10 @@ def _sections(built):
                              r"record, ADOPTION\.md, one row per proposal);"), ".” Of what the gate reads, its own "
                        "docstring says: “",
                        prose(NAME, "tools/check_method.py",
-                             r"^(It reads structure and citations, never what a rule says)\."), ".” It gives the "
+                             r"^(It reads structure and citations, never what a rule says)\."), ".” Further on, it "
+                       "says which of its checks do: “",
+                       prose(NAME, "tools/check_method.py", r"(Checks 7 and 9 read text, and are such limits)\.",
+                             num=True), ".” It gives the "
                        "gate's threat model: “",
                        prose(NAME, "tools/check_method.py",
                              r"^(Threat model \(the owner's decision, 2026-10-02\)\. The gate guards against two\s+"
@@ -179,8 +185,9 @@ def _sections(built):
                r"(Each rule in a template is tagged, in\s+parentheses, with the METHOD\.md section it comes from, "
                r"or \"own\" for the\s+templates' own guidance, as each template's legend says)"),
          ",” so follow a tag, and read the section it names."],
-        ["Try the method's own seam test on a codebase you already know: list every file each of several "
-         "independent changes would touch, and see whether one file appears in several such lists at once."],
+        ["Try the step the method takes before any split, on a codebase you already know: list every file each "
+         "of several independent changes would touch, and see whether one file appears in several such lists at "
+         "once."],
     ], ordered=True)])
 
     prove_it_wrong = S("Prove it wrong", [

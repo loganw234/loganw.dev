@@ -35,8 +35,8 @@ def ratio_block():
     body = render([
         "Logan's own figure for the balance of human to machine time is ", S("1:24"), " — not yet a measurement. ",
         S("It will be measured from now on."),
-        " The one measurement on record is ParcelRound's second round, where its own accounting puts the "
-        "human-active time at ", quote, ". In Logan's words, that reported time ",
+        " The one measurement on record is ParcelRound's second round, where the desktop app's own accounting "
+        "puts the human-active time at ", quote, ". In Logan's words, that reported time ",
         S("was a bit inflated, lining up more with the 1:24 figure"), "."
     ])
     return '<div class="measure"><p>%s</p></div>' % body
