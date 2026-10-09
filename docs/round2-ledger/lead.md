@@ -662,3 +662,57 @@ Decided:
 - The round's last part: the case study and this ledger's archive, in loganw.dev's `docs/`, past a verifier on Haiku, then pushed (decisions 32 and 33).
 
 For: the case study, Logan
+
+## 2026-10-08 19:12:36 -0700 - the case study and the archive at 35e0dd1 on round2-close; two more slips of the lead's, both caught before anything was pushed; verifier-CS dispatched on Haiku
+
+Measured:
+- `35e0dd1` on `round2-close`, from `7f2d51b` (main): `docs/ROUND2-CASE-STUDY.md`; `docs/round2-ledger/`, 33 files, each staged blob compared with its ledger file, 33 of 33 the same; `.gitattributes` keeps that directory's bytes; CLAUDE.md trap 19; README's layout rows. `bash verify/run.sh --require-all` on it (run 20261008-190706-35e0dd1): "passed 11, failed 0, skipped 0", "VERDICT: PASS, nothing skipped"; controls 393 caught.
+- **Two slips of the lead's, both on the local branch, fixed by amending its unpushed commit:**
+  - the first commit, `2d4ae4a`, went in although `--docs` had just refused CLAUDE.md's new trap ("stages took 15" reads as a stage count): the command chain committed after a failing check. The trap is reworded, and `--docs` reads 0 problems.
+  - `P4.md` holds one carriage return, and the repository's `* text=auto eol=lf` would have stored it without, so the archive was not byte for byte as the commit said. `.gitattributes` now stores `docs/round2-ledger/**` as `-text`.
+
+Decided:
+- **verifier-CS** is dispatched now, model requested: haiku, briefs `_verifier.md` and `verifier-CS.md`, in a worktree of loganw.dev at `35e0dd1`. The lead runs no gate while it works (trap 19).
+
+For: verifier-CS, the case study
+
+## 2026-10-08 19:13:14 -0700 - verifier-CS's test escalation arrived as a runtime message
+
+Measured:
+- "verifier-CS: test escalation" reached the lead through the runtime's agent messages: twelve agents, twelve test messages, each arrived.
+
+For: the case study
+
+## 2026-10-08 19:38:26 -0700 - verifier-CS: NOT READY on 35e0dd1; the lead's checks; three corrections to this file; two decisions on the archive
+
+Measured:
+- verifier-CS reported at about 19:37 (its file, with an addendum at 19:36:30). The runtime's figures for its run: context at the end 455,778 tokens, 102 tool uses, 1,452,553 ms. Model: claude-haiku-5-5. Its own full gate on `35e0dd1`, run alone (run 20261008-191852-35e0dd1): "passed 11", controls 393 caught. It re-ran `tools/round_metrics.py` over the window 13:16:10 to 18:56:43 and reproduced both tables cell by cell; 27, 5 and 77 from `facts.json` at `43c36a2` and `05413b2`; each key's hash; and the archive, 32 of 33 files byte-identical and `lead.md` the archive plus appended bytes.
+- Its six wrong answers in the case study, each checked by the lead, each true: W1 (the opening says this file went past a verifier before it was committed, and the last section is a placeholder); W2 ("eight verifiers": seven before the push); W3 ("Haiku writes more than it reads", which the table contradicts: it reads far more than it writes); W4 (case study 6's 45 k to 68 k is its five parcel verifiers' range; its other Opus verifiers wrote 114 k to 129 k); W5 ("two citations in [P1's] own commit message": verifier-P1's S1 was wrong, so one, which P1 had corrected itself); W6 (the claim that all four verifiers noted the design's difference rests, for verifier-P3, on its report, which this file summarised without that note).
+- Its restates R1 to R11 and its notes, each checked; all taken, R7 with N1's correction below.
+- **N1, settled by the lead:** the gate on `e349b1a` started at 16:26:56; its stages before controls took 164 s and its controls stage 877 s, so that stage ran from about 16:29:40 to 16:44:17. The planted copies' gates started at 16:44:11. So three gates did not run at once: the gate on `e349b1a` ran its controls while P1, P2 and P3 ran the site's `--control` in their own copies (P2 recorded three such runs, of 3 min 22 s to 4 min 0 s), and the two planted copies' gates ran beside each other.
+
+**Corrections to this file:**
+- To the entry of 16:44:52: its "three gates were running at once" is wrong, as above.
+- To the entry of 17:54:05 (verifier-P3's report, which its runtime kept out of its own file): the summary left out two of its notes, which verifier-P3's report gave, verbatim: under D1, "P3's design wrote "Below, one of the devices' prints" (`P3.md`, 15:43:04, section 4)"; under D2, "The design said "quoted whole" (`P3.md` 68), ROUND2's P3 section names this regression (lines 325-327), and the lead's 15:44:41 answer says the shortfall stays beside the print."
+- To the entry of 15:33:01, its side note 9's last line: the path fragment in verifier-P0's entry of 15:20:27 is not struck in the archive. It is "/c/Users/...", elided, naming no user and no machine, and striking it would break the archive's byte for byte.
+
+Decided:
+- **D1, the co-author trailer's address in the archive** (P4.md, and the lead's own `briefs/_common.md`): kept. It is in every commit's trailer, the privacy stage allows it, and the case study lists the README's rule against it as broken by the lead's own brief.
+- **D2:** the elided fragment is kept, as the correction above says.
+- **D3:** the case study is revised for W1 to W6 and R1 to R11, its opening and its last section written; CLAUDE.md's trap 19 and README's row restated; the site's own ledger gets an entry correcting its "three full gates run at once"; the archive is taken again; verifier-CS is resumed for its second pass.
+
+For: verifier-CS, the case study
+
+## 2026-10-08 19:41:33 -0700 - a correction to the entry of 19:4x on N1: the parcels' control runs are not shown to overlap the gate's controls stage
+
+Measured:
+- The entry says the gate on `e349b1a` ran its controls "while P1, P2 and P3 ran the site's `--control` in their own copies". Their stamps don't show that. What is measured: that controls stage ran from about 16:29:40 to 16:44:17; P2 reported at 16:30 and P1 at 16:33, and P3 was in its phase 2 throughout; P2's three `--control` runs are recorded without their times. So the stage ran while parcels were building and checking in their own copies, and which of their runs overlapped it is not determined.
+
+For: the case study
+
+## 2026-10-08 19:41:52 -0700 - the case study's second version, and the archive taken again, for verifier-CS's second pass
+
+Measured:
+- The case study revised for W1 to W6 and R1 to R11; CLAUDE.md's trap 19 and README's archive row restated; a new entry in `docs/VALIDATION.md` adds the case study and the archive and corrects round 2's entry's "three full gates run at once". The archive is taken again from this directory as it stands at this entry, byte for byte.
+
+For: verifier-CS

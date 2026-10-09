@@ -176,11 +176,12 @@ a figure it didn't read there.
     names, write the name unless their pronouns are stated. No gate reads
     pronouns: a verifier checks for them.
 
-19. **Run one full gate at a time.** Its controls stage takes about three
-    minutes alone. On 2026-10-08 three gates ran at once, on round 2's
-    merge and two planted copies, and the controls stage of each took
-    between 15 and 25 minutes. A verifier's own gate counts too: say in its
-    brief when the lead's is running.
+19. **Run the full gate alone.** Its controls stage takes about three
+    minutes on a quiet machine. On 2026-10-08 it took about 15 minutes for
+    a gate run while parcels were building and checking in their own
+    copies, and about 25 for each of two gates run side by side. A
+    verifier's own gate counts too: say in its brief when the lead's is
+    running.
 
 ## The discipline that matters most here
 

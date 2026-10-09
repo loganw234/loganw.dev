@@ -2164,3 +2164,25 @@ pre-registration is not defined on the page; that stands as a note.
 
 `bash verify/run.sh --require-all`: 11 passed, nothing skipped.
 `--control` caught 393 of 393.
+
+## 2026-10-08 - round 2's case study and its archived ledger; and a correction to round 2's entry: no three gates ran at once
+
+**What is added.** Round 2's case study, `docs/ROUND2-CASE-STUDY.md`: what
+happened, the yield of the planted faults, and the round's cost per agent,
+measured from the session's transcripts. And the round's ledger, archived
+byte for byte in `docs/round2-ledger/`: every agent's file, the briefs, the
+four keys and the scripts. `.gitattributes` stores that directory as its
+files are, since one of them holds a carriage return that the repository's
+line-ending rule would have removed. A verifier on Haiku, verifier-CS, read
+the case study's first version, found six wrong answers in it and eleven
+sentences to restate, and each was taken before this entry.
+
+**A correction to the entry "2026-10-08 - round 2: every moved pin at
+GitHub's main, ...".** Its list of the lead's slips says "three full gates
+run at once, which slowed their controls stages to between 15 and 25
+minutes". The gates' own times show otherwise. The gate on `e349b1a` ran its
+controls stage from about 16:29:40 to 16:44:17, while parcels were building
+and checking in their own copies, and it took 877 s; the two planted copies'
+gates, which began at 16:44:11, ran side by side and took about 1,490 s each
+on that stage. Alone it takes about 190 s. CLAUDE.md's trap 19 says to run
+the full gate alone.

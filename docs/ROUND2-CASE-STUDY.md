@@ -10,37 +10,41 @@ We have also started to track metrics a bit deeper, keeping totals on
 parcels, agents, token use, time, etc."
 
 So this file has two jobs: to say what happened, and to give the round's
-totals, measured. It went past a verifier, on Haiku, before it was
-committed; the last section says what that verifier found.
+totals, measured. A verifier on Haiku checked its first version against the
+ledger, the commits and the transcripts; the last section says what that
+verifier found, and what changed.
 
 Times are local (UTC-7), from the ledger's own stamps, which every author
-wrote with `date`, and from the transcript's timestamps for the owner's
-words. Commits are named by their short SHAs on the branch `round2`.
+wrote with `date` (one of verifier-plan's headings had no time, which its
+next entry corrects), and from the transcript's timestamps for the owner's
+words. Commits are named by their short SHAs.
 
 ## The setting
 
 - **The project.** loganw.dev, Logan W.'s site. Every figure on it is read
   from a repository at a pinned commit, from a committed GitHub snapshot, or
   from the site's own ledger, or is marked as stated, with who said it and
-  when; a gate refuses anything else. Round 1 built it, on
-  2026-09-29 and 30 (ParcelRound's case study 5).
+  when; a gate refuses anything else. Round 1 built it, on 2026-09-29 and 30
+  (ParcelRound's case study 5).
 - **The job.** Between 2026-09-29 and 2026-10-08, seven of the site's pinned
   repositories moved on GitHub: cft-fp256 by 381 commits, ParcelRound by 37,
   Quantum-Film by 171, StoryDocs by 1, and three of the Mercenaries-Fan-Build
   organisation's by 5, 409 and 70. HonestHarness, new, was public. The pages
   still described the projects as round 1's pins had them.
-- **The owner's decisions** (SPEC.md, decisions 31 to 36), each through the
+- **The owner's decisions** (SPEC.md, decisions 31 to 38), each through the
   question tool: HonestHarness gets a row on Map & Ledger and a node on the
   map, and its dossier waits until its round 1 lands on main; this file and
   the ledger go in the site's own repository; push when verified; one IBM
   hardware print, on the Film thread's own page (asked twice, below); every
-  verifier on Haiku, the lead's work included; and a stated line of his that
-  a pin has overtaken may be replaced by a figure read from its source, with
-  anything else coming to him.
+  verifier on Haiku, the lead's work included; a stated line of his that a
+  pin has overtaken may be replaced by a figure read from its source, with
+  anything else coming to him; About's credits sentence narrowed; and
+  Corrections' fourth gap shown.
 - **The models,** read from each agent's own transcript: the lead on
-  claude-opus-5-5; the four parcels on claude-sonnet-5-5; the eight
-  verifiers on claude-haiku-5-5. (Round 1's "sonnet" was claude-sonnet-5:
-  the same request resolved to a newer model.)
+  claude-opus-5-5; the four parcels on claude-sonnet-5-5; the seven
+  verifiers before the push, and this file's, on claude-haiku-5-5. (Round
+  1's "sonnet" was claude-sonnet-5: the same request resolved to a newer
+  model.)
 - **What was new against round 1:**
   - the round's totals kept as it ran: every dispatch and report in the
     lead's ledger file, with the runtime's figures, and a script,
@@ -80,10 +84,13 @@ words. Commits are named by their short SHAs on the branch `round2`.
 | 18:00 | The full gate passes on every parcel merged (`a4a438c`); the keys go into the ledger. |
 | 18:03 | The round's entry in the site's own ledger (`9b35773`); the full gate passes on it. |
 | 18:08 | verifier-I dispatched on the lead's merges, restates and records. |
-| 18:33 | verifier-I: NOT READY, four findings; every merge, made again with `git merge-tree`, is clean. Two of its findings go to Logan, who settles both: About's credits sentence narrowed, and Corrections' fourth gap shown. |
+| 18:33 | verifier-I: NOT READY, four findings. Every merge, made again with `git merge-tree`, merges its source files without a conflict; only the generated `public/` conflicted, and was built again each time. Two of its findings go to Logan, who settles both: About's credits sentence narrowed, and Corrections' fourth gap shown. |
 | 18:42 | The lead's fixes (`7f2d51b`); the full gate passes on them. verifier-I's second pass. |
 | 18:52 | verifier-I: READY. |
-| 18:56 | `main` fast-forwarded to `7f2d51b` and pushed. The deploy's gate and deploy jobs pass; every published file but BUILD is byte for byte the build, and BUILD names `7f2d51b`. |
+| 18:56 | `main` fast-forwarded to `7f2d51b` and pushed. |
+| 19:04 | The deploy's gate and deploy jobs pass; every published file but BUILD is byte for byte the build, and BUILD names `7f2d51b`. |
+| 19:07 | This file's first version, and the archive (`35e0dd1`); verifier-CS dispatched at 19:12. |
+| 19:37 | verifier-CS: NOT READY, six wrong answers in this file (the last section). |
 
 ## What happened
 
@@ -99,7 +106,7 @@ out.
 | P4 | the organisation, "which austinkregel founded and leads with his collaborators" | a claim about a person, with a pronoun no one stated |
 | P1 | cft-fp256's language as "the one atlas-engine's plates are now written in" | a relation no source states |
 | P1 | "no step so far has moved a recorded bit" | a sentence its source contradicts |
-| P2 | "Across its rounds, its planted faults: ten of ten" | one round's figure as every round's |
+| P2 | "Across its rounds, its planted faults:", the lead-in to the page's "ten of ten" | one round's figure set in a sentence about every round |
 | P2 | "The fifth round's case study records" a sixth-round quote | a lead-in naming the wrong source |
 | P3 | the results summary quoted without its sentence on the shortfall | a quote cut short |
 | P3 | "the device whose run came closest to its noise model's prediction" | a selection reason no source gives |
@@ -109,18 +116,20 @@ out.
   ibm_marrakesh, not ibm_kingston, is nearer its prediction on two of the
   measures.
 - **The limit.** All four reports also note that the parcel's design, in
-  the ledger, reads otherwise at the planted sentences. verifier-P2 writes
-  that it "did not use the design to find them"; the other three don't say
-  in which order they read. So the clone closed the route by `git diff`, and
-  left the route by the ledger open, which ParcelRound's case study 6 found
-  of its own round too ("A verifier that read the design first could have
-  found every plant by comparison alone").
+  the ledger, reads otherwise at the planted sentences (verifier-P3's in
+  the report its runtime kept out of its own file, which the lead's file
+  records). verifier-P2 writes that it "did not use the design to find
+  them"; the other three don't say in which order they read. So the clone
+  closed the route by `git diff`, and left the route by the ledger open,
+  which ParcelRound's case study 6 found of its own round too ("A verifier
+  that read the design first could have found every plant by comparison
+  alone").
 - **Beside the plants, real findings:** in P4's work, a count that didn't
-  say what it left out and a scope sentence no guard held; in P1's, two
-  citations in its own commit message; in P2's, two wrong labels and a
-  quote cut short; in P3's, a "half" that is 8 of 17, a README heading
-  printed as prose, and a docstring. Each was restated by the lead at its
-  merge.
+  say what it left out and a scope sentence no guard held; in P1's, one
+  clause of its own commit message, which P1 had already corrected itself;
+  in P2's, two wrong labels and a quote cut short; in P3's, a "half" that is
+  8 of 17, a README heading printed as prose, and a docstring. Each was
+  restated by the lead at its merge.
 - **Three claims of the verifiers' own were wrong,** and the lead carried
   one of them into the record. Logan's decision 35 has the lead check each
   Haiku finding against the records before acting on it.
@@ -152,20 +161,20 @@ then found, in pages round 1 had published and its verifiers had passed:
 - the Preservation thread's credits caption set Logan's statement inside a
   sentence that misread it, and a paragraph opened with a full stop (P4).
 
-The site's own ledger lists every correction the round made, in its entry
-of 2026-10-08.
+The site's own ledger lists most of the round's corrections in its entries
+of 2026-10-08; the round's ledger, archived beside this file, has every one,
+with the line that shows it.
 
 **3. The owner's words took more checking than any parcel.** The plan went
 past its verifier three times, on 8, 2 and 2 defects, and P0 three times.
-Two of the plan's defects were the owner's to settle, and verifier-P0 found
-a third: SPEC.md had quoted Logan's request without its last sentence, and
-read "beside the existing prints" one way where it could be read another.
-Each went back to Logan through the question tool, rather than being
-settled by the lead's reading. verifier-I found two more of his to settle:
-About's sentence on the Preservation thread's credits, which claimed more
-than the thread now does, and Corrections' fourth gap, which the spec names
-and the page had left out since round 1. He was asked five times in the
-round, and answered each within minutes.
+Two of the plan's defects were the owner's to settle, and went to him.
+verifier-P0 then found that SPEC.md had quoted his request without its last
+sentence, which the lead restored, and that "beside the existing prints"
+could be read another way, which went back to him. verifier-I found two
+more of his to settle: About's sentence on the Preservation thread's
+credits, which claimed more than the thread now does, and Corrections'
+fourth gap, which the spec names and the page had left out since round 1.
+He was asked five times in the round, and answered each within minutes.
 
 **4. Designing first held the parcels to their files, and moved the seam
 to one commit.** Each design listed the source paths its labels would name.
@@ -178,7 +187,7 @@ HonestHarness "runs" the methods, where its README says it is "a harness
 for running" them, with no code yet.
 
 **5. Escalation by the runtime's messages reached the lead every time.**
-All eleven agents sent a test message at the start, and every one arrived.
+All twelve agents sent a test message at the start, and every one arrived.
 No agent needed a real escalation: the questions came in designs and
 reports, at the moments the briefs set. Two verifiers' runtimes refused
 their writes to their own ledger files ("Subagents should return findings
@@ -186,6 +195,9 @@ as text"), so their reports are in the lead's file instead.
 
 **6. The lead's slips,** each written in the ledger when it was caught:
 - the plan's first draft, with its eight defects;
+- SPEC.md's quote of the owner's request, cut before its last sentence;
+- the ledger's own numbers for two of his decisions, written as 36 and 37
+  where SPEC.md has 35 and 36;
 - Python sent through a Bash heredoc twice, once to write a planted copy's
   key and once to archive the planting scripts; each time its backslashes
   didn't survive (CLAUDE.md trap 8), and each failed before it wrote
@@ -194,19 +206,30 @@ as text"), so their reports are in the lead's file instead.
   was busy, which the transcript keeps as an "attachment" record, not a
   "user" one; found mid-round, when two parcels showed fewer runs than they
   had reported;
-- three full gates run at once, which slowed the controls stage of each
-  from about 3 minutes to between 15 and 25;
+- the full gate run while other agents were working on the same machine:
+  the lead's gate on `e349b1a`, run while parcels were building and
+  checking in their own copies, took 877 s on its controls stage, and the
+  two planted copies' gates, run side by side, about 1,490 s each; alone
+  the stage takes about 190 s. The lead first recorded this as "three
+  gates at once", which the gates' own times show wrong (verifier-CS);
 - P0's commit subject counts its refusals as two where there were four;
 - a verifier's wrong reading of two line numbers, taken without opening the
   lines and written into a merge message as a correction (above);
+- the yield's first record said three verifiers noted the parcels' designs,
+  where all four did; and its summary of verifier-P3's report left those
+  notes out;
+- this file's first commit went in after the docs stage had refused a new
+  line of CLAUDE.md, and with one byte of the archive that git's line-ending
+  rule would have changed; both were amended before any push;
 - the ledger's README forbids any address but the site's contact, and the
   lead's own brief gave the parcels the co-author trailer, with its address,
-  to sign their commits with.
+  to sign their commits with. The archive keeps both, as written.
 
 ## Cost of the round (measured from the transcripts)
 
 **The method,** as case studies 6 and 7 of ParcelRound measured theirs:
 - Each agent's tokens are summed from its own transcript, once per message.
+  A message is one of the agent's model responses, counted once by its id.
   Fresh tokens are input, cache writes and output; cache reads are counted
   apart, and so is output on its own.
 - Runs, minutes and tool uses are the runtime's own notifications, one a
@@ -215,7 +238,8 @@ as text"), so their reports are in the lead's file instead.
   nowhere.
 - Each model is read from the agent's own transcript.
 - The lead's session is counted from Logan's request, as case study 6 did
-  (case study 7 left it out).
+  (case study 7 left it out). The lead's tool uses are its own; its time is
+  the window's wall clock.
 - The script is [round_metrics.py](round2-ledger/tools/round_metrics.py). It
   reads the session's transcripts, which are not published, so it shows the
   method and cannot remake the figures from this repository.
@@ -248,42 +272,75 @@ as text"), so their reports are in the lead's file instead.
 - **The verifiers wrote most of the output:** 57.9% of it, against the
   parcels' 32.7% and the lead's 9.4%. In fresh tokens the two were about
   equal, 7.7 M against 7.8 M, as case study 7 found of its own run.
-- **Haiku writes more than it reads, against the earlier verifiers.** Each
-  parcel verifier's single run wrote 248 k to 287 k output tokens; round
-  6's Opus verifiers wrote 45 k to 68 k each (case study 6). Its fresh
-  tokens per first run, 0.67 M to 0.75 M, sit near the medians case study 7
-  measured on Sonnet and Opus first runs (805 k and 751 k).
+- **Haiku's verifiers wrote more than round 6's.** Each parcel verifier's
+  single run wrote 248 k to 287 k output tokens. Round 6's five parcel
+  verifiers, on Opus, wrote 45 k to 68 k each, and its three other Opus
+  verifiers 114 k to 129 k (case study 6). In fresh tokens per first run,
+  0.67 M to 0.75 M, they sit near the medians case study 7 measured on
+  Sonnet and Opus first runs (805 k and 751 k).
 - **The checking of the lead's own work** (the plan's verifier, P0's and
   the integration verifier, eight runs in all) used 4.9 M fresh tokens, more
   than any parcel used, and more than the four parcels' verifiers together
   (2.8 M).
 
+**After the push,** from 18:56:43 to this version's writing, 19:39:45: 43
+minutes of wall clock. verifier-CS's first run took 24 minutes, 102 tool
+uses, 247 k output, 0.7 M fresh tokens and 20.6 M cache reads; the lead's
+session 34 tool uses, 38 k output, 98 k fresh and 26.6 M cache reads. The
+rest of the close (verifier-CS's second pass, the archive taken again, the
+last push) comes after this version, and the round's ledger records it.
+
 ## What METHOD.md should say differently (proposed; the owner's to settle)
 
 1. **A pin move needs a reading for currency, which no gate makes.** After a
    move, a quote that still matches can describe the past. This round's
-   briefs and verifier lists named it, and it was most of the work. The
-   change: the verifier template's list gains "a sentence true at the pin
-   but no longer the current truth", for any round that moves a pin.
+   briefs and verifier lists named it. The change: the verifier template's
+   list gains "a sentence true at the pin but no longer the current truth",
+   for any round that moves a pin.
 2. **A planted copy is reachable by comparison through the ledger, too.**
    The clone closed `git diff`; the parcel's design in the shared ledger
    stayed readable. The change: a planted-copy verifier reads the parcel's
    ledger file only after it reports, or the plants go into a copy of the
    design as well.
-3. **A smaller model can verify a content round, with the lead's re-check.**
-   Four Haiku verifiers caught 8 of 8 plants and found real defects; of the
-   twelve reports the verifiers gave before the push, two held claims that
-   were wrong, three in all, and the lead carried one into the record.
-   The change: where the work is content, verifiers may run on a smaller
+3. **A smaller model verified this content round, with the lead's
+   re-check.** Four Haiku verifiers caught 8 of 8 plants and found real
+   defects; of the twelve reports the verifiers gave before the push, two
+   held claims that were wrong, three in all, and the lead carried one into
+   the record. That is one round, of four parcels. The change, on that
+   evidence: where the work is content, verifiers may run on a smaller
    model, and the lead checks each finding against the records before
-   acting on it (decision 35's own words).
+   acting on it (decision 35's own words), and the yield is measured again
+   in the next such round.
 4. **Read the cost from every record the transcript keeps.** A
    notification's "tokens" is a context size (case study 7), and a
    notification that arrives while the lead works is kept in another kind
    of record. The change: the cost method says both.
-5. **Run the gate alone.** Three at once cost each controls stage five to
-   eight times its time.
+5. **Run the gate alone.** Run beside other agents' builds and checks, its
+   controls stage took 4.6 to 7.8 times its time alone.
 
 ## The round's end
 
-(To be filled after the integration verifier, the push and the live check.)
+- **The push.** verifier-I said READY on `7f2d51b` at 18:52, with its own
+  full gate passing. `main` was fast-forwarded to it and pushed at 18:56:43,
+  and only `main`. The deploy run's gate and deploy jobs passed. Every
+  published file but BUILD, fetched from https://loganw.dev/, is byte for
+  byte the build (39 of 39), BUILD names `7f2d51b`, and the author's email
+  domain appears nowhere in the live `facts.json`.
+- **The cleanup.** No finished agent left a process running. Every agent's
+  worktree but this file's verifier's is removed, with the scratch worktree
+  of the first survey; the planted branches are deleted, and never left the
+  lead's machine.
+- **This file's verifier,** verifier-CS, on Haiku, read the first version
+  (`35e0dd1`) against the ledger, the commits and the transcripts. It
+  re-derived the cost tables cell by cell with the script, the 27, 5 and 77
+  from `facts.json`, and each key's hash, and ran the full gate itself. It
+  found six wrong answers, each now restated: the opening claimed a check
+  that had not yet happened; "eight verifiers" where the table has seven;
+  "Haiku writes more than it reads", which the table contradicts; case
+  study 6's output range given for all its Opus verifiers, where it was its
+  parcel verifiers'; "two citations" in P1's message, where one was a
+  verifier's error; and a claim that rested on a report the lead's summary
+  had cut. It found eleven sentences to restate, all taken, and asked
+  whether three gates had run at once, which the gates' own times answer:
+  they had not. Its second pass, on the commit that answers them, is
+  recorded in the round's ledger.
