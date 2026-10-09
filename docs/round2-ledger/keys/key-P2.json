@@ -1,0 +1,22 @@
+{
+ "parcel": "P2",
+ "commit": "37d0609",
+ "branch": "r2-plant-P2",
+ "verifier": "verifier-P2",
+ "plants": [
+  {
+   "file": "site/pages/method.py",
+   "old": "\"Its sixth round's planted faults: \"",
+   "new": "\"Across its rounds, its planted faults: \"",
+   "kind": "a figure set in a sentence wider than its source (a round's figure as every round's)",
+   "why": "'ten of ten caught, from the sources' is CASE-STUDY-6.md's figure for round 6 alone; the same page's note says no figure is a total across rounds, and round 5's case study, quoted just above, records its own plants separately."
+  },
+  {
+   "file": "site/pages/work_parcelround.py",
+   "old": "\" ledger and no workflow. The sixth round's case study \"",
+   "new": "\" ledger and no workflow. The fifth round's case study \"",
+   "kind": "a lead-in that names the wrong source",
+   "why": "The quotation that follows ('a gate of its own, tools/check_method.py, and an adoption record, ADOPTION.md, one row per proposal') is CASE-STUDY-6.md's, as its label says; round 5 was loganw.dev's round, and its case study records no gate for the method."
+  }
+ ]
+}

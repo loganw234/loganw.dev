@@ -1,0 +1,22 @@
+{
+ "parcel": "P4",
+ "commit": "1e6b4ec",
+ "branch": "r2-plant-P4",
+ "verifier": "verifier-P4",
+ "plants": [
+  {
+   "file": "site/pages/thread_preservation.py",
+   "old": "        \". The same README points all further mods to the community Modkit: \",",
+   "new": "        \". The same README says all further mods are now built around the community Modkit: \",",
+   "kind": "a sentence that claims more than its source",
+   "why": "Mercenaries2 e51dcbe README.md line 6 says the community Modkit is the one 'that all further mods will be built around': a plan, in the future tense. 'are now built around' claims it has happened, which no source on the page says."
+  },
+  {
+   "file": "site/pages/thread_preservation.py",
+   "old": "            \"<p>The Mercenaries-Fan-Build organisation's repositories that this site pins, each in its own \"",
+   "new": "            \"<p>The Mercenaries-Fan-Build organisation's repositories that this site pins, which austinkregel \"\n            \"founded and leads with his collaborators, each in its own \"",
+   "kind": "a claim about a person, with a pronoun no one stated",
+   "why": "No source the page reads says who founded or leads the organisation; the commits at the pins show only who authored them, and the page's own caption says a count is not more than that. 'his' is a pronoun for someone whose pronouns are not stated (CLAUDE.md trap 18)."
+  }
+ ]
+}

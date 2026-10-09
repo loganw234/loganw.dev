@@ -6,3 +6,6 @@
 *.py text eol=lf
 *.woff2 binary
 *.png binary
+# A round's ledger is archived byte for byte, as its authors wrote it: git
+# stores those files as they are, carriage returns included.
+docs/round2-ledger/** -text

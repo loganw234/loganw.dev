@@ -1,0 +1,22 @@
+{
+ "parcel": "P1",
+ "commit": "bef03b0",
+ "branch": "r2-plant-P1",
+ "verifier": "verifier-P1",
+ "plants": [
+  {
+   "file": "site/pages/thread_determinism.py",
+   "old": "\"The same repository also holds a language: \"",
+   "new": "\"The same repository also holds a language, the one atlas-engine's plates are now written in: \"",
+   "kind": "a sentence that claims more than its source (a relation no source states)",
+   "why": "cft-fp256's docs/LANGUAGE.md line 3 calls its language one for dynamical systems, ordinary differential equations and maps; atlas-engine's README calls atlas-engine itself 'A language for platonography'. No source at either pin says atlas-engine's plates are written in cft-fp256's language."
+  },
+  {
+   "file": "site/pages/work_cft_fp256.py",
+   "old": "\"The contract is versioned. CONFORMANCE.md opens with its profile, ",
+   "new": "\"The contract is versioned, and no step so far has moved a recorded bit. CONFORMANCE.md opens with its profile, ",
+   "kind": "a sentence the source at the pin contradicts",
+   "why": "CONFORMANCE.md at ab51655 says the tree is at profile 3, 'a major step: recorded bits moved', which the same paragraph quotes; the exp2 tie moved recorded bits."
+  }
+ ]
+}

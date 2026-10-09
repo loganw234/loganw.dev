@@ -214,6 +214,8 @@ private repository, which it can't read.
 | [docs/VALIDATION.md](docs/VALIDATION.md) | The ledger. It is append-only: every run, failures included. |
 | [docs/ROUND1.md](docs/ROUND1.md) | The plan for the parcel round that builds the rest of the site. |
 | [docs/ROUND2.md](docs/ROUND2.md) | The plan for round 2, which brings the site up to the projects as they stood on 2026-10-08. |
+| [docs/ROUND2-CASE-STUDY.md](docs/ROUND2-CASE-STUDY.md) | Round 2's case study: what happened, and its cost per agent, measured from the transcripts. |
+| [docs/round2-ledger/](docs/round2-ledger/) | Round 2's ledger, archived byte for byte: every agent's file, the briefs as dispatched, the planted faults' keys, and the scripts. |
 | [design/](design/) | The design experiments, and the one that was chosen. |
 
 ## Licence
