@@ -159,3 +159,62 @@ Believed:
 - The revision answers what pass 1 found, and the three wording faults are the only things a reader would act on wrongly.
 
 For: the lead; the case study (S1 to S3, R-a to R-e); README.md (S2)
+
+## 2026-10-08 20:20:28 -0700 - verifier-CS pass 3 on bfdda6c, the last under the lead's rule: NOT READY on two wrong answers, each a one-line fix; S1 to S3 and R-a to R-d taken; Logan's ten answers verified against the chat record; the gate passes
+
+Measured:
+
+Setup. Worktree fast-forwarded from eb90939 to bfdda6c (`git merge --ff-only bfdda6c`); clean before and after. Diff: seven files (README.md, the case study, SPEC.md, VALIDATION.md, public/MANIFEST, and the archive's lead.md and verifier-CS.md).
+
+The gate on bfdda6c, run alone with no other gate or build running (run 20261008-201405-bfdda6c; log in my scratch): "passed 11, failed 0, skipped 0, cached 0"; "VERDICT: PASS, nothing skipped"; controls 393 caught, 0 did not fail, 0 skipped by name (218 s); runner-control failed as it must.
+
+S1, the 19:37 row (line 93): fixed. The row now says the six were in the first version, "which the last section lists", and the last section does list them. Confirmed.
+
+S2, README.md line 218: fixed, and the lead's 20:01:11 entry is right. verifier-plan's first entry (13:43:52) lists what it read: README.md, lead.md, briefs/verifier-plan.md and tools/round_metrics.py, "No other file is in it". So the shared briefs did not exist at its 13:40 dispatch. My pass-2 wording (that its first pass read the shared briefs "as they stood at 13:40") was wrong, and this entry corrects it. The row's parenthetical, that the plan's verifier read earlier drafts of the shared ones in its later passes, which are not kept, is accurate. Confirmed.
+
+S3, the 19:59 heading and case study lines 343 to 345: fixed. The new VALIDATION entry (a correction, since the heading is append-only) says the controls stages never overlapped, though three gate runs were in progress for 13 seconds. Its times match the e349b1a stage record (controls 16:29:40 to 16:44:17; runner-control to 16:44:24) and the planted copies' start (16:44:11). The case study now says the same. Confirmed.
+
+R-a, the slip lists: the render item (the plan's control 1 and 10b6b17's message) is in the case study's list, attributed to verifier-plan and verifier-P0; the new VALIDATION entry says the round's list is partial. Confirmed for those two items; see SB-1 for what the case study's sentence still claims.
+
+R-b, "All twelve of the round's agents, the lead aside": twelve subagents, eleven of the build and verifier-CS (lead.md 19:13:14 counts twelve test messages). Confirmed, but see R-3: the cost table's "all 12" counts the lead and not verifier-CS.
+
+R-c, the 14:15 row: verifier-plan.md line 125 stamps its report at 14:15:26; the row says 14:15 and notes the lead's 14:17 record. Confirmed.
+
+R-d, "the 7f2d51b build (39 of 39)": confirmed (pass 2 checked the live MANIFEST against 7f2d51b's).
+
+R-e, "The machine's Python and Node processes, listed before the worktrees were removed, held none of the round's agents'": the transcript holds a PowerShell process listing at 19:39:18 that names python and node processes and mentions no worktree, scratch folder, gate run or agent session; the worktree removal (Bash) is at 19:39:29. The claim is supported by the transcript, not by any ledger entry (R-1).
+
+Logan's ten answers, in chat at 20:06:12. The transcript holds one queued command stamped 20:06:12 (an attachment record, since the lead was busy). All nine distinct answer strings occur in it verbatim, in list order: item 1 at position 18; 2 at 80; 3 at 130; 4 at 198; 5 at 209; 6 and 7 at 221 and 238; 8 at 255; 9 at 265; 10 at 282. SPEC decisions 39 to 41 quote answers 2 to 4 verbatim. The case study's last section gives all ten, and the case study's "What stayed open" list matches the lead's list except for item 10 (SB-2). Decision 41's sentence, "This is the one place the site states it", exists at site/pages/method.py line 231.
+
+The lead's reply at 20:07:31 contains the deletion commands for items 9 and 10 (transcript). "9 and 10 went to Logan as commands to run" is therefore supported by the transcript but not by any ledger entry (R-1).
+
+The archive, retaken at bfdda6c: 35 files. 34 are byte-identical to the live ledger. lead.md is a prefix: the archive holds it through the 20:07:31 entry, and the live file has the 20:13:15 entry and the coordinator's message after it. Address-like strings occur in the same four files as before (the site's contact, and the co-author trailer's address in P4.md and briefs/_common.md); none in the new text. One carriage return, in P4.md.
+
+Wrong answers, to send back:
+- SB-1, the new VALIDATION entry, sentence "The round's case study ... lists every slip the round's ledger records", and the case study's list (lines 197 to 232). Not true. The ledger records two slips of the lead's from its 19:38:26 entry that neither list carries: the claim that P1, P2 and P3 ran `--control` during e349b1a's controls stage (corrected at 19:41:33, "not shown to overlap"); and "So three gates did not run at once" (corrected at 20:01:11, "too strong"). Fix: add both items, or narrow the sentence to the slips up to the push and point to the 19:41 and 20:01 entries.
+- SB-2, the case study's item 10 (lines 374 to 375), "for round 1's unpushed commits that hold the author address". The lead's list, which Logan answered "Clear to delete" (lead.md 20:07:31, item 10), reads "for round 1's P2 commits that hold the author address". The case study widens the scope of a permanent deletion Logan approved, to every unpushed round-1 commit of that kind. Fix: restore "round 1's P2 commits that hold the author address and this round's planted copies".
+
+Restates, to merge with the change:
+- R-1, the process listing (19:39:18) and the deletion commands (20:07:31) are recorded only in the transcript. Record each in a ledger entry with its time and result, or name the transcript as the source. "Held none of the round's agents'" is supported only in this form: no listed command line names a worktree, scratch folder, gate run or agent session.
+- R-2, "the archive taken again, 35 of 35 byte for byte" (lead.md 20:13:15): true of the ledger as it stood at 20:07:31; lead.md in the archive ends there. Say so.
+- R-3, the cost table's "all 12" counts the lead (4 parcels, 7 verifiers, the lead), and the escalation sentence's twelve counts verifier-CS (11 build-phase subagents plus verifier-CS). A reader cannot reconcile the two twelves; add a note.
+
+Believed:
+- The revision answers pass 2, and Logan's answers are recorded exactly as he gave them and in his order. The two wrong answers are narrow (a completeness claim and one item's scope), each fixable in a line.
+
+Verdict: NOT READY, on SB-1 and SB-2. Under the lead's rule (lead.md 14:52:58), a NOT READY on the third pass goes to Logan. R-1 to R-3 merge with the change. Everything else in the diff holds: S1 to S3 and R-a to R-d are fixed; the gate passes; the archive and Logan's answers check out.
+
+Not determined: whether Logan's chat reply reached him as the transcript's assistant record shows; the ledger does not record it.
+
+For: the lead; the case study (SB-1, SB-2, R-1 to R-3); Logan (the ten answers, and SB-2's scope)
+
+## 2026-10-08 20:23:10 -0700 - verifier-CS addendum to the pass-3 report at 20:20:28: one more restate (R-4), item 6's number
+
+Measured:
+- R-4, the case study's "What stayed open", item 6 (line 368 of the case study at bfdda6c): "ParcelRound's own gate's check, holding loganw.dev's patterns at `43c36a2`: 'Leave for now'". The lead's list, which Logan answered, reads "ParcelRound's check 9, holding loganw.dev patterns at `43c36a2`". The case study drops "9", so it no longer names the check Logan answered about. Restate: say "check 9".
+- Nothing else in the pass-3 report changes.
+
+Believed:
+- Nothing beyond the above.
+
+For: the lead, the case study

@@ -1,7 +1,8 @@
 # Round 2 of loganw.dev: an update round on Sonnet parcels and Haiku verifiers, measured
 
 Written after the round from its ledger, which is archived beside this file
-in [round2-ledger/](round2-ledger/), and from the session's transcripts,
+in [round2-ledger/](round2-ledger/) as it stood at this file's last commit,
+and from the session's transcripts,
 which are not published. It covers one round of one project: the site
 brought up to the projects it describes, as they stood on 2026-10-08. The
 owner asked for it this way: "since this is a lightweight round in terms of
@@ -189,6 +190,8 @@ for running" them, with no code yet.
 
 **5. Escalation by the runtime's messages reached the lead every time.**
 All twelve of the round's agents, the lead aside, sent a test message at the start, and every one arrived.
+(The cost table's 12 is the eleven agents before the push, with the lead;
+these twelve are those eleven and this file's verifier.)
 No agent needed a real escalation: the questions came in designs and
 reports, at the moments the briefs set. Two verifiers' runtimes refused
 their writes to their own ledger files ("Subagents should return findings
@@ -217,6 +220,11 @@ as text"), so their reports are in the lead's file instead.
   two planted copies' gates, run side by side, about 1,490 s each; alone
   the stage takes about 190 s. The lead first recorded this as "three
   gates at once", which the gates' own times show wrong (verifier-CS);
+  and its own correction of that, at 19:38, went too far twice: it said the
+  parcels' control runs overlapped the gate's controls stage, which their
+  stamps don't show (corrected at 19:41), and that three gates had not run
+  at once, where for 13 seconds three runs were in progress (corrected at
+  20:01);
 - P0's commit subject counts its refusals as two where there were four;
 - a verifier's wrong reading of two line numbers, taken without opening the
   lines and written into a merge message as a correction (above);
@@ -365,16 +373,19 @@ over".
   4. Method's sentence "This is the one place the site states it": "Keep
      it";
   5. Quantum-Film's own README, stale in three places: "Leave it";
-  6. ParcelRound's own gate's check, holding loganw.dev's patterns at
+  6. ParcelRound's own gate's check 9, holding loganw.dev's patterns at
      `43c36a2`: "Leave for now";
   7. ParcelRound's case study 7, on a branch: "Leave for now";
   8. HonestHarness's dossier, waiting until its round 1 lands on main:
      "Agreed";
   9. round 1's ledger working copy, archived in ParcelRound: "Ok to delete";
-  10. `git gc --prune=now`, for round 1's unpushed commits that hold the
-      author address and this round's planted copies: "Clear to delete".
+  10. `git gc --prune=now`, for round 1's P2 commits that hold the author
+      address and this round's planted copies: "Clear to delete".
   The lead permanently deletes no data itself, even when cleared, so 9 and
-  10 went to Logan as commands to run.
+  10 go to Logan as commands to run, which the round's ledger records. As
+  measured there, item 10's commands drop every unreachable commit, which
+  is more than the list named: also every commit amended or replaced
+  before it was pushed. No branch's commit is touched.
 - **Its second pass,** on `eb90939`, found three one-line wrong answers and
   five sentences to restate, each now restated: among them, a row that put
   its first findings in the wrong section, "three gates" answered too

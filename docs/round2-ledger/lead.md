@@ -764,3 +764,31 @@ Decided:
 - **9 and 10 are permanent deletions of data, which the lead does not perform itself, even when cleared.** The lead gives Logan the exact commands, after checking each target: round 1's ledger is in ParcelRound's `archive/round5-ledger.zip` on its main.
 
 For: the case study, Logan
+
+## 2026-10-08 20:13:15 -0700 - bfdda6c, with Logan's ten answers; the full gate passes on it, run alone; verifier-CS resumed for its third pass
+
+Measured:
+- `bfdda6c` on `round2-close`, parent `eb90939` (the commit `be62744`, never dispatched, amended to add Logan's answers of 20:06): the case study answering verifier-CS's second pass and recording all ten answers; SPEC.md decisions 39 to 41; README's archive row; a `docs/VALIDATION.md` entry correcting the previous entry's heading; the archive taken again, 35 of 35 byte for byte. `bash verify/run.sh --require-all` on it (run 20261008-200826-bfdda6c), alone: "passed 11, failed 0, skipped 0", controls 393 caught.
+
+Decided:
+- verifier-CS is resumed for its third pass, the last under the lead's rule, scoped to `git diff eb90939 bfdda6c`. Message after this entry:
+  > verifier-CS: pass 3, the last under the lead's rule. The revision is bfdda6c on round2-close (git merge --ff-only bfdda6c). Scope: git diff eb90939 bfdda6c. It answers S1 to S3 and R-a to R-e, and adds Logan's answers of 20:06 on the ten items left open (lead.md's entries after 19:59, verbatim; SPEC decisions 39 to 41; the case study's last section). Check each against its source, pick your own faults in the diff, and report READY or NOT READY.
+
+For: verifier-CS
+
+## 2026-10-08 20:22:13 -0700 - verifier-CS's third pass: NOT READY on two one-line wrong answers; to Logan under the three-pass rule; the process listing and the commands for items 9 and 10, recorded
+
+Measured:
+- verifier-CS's third pass reported at about 20:24 (its entries 20:20:28 and 20:23:10). The runtime's figures for that run: context at the end 739,770 tokens, 48 tool uses, 493,258 ms. Its own full gate on `bfdda6c`, alone (run 20261008-201405-bfdda6c): 11 passed, controls 393 caught. It found Logan's ten answers verbatim in his message of 20:06:12, and withdrew its own pass-2 claim about what the plan's verifier read at 13:40.
+- **SB-1, true:** the new `docs/VALIDATION.md` entry says the case study "lists every slip the round's ledger records", and two are not in its list: this file's entry of 19:38 claimed, and the lead corrected at 19:41:33 and 20:01:11, that the parcels' control runs overlapped the gate's controls stage and that three gates did not run at once.
+- **SB-2, true:** the case study's item 10 says "round 1's unpushed commits that hold the author address", where the list Logan answered said P2's.
+- R-1 to R-4, each checked and taken; R-1's records are this entry.
+- **The process listing** before the worktrees were removed (19:39, the transcript's own record of the lead's command): Python and Node processes were the owner's UI server (`ui.py --port 8330`), the RunPod connector's servers, the lead's preview server (`http.server 8432`), and another session's HonestHarness gate (`tools/check.py --control`, and a `pytest` beside it). None was a round-2 agent's.
+- **The commands for items 9 and 10**, for Logan to run once the case study is pushed. The lead runs neither: they delete data for good.
+  - 9, round 1's ledger working copy (476 K; in ParcelRound's `archive/round5-ledger.zip` on its main, since `49a9266`): `rm -rf <repos>/loganw-dev-ledger`.
+  - 10, in loganw.dev: `git reflog expire --expire-unreachable=now --all`, then `git gc --prune=now`. Its reach, measured by `git fsck --unreachable`: 25 unreachable commits with the reflogs set aside, 13 counting them. So it drops more than the list named: round 1's P2 commits and this round's planted copies, and also every commit amended or replaced before it was pushed. No branch's commit is touched.
+
+Decided:
+- Under the lead's rule (ROUND2.md, "What READY means"), a wrong answer on a third pass goes to Logan. The fixes are made in a commit after `bfdda6c`, and Logan is asked whether to push on the lead's checks or send it for a fourth pass.
+
+For: Logan, the case study
