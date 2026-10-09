@@ -15,7 +15,7 @@ from render import L, render
 PAGE = {"file": "corrections.html", "nav": "Corrections",
         "title": "Corrections — loganw.dev",
         "description": "The rules for proving a claim on this site wrong, the gaps the record already names, "
-                       "and every correction so far."}
+                       "and a selection of the corrections so far, with where the rest are recorded."}
 
 DISPROOF_URL = "https://github.com/loganw234/loganw.dev/issues/new?template=disproof.yml"
 LEDGER_PATH = "docs/VALIDATION.md"

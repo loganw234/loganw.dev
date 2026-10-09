@@ -2033,3 +2033,98 @@ and another's label linked to a source, and every stage passed.
 
 `bash verify/run.sh --require-all`: 11 passed, nothing skipped.
 `--control` caught 386 of 386.
+
+## 2026-10-08 - round 2: every moved pin at GitHub's main, HonestHarness on Map & Ledger, and each page made the current truth at its pin; parcels on Sonnet, verifiers on Haiku, 8 of 8 planted faults caught
+
+**What Logan asked for** (SPEC decisions 31 to 36): "an update round against
+the new information", with "Sonnet models for the parcels and Haiku as
+verifiers", and the round's totals kept: parcels, agents, token use and time.
+The plan is [ROUND2.md](ROUND2.md). Its verifier, on Haiku, made three passes
+before Logan approved it, on 8, then 2, then 2 defects, each checked by the
+lead against the records and fixed.
+
+**What moved.** Seven pins, each to GitHub's main on 2026-10-08: cft-fp256
+`ab51655`, ParcelRound `f42242e`, Quantum-Film `3a73823`, StoryDocs
+`8548802`, and the Mercenaries-Fan-Build organisation's mercs2-modkit
+`9acb750`, mercs2-wad-simulator `d18af76` and notes-on-the-released-game
+`dac773d`. HonestHarness is pinned at `b310f82`, its main. The snapshot is
+`sources/github-2026-10-08-1345.json`.
+
+**What changed:**
+
+- **P0**, the lead's (`05413b2`): the pins and the snapshot. Logan's line of
+  2026-09-29 on cft-fp256's revision-7 round, which the build refused once
+  the pin moved, is replaced under decision 36 by cft-fp256's newest ledger
+  entry at its pin. Verify's three quotes are read again at the pin.
+  HonestHarness has a row on Map & Ledger, and a node and three edges on the
+  map. ParcelRound's check is its own gate, `tools/check_method.py`.
+- **P1**, cft-fp256's pages: the dossier's record since 2026-09-23, the
+  contract's profile, and the exp2 tie as a kept failure; Verify's gate
+  budget quoted whole; the language and the certificates on the Determinism
+  thread.
+- **P2**, the two methods: ParcelRound's gate, ADOPTION.md and case studies
+  5 and 6, on its dossier and on the Method page.
+- **P3**, Quantum-Film: its round 3 on IBM hardware in the dossier, and one
+  print on the Film thread, ibm_kingston's law job, its caption held to its
+  records by a check, and the hardware's agreement beside its shortfall.
+- **P4**, the Preservation thread: the community Modkit, and the
+  organisation's pinned repositories in their READMEs' own words.
+
+**Corrections to what the site had published,** found by this round's
+parcels and verifiers. The round's ledger gives each with the line that
+shows it.
+
+- ParcelRound's dossier said "the method has no build of its own to gate",
+  false since its round 6. Three of its items were never true: they sent a
+  reader to CASE-STUDY.md for a timeline, timestamps, cited commits and a
+  recount it doesn't hold (P2).
+- HonestFramework's dossier said its claims were "all re-checked in under a
+  second", which no source says (P2).
+- cft-fp256's dossier said `make golden` "needs only Python and, optionally,
+  mpmath", where it needs pytest too; and that it compares results against
+  the vector sets in `vectors/SHA256SUMS`, which it doesn't, and no gate
+  does (P1).
+- Verify's lede stated, as the contract, what CONFORMANCE.md says it is
+  written for (verifier-P0, P1).
+- The Preservation thread's credits caption set Logan's statement inside a
+  sentence of its own, "Logan goes by ... in this community", which read
+  wrongly and added words he didn't say; and a paragraph opened with a full
+  stop (P4).
+- The Method page credited the round-2 time measurement to "its own
+  accounting", where it was the desktop app's; ParcelRound's dossier called
+  P0's listing step "the method's own seam test"; the Film thread said
+  StoryDocs touched "half" of the map's other projects, where its arrows
+  reach 8 of 17; and the mercs2 count didn't say that it leaves out
+  Merc2-Mods-Exp (verifier-P2, verifier-P3, verifier-P4).
+
+**Verified.** Every parcel ran on claude-sonnet-5-5 and every verifier on
+claude-haiku-5-5, each read from the agent's own transcript. Each parcel's
+verifier worked on a copy of its work holding two planted faults, in a
+clone that held no other branch: 8 of 8 caught, each on its first pass. The
+keys are in the round's ledger. The lead merged each parcel's own commit by
+its SHA, built `public/` again at each merge, and restated what the
+verifiers found. `bash verify/run.sh --require-all` on `a4a438c`, the
+round's last commit before this entry: 11 passed, nothing skipped;
+`--control` caught 393 of 393.
+
+**Known limits:**
+
+- Whether a sentence is the current truth at its pin, and not only true at
+  it, is read by a verifier. No stage holds it.
+- A verifier on a planted copy could also find a plant by comparing the copy
+  with the parcel's design in the round's ledger. All four reports note that
+  the design reads otherwise at the planted sentences; each also cites the
+  source line its plants contradict, and verifier-P2 writes that it did not
+  use the design to find them.
+- Quantum-Film's "Last verified" stays at 2026-09-26. Its newest full run
+  skipped one stage by name, and the form pins.json declares counts only a
+  run with none skipped.
+
+**The lead's slips,** each written in the round's ledger when it was caught:
+the plan's first draft, with eight defects; a key written through a Bash
+heredoc, whose backslashes didn't survive (CLAUDE.md trap 8), caught before
+it wrote anything; the metrics script, which missed the notifications kept
+as "attachment" records; three full gates run at once, which slowed their
+controls stages to between 15 and 25 minutes; and P0's commit subject, which
+counts
+its refusals as two where there were four.
