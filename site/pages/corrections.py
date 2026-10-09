@@ -1,10 +1,11 @@
 """Corrections: the site-wide rules of engagement for proving a claim on this
 site wrong (docs/SPEC.md, "Corrections (global page)"; briefs/P4.md).
 
-The rules of engagement and the "where I'd attack first" gaps are Logan's,
-from the spec, printed through facts.stated() or quoted from cft-fp256 at its
-pin. The corrections ledger is seeded from this site's own record,
-docs/VALIDATION.md, read through facts.own_prose()/own_entry() and
+The rules of engagement are Logan's, from the spec, printed through
+facts.stated(). The "where I'd attack first" gaps are the spec's too, so their
+names are Logan's (plain text here); the sentence beneath each is cft-fp256's,
+quoted at its pin. The corrections ledger is seeded from this site's own
+record, docs/VALIDATION.md, read through facts.own_prose()/own_entry() and
 facts.own_commit() - never typed from memory.
 """
 import facts
@@ -44,11 +45,17 @@ def engagement():
 
 # ---------------------------------------------------------------------------
 # II. "Where I'd attack first" - the gaps the record already names, quoted at
-# cft-fp256's pin. The spec also names "clause readings in COMPLIANCE"; that
+# cft-fp256's pin. The names are the spec's (Logan's); the quoted sentences
+# are cft-fp256's, re-read at its pin ab51655 in round 2: all three stand and
+# none is closed. The spec also names "clause readings in COMPLIANCE"; that
 # document's own conformance statement (docs/COMPLIANCE.md, "The conformance
 # statement") states its coverage plainly and calls no clause reading of its
-# own open to dispute anywhere in the file - checked, not found - so it is
-# left out here rather than asserted without a source.
+# own open to dispute anywhere in the file - checked, not found, at both pins
+# (the file is the same at 77b8440 and ab51655) - so it is left out here
+# rather than asserted without a source. The file does say, in its own rows,
+# how some clauses are met by a chosen mechanism (lines 92, 110, 111 and 158
+# to 162 at ab51655); whether that makes it a gap to show is Logan's choice
+# (docs/SPEC.md, decision 36), and it stays out until he says.
 # ---------------------------------------------------------------------------
 
 def attack_first():
@@ -142,8 +149,8 @@ def ledger_table():
     return '<div class="table-wrap"><table>%s<tbody>%s</tbody></table></div>' % (head, "".join(body))
 
 
-LEDGER_CAP = ("A selection, not every finding this site's own ledger records: plain instances, early in this "
-              "round, where a single fix commit answers a single finding, each read from "
+LEDGER_CAP = ("A selection, not every finding this site's own ledger records: plain instances, early in the "
+              "site's first round, where a single fix commit answers a single finding, each read from "
               "docs/VALIDATION.md's own entry and checked against this site's own history. The rest of that "
               "entry, and everything since, is in the ledger itself.")
 

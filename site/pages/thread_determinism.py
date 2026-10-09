@@ -25,10 +25,22 @@ def account():
     paras.append(render([
         "The language needed arithmetic that could not drift between machines, which is what cft-fp256 is: ",
         P("cft-fp256", "README.md", r"^\*\*(A math coprocessor that gets the same answer everywhere)\.\*\*"),
-        " Its ABI is ", facts.macros("cft-fp256", "host/include/cft.h",
-                                     ["CFT_ABI_VERSION_MAJOR", "CFT_ABI_VERSION_MINOR"]),
+        ". Its ABI is ", facts.macros("cft-fp256", "host/include/cft.h",
+                                      ["CFT_ABI_VERSION_MAJOR", "CFT_ABI_VERSION_MINOR"]),
         " on main, checked by ", C("make verify-quick"), " (",
-        P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True), ")."]))
+        P("cft-fp256", "CLAUDE.md", r"^make verify-quick\s+# (~\d+ min, \d+ of \d+ stages)", num=True), ") and ",
+        C("make verify-gate"), " (",
+        P("cft-fp256", "CLAUDE.md", r"^make verify-gate\s+# (~\d+ h quiet, \d+ of \d+ - what a change should pass)",
+          num=True), ")."]))
+    paras.append(render([
+        "The same repository also holds a language: ",
+        P("cft-fp256", "docs/LANGUAGE.md",
+          r"^(A small text language for dynamical systems - ordinary differential\s+equations and maps - whose "
+          r"every rounding is fixed by the text)\."),
+        "; and certificates: ",
+        P("cft-fp256", "docs/CERTIFICATES.md",
+          r"^(A certificate is a text file that says what a deterministic run was and\s+how accurate it is)"),
+        "."]))
     paras.append(render([
         "Built on it: ",
         P("cft-rebound", "README.md", r"^(REBOUND's IAS15 integrator with its arithmetic routed through libcft)"),

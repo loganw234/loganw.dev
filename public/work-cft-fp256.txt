@@ -3,65 +3,70 @@ cft-fp256 — dossier
 
 I. What it is
 
-A math coprocessor that gets the same answer everywhere [fact 1463]. It does IEEE 754 arithmetic at four precisions - 32, 64, 128 and 256 bits - and guarantees that the same inputs give the same bits whether the work runs on a laptop CPU, in a browser tab, on a microcontroller, or on the FPGA card it was designed for [fact 1464].
+A math coprocessor that gets the same answer everywhere [fact 1476]. It does IEEE 754 arithmetic at four precisions - 32, 64, 128 and 256 bits - and guarantees that the same inputs give the same bits whether the work runs on a laptop CPU, in a browser tab, on a microcontroller, or on the FPGA card it was designed for [fact 1477].
 
 II. What it is not
 
-Raw fp32 and fp64 throughput [fact 1465]. Every CPU and GPU on the market serves those formats at clocks and lane counts an FPGA fabric will not match, and nothing here pretends otherwise [fact 1466]. The tile earns its place at the precisions commodity hardware does not offer, and on the guarantee that the answer does not move [fact 1467].
+Raw fp32 and fp64 throughput [fact 1478]. Every CPU and GPU on the market serves those formats at clocks and lane counts an FPGA fabric will not match, and nothing here pretends otherwise [fact 1479]. The tile earns its place at the precisions commodity hardware does not offer, and on the guarantee that the answer does not move [fact 1480].
 
 III. The contract
 
-Named levels, quoted from CONFORMANCE.md: “Level A - IEEE 754-2019 in radix 2 [fact 1468]” is the standard itself; “Level B - the cft-fp256 profile [fact 1469]” is “Level A, plus every choice the standard leaves to the implementation fixed to one answer, plus operations the standard does not define [fact 1470].” The relationship runs one way, in the document's own words: “An implementation conforming to the cft-fp256 profile conforms to [fact 1471] IEEE 754-2019 in radix 2 for the operations the profile covers [fact 1472].”
+Named levels, quoted from CONFORMANCE.md: “Level A - IEEE 754-2019 in radix 2 [fact 1481]” is the standard itself; “Level B - the cft-fp256 profile [fact 1482]” is “Level A, plus every choice the standard leaves to the implementation fixed to one answer, plus operations the standard does not define [fact 1483].” The relationship runs one way, in the document's own words: “An implementation conforming to the cft-fp256 profile conforms to [fact 1484] IEEE 754-2019 in radix 2 for the operations the profile covers [fact 1485].”
 
-The README states the promise directly: “That guarantee is the product [fact 1473].” The hardware only makes it faster [fact 1474].
+The README states the promise directly: “That guarantee is the product [fact 1486].” The hardware only makes it faster [fact 1487].
+
+The contract is versioned. CONFORMANCE.md opens with its profile, “Profile 3, 2026-10-05 [fact 1488]” (profile 2 was 2026-10-02 and profile 1 2026-09-16 [fact 1489]), and says of the tree: “a major step: recorded bits moved [fact 1490].” A major step is “a change to any recorded bit or flag, or to an accepted image's result, flags, STATUS or acceptance [fact 1491].”
 
 IV. Verified
 
-Last verified: 2026-10-06 [fact 1475].
+Last verified: 2026-10-06 [fact 1492].
 
-- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 1476]
-- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 1477]
+- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 1493]
+- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 1494]
+- 2026-10-06 - step 6's closing records, part one: revision 8's first hardware image, rev8a (the single with R21 at 4,096 scratch slots), closes 135 MHz with +0.330 ns and passes its card legs; segrun_check's card leg follows the tile (SC8), 695 of 695 on it; the sentences that held only while no revision-8 image existed, restated; the verifiers' notes for the close; the known limits [fact 1495]
+- 2026-10-06 - step 6's closing records, part two: revision 8's streaming quad, rev8q (four tiles without R21 at 4,096 scratch slots), closes 135 MHz with +0.048 ns and passes its card legs; the deep single, rev8d (one tile with R21 at 8,192 slots), closes 135 MHz with +0.036 ns and passes its card legs; the gate at the close's integration passes (e3fe2ca, 36 stages, 0 failed); step 6 closed [fact 1496]
 
 V. Kept failures
 
-- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 1478]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 1479], commit f192bf0 [fact 1480].
-- a device predating a new capability flag ignored an unchecked reserved bit and read far past a one-element buffer [fact 1481] — measured as a host-side segfault in the entry 2026-09-12 - a stride-0 operand, the MODE guard it needed, and a contract I misread [fact 1482]. Fixed by commit 8b7dea1 [fact 1483].
+- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 1497]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 1498], commit f192bf0 [fact 1499].
+- a device predating a new capability flag ignored an unchecked reserved bit and read far past a one-element buffer [fact 1500] — measured as a host-side segfault in the entry 2026-09-12 - a stride-0 operand, the MODE guard it needed, and a contract I misread [fact 1501]. Fixed by commit 8b7dea1 [fact 1502].
+- exp2 at x = emin - p [fact 1503]: Its exact value 2^(emin - p) is half the smallest subnormal, the tie between +0 and it, which IEEE 754's roundTiesToAway (rmm) rounds to the subnormal. The model rounded it as a quarter of the subnormal and gave +0 [fact 1504]. Step 6's design study M1 found it (its question 5), verifier-VM1 confirmed it [fact 1505] — in the entry 2026-10-05 - the golden model's exp2 tie fixed, and the conformance profile's major step to 3 (parcel XT); M1's design study merged as a design record [fact 1506]. Fixed by commit ca43695 [fact 1507].
 
 VI. Test it
 
-- replays the published conformance vectors in front of you [fact 1485] — Try it without installing anything [fact 1486].
-- make golden: The golden model's self-tests [fact 1487] (needs only Python and, optionally, mpmath).
-- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 1488], which needs the FPGA and its toolchain.
+- replays the published conformance vectors in front of you [fact 1509] — Try it without installing anything [fact 1510].
+- make golden: The golden model's self-tests (any Python 3.10+, mpmath optional but recommended) [fact 1511], after “pip install pytest mpmath [fact 1512]”.
+- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 1513], which needs the FPGA and its toolchain.
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page.
 
-- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 1489].” Anything less than a perfect score is a disproof.
-- make golden locally, against the same vector sets published in the repository's vectors/SHA256SUMS [fact 1490].
-- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 1491] records; a differing hex value is a disproof.
-- Rebuild host/tools/mpfr_check.c and widen its sweep past the campaign's own cases: the independent oracle is only as good as the cases put to it.
+- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 1514].” Anything less than a perfect score is a disproof.
+- make vectors locally, then compare the digests it writes with the ones the repository publishes in vectors/SHA256SUMS [fact 1515], by the recipe CONFORMANCE.md gives; a differing line is a disproof. The record says this is a check no gate makes: “no gate compares a set's digest with vectors/SHA256SUMS [fact 1516].”
+- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 1517] records; a differing hex value is a disproof.
+- Rebuild host/tools/mpfr_check.c and widen its sweep past the campaign's own cases: the independent oracle is only as good as the cases put to it. The record names one it lacks: “The MPFR campaign's pool (host/tools/mpfr_check.c, build_tpool) lacks the tie's argument, so the gate's mpfr stage does not test the fix; XT-1's probe does [fact 1518].”
 
 VIII. Connections
 
-- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 1494]
-- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 1495]
-- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1499]
-- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1500]
-- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 1502]
-- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1504]
-- cft-fp256 was distilled into HonestHarness: the requirements, H1 to H17, derived from the record of cft-fp256's rounds [fact 1507]
-- StoryDocs documents cft-fp256: projects/cft-fp256 [fact 1513]
+- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 1521]
+- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 1522]
+- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1526]
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1527]
+- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 1529]
+- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 1531]
+- cft-fp256 was distilled into HonestHarness: the requirements, H1 to H17, derived from the record of cft-fp256's rounds [fact 1534]
+- StoryDocs documents cft-fp256: projects/cft-fp256 [fact 1540]
 
 IX. Provenance
 
-cft-fp256 read at ab51655 [fact 1517].
+cft-fp256 read at ab51655 [fact 1544].
 
-- README.md [fact 1518]
-- CONFORMANCE.md [fact 1519]
-- CLAUDE.md [fact 1520]
-- docs/VALIDATION.md [fact 1521]
+- README.md [fact 1545]
+- CONFORMANCE.md [fact 1546]
+- CLAUDE.md [fact 1547]
+- docs/VALIDATION.md [fact 1548]
 
-HonestFramework read at 65447fd [fact 1522].
+HonestFramework read at 65447fd [fact 1549].
 
-- CASE-STUDY.md [fact 1523]
+- CASE-STUDY.md [fact 1550]
