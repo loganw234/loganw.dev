@@ -215,7 +215,7 @@ private repository, which it can't read.
 | [docs/ROUND1.md](docs/ROUND1.md) | The plan for the parcel round that builds the rest of the site. |
 | [docs/ROUND2.md](docs/ROUND2.md) | The plan for round 2, which brings the site up to the projects as they stood on 2026-10-08. |
 | [docs/ROUND2-CASE-STUDY.md](docs/ROUND2-CASE-STUDY.md) | Round 2's case study: what happened, and its cost per agent, measured from the transcripts. |
-| [docs/round2-ledger/](docs/round2-ledger/) | Round 2's ledger, archived byte for byte: every agent's file, the briefs as each stood when its agent was dispatched (later passes went by message, which the lead's file records), the planted faults' keys, and the scripts. |
+| [docs/round2-ledger/](docs/round2-ledger/) | Round 2's ledger, archived byte for byte: every agent's file, the briefs as each was last written before its agent's dispatch (the plan's verifier read earlier drafts of the shared ones, which are not kept), the planted faults' keys, and the scripts. |
 | [design/](design/) | The design experiments, and the one that was chosen. |
 
 ## Licence

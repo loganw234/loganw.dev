@@ -31,15 +31,16 @@ words. Commits are named by their short SHAs.
   Quantum-Film by 171, StoryDocs by 1, and three of the Mercenaries-Fan-Build
   organisation's by 5, 409 and 70. HonestHarness, new, was public. The pages
   still described the projects as round 1's pins had them.
-- **The owner's decisions** (SPEC.md, decisions 31 to 38), each through the
-  question tool: HonestHarness gets a row on Map & Ledger and a node on the
+- **The owner's decisions** (SPEC.md, decisions 31 to 41), all but the last
+  three through the question tool: HonestHarness gets a row on Map & Ledger and a node on the
   map, and its dossier waits until its round 1 lands on main; this file and
   the ledger go in the site's own repository; push when verified; one IBM
   hardware print, on the Film thread's own page (asked twice, below); every
   verifier on Haiku, the lead's work included; a stated line of his that a
   pin has overtaken may be replaced by a figure read from its source, with
-  anything else coming to him; About's credits sentence narrowed; and
-  Corrections' fourth gap shown.
+  anything else coming to him; About's credits sentence narrowed;
+  Corrections' fourth gap shown; and, at the round's end, three items left
+  as they were (below).
 - **The models,** read from each agent's own transcript: the lead on
   claude-opus-5-5; the four parcels on claude-sonnet-5-5; the seven
   verifiers before the push, and this file's, on claude-haiku-5-5. (Round
@@ -65,7 +66,7 @@ words. Commits are named by their short SHAs.
 | 13:32 | Logan's four decisions, through the question tool. |
 | 13:40 | The plan's first draft (`6ec5616`); verifier-plan dispatched. |
 | 13:53 | P0 committed (`05413b2`): the pins, the snapshot, HonestHarness's row and node. The build had met two more refusals than the trial. The full gate passes on it at 13:58. |
-| 14:17 | verifier-plan: NOT READY, eight defects. Two are the owner's to answer. |
+| 14:15 | verifier-plan: NOT READY, eight defects (the lead records them at 14:17). Two are the owner's to answer. |
 | 14:18 | Logan answers them: Haiku for every verifier; his overtaken lines may be read from their sources. |
 | 14:22-14:52 | Drafts 2, 3 and 4. verifier-plan's second pass finds 2 defects, its third 2 wrong answers: by the lead's three-pass rule, the third goes to Logan. |
 | 14:54 | Logan approves draft 4 (`9f3c894`). |
@@ -90,7 +91,7 @@ words. Commits are named by their short SHAs.
 | 18:56 | `main` fast-forwarded to `7f2d51b` and pushed. |
 | 19:04 | The deploy's gate and deploy jobs pass; every published file but BUILD is byte for byte the build, and BUILD names `7f2d51b`. |
 | 19:07 | This file's first version, and the archive (`35e0dd1`); verifier-CS dispatched at 19:12. |
-| 19:37 | verifier-CS: NOT READY, six wrong answers in this file (the last section). |
+| 19:37 | verifier-CS: NOT READY, six wrong answers in this file's first version, which the last section lists. |
 
 ## What happened
 
@@ -187,7 +188,7 @@ HonestHarness "runs" the methods, where its README says it is "a harness
 for running" them, with no code yet.
 
 **5. Escalation by the runtime's messages reached the lead every time.**
-All twelve agents sent a test message at the start, and every one arrived.
+All twelve of the round's agents, the lead aside, sent a test message at the start, and every one arrived.
 No agent needed a real escalation: the questions came in designs and
 reports, at the moments the briefs set. Two verifiers' runtimes refused
 their writes to their own ledger files ("Subagents should return findings
@@ -196,6 +197,10 @@ as text"), so their reports are in the lead's file instead.
 **6. The lead's slips,** each written in the ledger when it was caught:
 - the plan's first draft, with its eight defects;
 - SPEC.md's quote of the owner's request, cut before its last sentence;
+- the plan's control 1, and the message of its third draft (`10b6b17`),
+  saying `render.render()` refuses a figure typed by hand, where it passes a
+  plain string through and only the numbers stage refuses one
+  (verifier-plan, verifier-P0);
 - the ledger's own numbers for two of his decisions, written as 36 and 37
   where SPEC.md has 35 and 36;
 - Python sent through a Bash heredoc twice, once to write a planted copy's
@@ -292,6 +297,9 @@ last push) comes after this version, and the round's ledger records it.
 
 ## What METHOD.md should say differently (proposed; the owner's to settle)
 
+Logan, on 2026-10-08: "Include them in the case study doc and Ill bring them
+over".
+
 1. **A pin move needs a reading for currency, which no gate makes.** After a
    move, a quote that still matches can describe the past. This round's
    briefs and verifier lists named it. The change: the verifier template's
@@ -324,9 +332,10 @@ last push) comes after this version, and the round's ledger records it.
   full gate passing. `main` was fast-forwarded to it and pushed at 18:56:43,
   and only `main`. The deploy run's gate and deploy jobs passed. Every
   published file but BUILD, fetched from https://loganw.dev/, is byte for
-  byte the build (39 of 39), BUILD names `7f2d51b`, and the author's email
+  byte the `7f2d51b` build (39 of 39), BUILD names `7f2d51b`, and the author's email
   domain appears nowhere in the live `facts.json`.
-- **The cleanup.** No finished agent left a process running. Every agent's
+- **The cleanup.** The machine's Python and Node processes, listed before
+  the worktrees were removed, held none of the round's agents'. Every agent's
   worktree but this file's verifier's is removed, with the scratch worktree
   of the first survey; the planted branches are deleted, and never left the
   lead's machine.
@@ -341,6 +350,33 @@ last push) comes after this version, and the round's ledger records it.
   parcel verifiers'; "two citations" in P1's message, where one was a
   verifier's error; and a claim that rested on a report the lead's summary
   had cut. It found eleven sentences to restate, all taken, and asked
-  whether three gates had run at once, which the gates' own times answer:
-  they had not. Its second pass, on the commit that answers them, is
-  recorded in the round's ledger.
+  whether three gates had run at once. The gates' own times answer it:
+  their controls stages never overlapped, though for 13 seconds, from
+  16:44:11 to 16:44:24, three gate runs were in progress.
+- **What stayed open, and Logan's word on each,** in chat at 20:06,
+  answering the lead's numbered list:
+  1. the five proposals above: "Include them in the case study doc and Ill
+     bring them over";
+  2. Quantum-Film's "Last verified", held at 2026-09-26 by pins.json's
+     declared pass form: "Leave for now with the old proper verified run";
+  3. the Mercenaries-Fan-Build organisation's repositories, on neither the
+     map nor Map & Ledger: "Leave them off, older community work not what Im
+     focusing on now";
+  4. Method's sentence "This is the one place the site states it": "Keep
+     it";
+  5. Quantum-Film's own README, stale in three places: "Leave it";
+  6. ParcelRound's own gate's check, holding loganw.dev's patterns at
+     `43c36a2`: "Leave for now";
+  7. ParcelRound's case study 7, on a branch: "Leave for now";
+  8. HonestHarness's dossier, waiting until its round 1 lands on main:
+     "Agreed";
+  9. round 1's ledger working copy, archived in ParcelRound: "Ok to delete";
+  10. `git gc --prune=now`, for round 1's unpushed commits that hold the
+      author address and this round's planted copies: "Clear to delete".
+  The lead permanently deletes no data itself, even when cleared, so 9 and
+  10 went to Logan as commands to run.
+- **Its second pass,** on `eb90939`, found three one-line wrong answers and
+  five sentences to restate, each now restated: among them, a row that put
+  its first findings in the wrong section, "three gates" answered too
+  strongly, and a slip of the lead's this file had left out. Its third pass,
+  on the commit that answers them, is recorded in the round's ledger.

@@ -2186,3 +2186,19 @@ and checking in their own copies, and it took 877 s; the two planted copies'
 gates, which began at 16:44:11, ran side by side and took about 1,490 s each
 on that stage. Alone it takes about 190 s. CLAUDE.md's trap 19 says to run
 the full gate alone.
+
+## 2026-10-08 - a correction to the previous entry: the gates' controls stages never overlapped, though three gate runs were in progress for 13 seconds; and round 2's list of the lead's slips is partial
+
+The previous entry's heading says "no three gates ran at once". Its own body
+gives the times, and they show something narrower. The gate on `e349b1a`
+finished its runner's own control at 16:44:24, by its stage record, and the
+two planted copies' gates began at 16:44:11: for 13 seconds three gate runs
+were in progress. Their controls stages never overlapped: the planted
+copies' began at about 16:49, five minutes after the other's had ended.
+
+Round 2's entry lists the lead's slips, and the list is partial. It leaves
+out, among others, the plan's control 1 and the message of the plan's third
+draft (`10b6b17`), which said `render.render()` refuses a figure typed by
+hand, where it passes a plain string through and only the numbers stage
+refuses one. The round's case study, `docs/ROUND2-CASE-STUDY.md`, lists every
+slip the round's ledger records.

@@ -716,3 +716,51 @@ Measured:
 - The case study revised for W1 to W6 and R1 to R11; CLAUDE.md's trap 19 and README's archive row restated; a new entry in `docs/VALIDATION.md` adds the case study and the archive and corrects round 2's entry's "three full gates run at once". The archive is taken again from this directory as it stands at this entry, byte for byte.
 
 For: verifier-CS
+
+## 2026-10-08 19:47:24 -0700 - eb90939; the full gate passes on it, run alone; verifier-CS resumed for its second pass
+
+Measured:
+- `eb90939` on `round2-close`, parent `35e0dd1`. `bash verify/run.sh --require-all` on it (run 20261008-194233-eb90939), with no other gate or agent running: "passed 11, failed 0, skipped 0", "VERDICT: PASS, nothing skipped"; controls 393 caught, in 212 s.
+
+Decided:
+- verifier-CS is resumed for its second pass, scoped to `git diff 35e0dd1 eb90939`. Message after this entry:
+  > verifier-CS: pass 2 of up to 3. The revision is eb90939 on round2-close (git merge --ff-only eb90939). Scope: git diff 35e0dd1 eb90939. It answers W1 to W6 and R1 to R11, settles N1 from the gate's stage times (lead.md, the entries after 19:37), corrects round 2's ledger entry in a new one, restates trap 19 and README's row, and retakes the archive (35 files). Check each against its source, pick your own faults in the diff, and report READY or NOT READY. The ledger has grown since eb90939 only by the lead's entries after it.
+
+For: verifier-CS
+
+## 2026-10-08 20:01:11 -0700 - verifier-CS's second pass: NOT READY on three one-line wrong answers; each checked, all taken; a correction to the entry of 19:38
+
+Measured:
+- verifier-CS's second pass reported at about 19:59 (its entry 19:58:44). The runtime's figures for that run: context at the end 627,968 tokens, 54 tool uses, 743,586 ms. Its own full gate on `eb90939`, run alone (run 20261008-195154-eb90939): 11 passed, controls 393 caught.
+- **S1, true:** the case study's 19:37 row put its first findings "(the last section)", where they were in the opening, the setting, the cost section and "What happened"; the last section lists them.
+- **S2, true in its conclusion:** the archive's shared briefs are their last versions; the plan's verifier read earlier drafts of them in its second and third passes (at 14:22 and 14:43), which are not kept. Its first pass, at 13:40, read only `briefs/verifier-plan.md`, unchanged since: the shared briefs did not exist then. README's row is restated to say so.
+- **S3, true:** the gate on `e349b1a`'s stage record, rebuilt from its start, 16:26:56, and each stage's seconds: controls 16:29:40 to 16:44:17, runner-control 16:44:17 to 16:44:24. The planted copies' gates began at 16:44:11. So for 13 seconds three gate runs were in progress, and their controls stages never overlapped.
+- R-a to R-e, each checked and taken: the slip of the `render.render()` claim added (the case study's list, and a site-ledger entry saying round 2's list there is partial); "twelve agents" said to be the lead aside; the 14:17 row restated to verifier-plan's own 14:15 stamp; "39 of 39" named as the `7f2d51b` build; "no finished agent left a process running" restated as what the lead checked (the machine's Python and Node processes, before the worktrees were removed).
+
+**Correction to the entry of 19:38:** its "So three gates did not run at once" is too strong, as S3 shows. The controls stages never overlapped; three gate runs were in progress for 13 seconds.
+
+Decided:
+- The case study, README's row, and a new `docs/VALIDATION.md` entry (append-only: it corrects the previous entry's heading) are committed with the archive taken again; verifier-CS is resumed for its third pass, the last under the lead's rule.
+
+For: verifier-CS
+
+## 2026-10-08 20:07:31 -0700 - Logan's word on the ten items left open, in chat at 20:06:12
+
+Measured:
+- Logan, in chat at 20:06:12 -0700 (the transcript's timestamp), answering the lead's numbered list of what was open for him, verbatim, each beside the item it answers:
+  1. The five proposals for ParcelRound's METHOD.md in the case study: "Include them in the case study doc and Ill bring them over"
+  2. Quantum-Film's "Last verified", held at 2026-09-26 by pins.json's declared pass form: "Leave for now with the old proper verified run"
+  3. The Mercenaries-Fan-Build organisation's repositories, on neither the map nor Map & Ledger: "Leave them off, older community work not what Im focusing on now"
+  4. Method's sentence "This is the one place the site states it": "Keep it"
+  5. Quantum-Film's own README, stale in three places: "Leave it"
+  6. ParcelRound's check 9, holding loganw.dev patterns at `43c36a2`: "Leave for now"
+  7. ParcelRound's case study 7, on a branch, not main: "Leave for now"
+  8. HonestHarness's dossier, waiting until its round 1 lands on main: "Agreed"
+  9. Round 1's ledger working copy (`<repos>/loganw-dev-ledger`), archived in ParcelRound: "Ok to delete"
+  10. `git gc --prune=now` in loganw.dev, for round 1's P2 commits that hold the author address and this round's planted copies: "Clear to delete"
+
+Decided:
+- 2, 3 and 4 are decisions about the site: SPEC.md decisions 39, 40 and 41. 1 is recorded under the case study's proposals; 5 to 8 need no change; the case study's last section gives all ten.
+- **9 and 10 are permanent deletions of data, which the lead does not perform itself, even when cleared.** The lead gives Logan the exact commands, after checking each target: round 1's ledger is in ParcelRound's `archive/round5-ledger.zip` on its main.
+
+For: the case study, Logan

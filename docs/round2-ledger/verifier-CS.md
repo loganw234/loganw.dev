@@ -91,3 +91,71 @@ Believed:
 - Nothing beyond the above.
 
 For: the lead, the case study
+
+## 2026-10-08 19:58:44 -0700 - verifier-CS pass 2 on eb90939: NOT READY on three wording faults, each a small fix, and on one R10 claim the archive still contradicts; the gate passes; the archive and the stage times checked
+
+Measured:
+
+Setup. Worktree fast-forwarded from 35e0dd1 to eb90939 (`git merge --ff-only eb90939`); clean before and after. Diff: eight files (CLAUDE.md, README.md, the case study, VALIDATION.md, public/MANIFEST, and the archive's three new or changed files, briefs/verifier-CS.md, verifier-CS.md and lead.md).
+
+The gate on eb90939, run alone after checking that no other gate or build was running (run 20261008-195154-eb90939; log in my scratch): "passed 11, failed 0, skipped 0, cached 0"; "VERDICT: PASS, nothing skipped"; controls 393 caught, 0 did not fail, 0 skipped by name (214 s); runner-control failed as it must. The lead's run (194233) agrees.
+
+Item by item (W = my pass-1 wrong answers, R = my pass-1 restates):
+- W1, lines 13 to 15 and 321 to 346: fixed. The opening no longer claims pre-commit verification; the last section is written and says what the verifier found. Confirmed.
+- W2, lines 43 to 47: "the seven verifiers before the push, and this file's". Confirmed.
+- W3, line 275: "Haiku's verifiers wrote more than round 6's", with the per-run figures (248 to 287 k against 45 to 68 k). Confirmed.
+- W4, lines 275 to 278: round 6's five parcel verifiers wrote 45 to 68 k each; its three other Opus verifiers 114 to 129 k. Checked against case study 6's table (f42242e). Confirmed.
+- W5, lines 127 to 129: "one clause of its own commit message, which P1 had already corrected itself". Confirmed against lead.md's 16:34:27 entry and bef03b0's message.
+- W6, lines 118 to 126: "All four reports also note ...", now sourced to verifier-P3's report as the lead's 19:38:26 correction quotes it. The quoted design words match P3.md (line 68, "quoted whole"; line 86, "Below, one of the devices' prints"), so the design reference is real. Accepted, with the limit that the verbatim report exists only in the lead's file.
+- R1, lines 164 to 166: "lists most ... has every one, with the line that shows it". One example checked: the threads.py restate has its line (P4.md line 510: "threads.py line 20 (F6)"; line 302 quotes it). The word "every" is not checked exhaustively. Confirmed for the example.
+- R2, row 18:33 (line 87): "merges its source files without a conflict; only the generated public/ conflicted, and was built again each time". Confirmed against verifier-I's item 1.
+- R3, rows 18:56 and 19:04 (lines 90 to 91): confirmed. The deploy run 37872192090 concluded success, and both its gate and deploy jobs did too (`gh run view`). The live site: 38 of 39 published files are byte-identical to eb90939's public/; the one difference is MANIFEST, because eb90939 changed public/MANIFEST (the VALIDATION.md hash). The live MANIFEST equals 7f2d51b's (`git show 7f2d51b:public/MANIFEST`), so "39 of 39" is true of the pushed build (see R-d). BUILD reads "Deployed from 7f2d51b...". The email domain occurs 0 times in the live facts.json (counted, not printed).
+- R4, lines 196 to 226: partly. Added: the 14:43:12 numbering, b7879df's quote, the yield's first record, and the 19:12:36 slips; "Each went back to Logan" fixed in the owner's section. Not added: lead.md's 15:24:47 entry, which says 10b6b17's message wrongly says render.render() refuses a typed figure. Restate (R-a).
+- R5, line 265: "it was most of the work" removed. Confirmed.
+- R6, lines 305 to 313: the proposal now says "That is one round, of four parcels." Confirmed.
+- R7, lines 318 to 319: "4.6 to 7.8 times its time alone". Confirmed: 877/190 = 4.6; 1,490/190 = 7.8.
+- R8, line 109: the P2 plant is the lead-in; "ten of ten" is the page's own figure. Confirmed against key-P2.json.
+- R9, line 232: "A message is one of the agent's model responses, counted once by its id." Confirmed against round_metrics.py (distinct message ids with a usage record).
+- R10, README.md line 218: NOT fixed (S2 below).
+- R11, lines 17 to 18: "one of verifier-plan's headings had no time, which its next entry corrects". Confirmed: verifier-plan.md line 125 is that correction, stamped 14:15:26.
+
+N1, settled from the stage records.
+- e349b1a's gate (`stages.jsonl` in its state directory, in the main checkout): build 22 s, manifest 1, facts 21, numbers 1, links 1, local-only 3, docs 2, privacy 42, github 71; those sum to 164 s, so controls ran from 16:29:40 for 877 s, to 16:44:17; runner-control took 7 s, to 16:44:24. Confirmed (the lead's 19:38:26 figures).
+- The planted gates (lead's scratch, `gate-plant-P1.log` and `gate-plant-P2.log`; run ids 164411): the stages before controls sum to 307 s (9a5449d) and 306 s (2093b9d), so their controls began near 16:49:18 and 16:49:17, and ran 1,493 s and 1,491 s, to about 17:14. Confirmed.
+- So the controls stages did not overlap: the planted controls began about five minutes after e349b1a's ended. But gate runs did overlap: from 16:44:11 (the planted starts) to 16:44:24 (e349b1a's runner-control), three full gate runs were in progress, for 13 seconds. The wording "no three gates ran at once" (VALIDATION.md heading, line 2168), "they had not" (case study lines 343 to 345), and "So three gates did not run at once" (lead.md 19:38:26) is therefore wrong as worded (S3). The controls stages are the correct subject.
+- P2's three --control runs: "3 m 22 s, 3 m 31 s and 4 m 0 s" (P2.md line 288), with no times recorded, as the 19:41:33 correction says. Confirmed. Which parcel runs overlapped e349b1a's controls is not determined, also as that correction says.
+
+The round's corrected entry (VALIDATION.md 2168 to 2188): its content checks against the stage records, except the heading (S3). The first version's list entry it corrects (line 2127 to 2128) is quoted exactly.
+
+Trap 19 (CLAUDE.md lines 179 to 184): "about three minutes on a quiet machine" (my runs 216 s and 214 s, the lead's 190 s and 212 s), "about 15 minutes" (877 s) and "about 25 for each of two gates run side by side" (1,490 s). Consistent with the records. Confirmed.
+
+The archive, retaken at 19:41:52: 35 files. Each equals the live ledger file byte for byte except lead.md, which is the archive plus 1,061 appended bytes, and the appended text is only the lead's entries after 19:41:52 (19:47:24 and the coordinator's message). No live-only or archive-only file. CR count: P4.md one, as before. Addresses in docs/: the same set as pass 1 (the site's contact, and the co-author trailer's address in P4.md and briefs/_common.md); none in the new files. Absolute paths in the archive: none; the elided form of the user directory (the fragment that verifier-P0.md's correction flags) occurs in verifier-P0.md and in the lead's 19:38:26 entry, both allowed. `python site/build.py --privacy` is inside the gate: 0 problems.
+
+The post-push figures (lines 286 to 291), re-derived with round_metrics.py over 18:56:43 to 19:39:45: 43 minutes; verifier-CS 1 run, 24 minutes, 102 tool uses, 74 messages, 247 k output, 698 k fresh, 20.6 M cache reads; the lead 34 tool uses, 38 k output, 98 k fresh, 26.6 M cache reads. Confirmed.
+
+Cleanup (lines 329 to 332). `git worktree list`: only the main checkout and my worktree remain. `git branch --list "r2-*"`: none, so no planted branch is left; `ls-remote --heads origin`: only main. Two other branches, verifier-P3-commit and verifier-P4-commit, point to round 1's commits (28082eb and 4d11e60 with their check commits), not to round 2's; not a finding. "No finished agent left a process running": not determined beyond the gate and build processes, none of which is running now.
+
+Wrong answers, to send back (S):
+- S1, line 93, the 19:37 row: "six wrong answers in this file (the last section)". The six were in the opening (lines 13 to 14), the setting (lines 40 to 42), the cost section (lines 251 to 253), and "What happened" (lines 111 to 112 and 118 to 120); only the placeholder was in the last section. The label misnames where they were. Fix: drop the parenthetical or list the sections.
+- S2, README.md line 218: "the briefs as each stood when its agent was dispatched". False for verifier-plan's first pass: it was dispatched at 13:40, and the shared briefs _common.md and _verifier.md were revised at 14:22 (lead.md, 14:22:22), so the archived versions are not the ones it read. The parenthetical covers later passes only. Fix: say that verifier-plan's first pass read the shared briefs as they stood at 13:40, before the 14:22 revision, which lead.md records. The ledger has no history from which the 13:40 text can be restored.
+- S3, VALIDATION.md heading 2168, case study lines 343 to 345 ("asked whether three gates had run at once, which the gates' own times answer: / they had not"), and lead.md 19:38:26 ("So three gates did not run at once"). Wrong as worded: for 13 seconds three full gate runs were in progress (16:44:11 to 16:44:24). Fix: "the controls stages never overlapped" (true by the stage records above).
+
+Restates, to merge with the change (R-a to R-e):
+- R-a, lines 196 to 226 and VALIDATION.md 2123 to 2130: the slip lists are partial. The case study's omits lead.md 15:24:47 (10b6b17's message, false about render.render()); the round's VALIDATION list is partial too, and the new entry does not extend it. Say the lists are partial, or add the item.
+- R-b, line 190, "All twelve agents sent a test message": twelve subagents, eleven of the build plus verifier-CS (lead.md 19:13:14 counts twelve). The cost table's "12" counts the lead instead. Say which.
+- R-c, line 68, the 14:17 row: the lead's receipt time (lead.md 14:17:38, "about 14:17"). verifier-plan's own stamp for its report is 14:15:26 (verifier-plan.md line 125, which says the report "was appended" then). The intro says the times come from the ledger's own stamps. Say which.
+- R-d, line 327, "byte for byte the build (39 of 39)": name the build, 7f2d51b, since eb90939's public/MANIFEST differs from the live one by design.
+- R-e, lines 329 to 330, "No finished agent left a process running": not verified; drop it or say what was checked.
+
+Decisions and notes for the lead:
+- The N1 settlement (lead.md 19:38:26 and 19:41:33) is right in substance; the stage records above support the controls-stage version. Only S3's wording needs changing.
+- verifier-plan's first-pass briefs cannot be restored from the ledger, so the README must say the exception (S2).
+
+Verdict: NOT READY, on S1 to S3, each a one-line fix. R-a to R-e merge with the change. Everything else in the diff holds: W1 to W6 answered; R1, R2, R3, R5 to R9 and R11 answered; N1 settled on the stage records; the trap, the corrected entry and the archive (35 files, byte for byte) check out; the gate passes.
+
+Not determined: (1) whether any parcel's own control run overlapped e349b1a's controls stage (the lead's 19:41:33 correction says so); (2) the verbatim text of verifier-P3's report, which exists only as the lead's quotations, though the design words it quotes match P3.md.
+
+Believed:
+- The revision answers what pass 1 found, and the three wording faults are the only things a reader would act on wrongly.
+
+For: the lead; the case study (S1 to S3, R-a to R-e); README.md (S2)

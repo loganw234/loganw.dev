@@ -275,7 +275,8 @@ totals on parcels, agents, token use, time, etc. See the new case studies
 for examples, particularly in HonestHarness as thats the most 'tracked'
 examples currently." The plan is [ROUND2.md](ROUND2.md). His answers to the
 lead's questions, verbatim, the first four at 13:32, the next two at 14:18,
-a second answer for decision 34 at 15:24, and the last two at 18:33. Each answer is the option he
+a second answer for decision 34 at 15:24, the next two at 18:33, and the
+last three at 20:06, in chat, answering the lead's list of what was open. Each answer is the option he
 chose, in the words the lead wrote for that option; his choice is his
 word.
 
@@ -321,6 +322,14 @@ word.
     dispute: "Show it, with its evidence": "Add the fourth gap, quoting
     COMPLIANCE.md's clause readings (9.3, 9.4) at cft-fp256's pin; a lead's
     restate, checked like the others."
+39. **Quantum-Film's "Last verified",** which pins.json's declared pass
+    form holds at 2026-09-26, since its newest full run skipped a stage by
+    name: "Leave for now with the old proper verified run".
+40. **The Mercenaries-Fan-Build organisation's repositories,** on neither
+    the map nor Map & Ledger: "Leave them off, older community work not
+    what Im focusing on now".
+41. **Method's sentence "This is the one place the site states it":** "Keep
+    it".
 
 ---
 
