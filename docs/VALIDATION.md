@@ -2128,3 +2128,39 @@ as "attachment" records; three full gates run at once, which slowed their
 controls stages to between 15 and 25 minutes; and P0's commit subject, which
 counts
 its refusals as two where there were four.
+
+## 2026-10-08 - round 2's integration verifier: About and Corrections settled at Logan's word, the map's mercs2 label restated, and a citation the lead had corrected wrongly
+
+The round's integration verifier, on Haiku, read the lead's merges, restates
+and records from the seam commit to the previous entry. It made each merge
+again from its parents with `git merge-tree`, and found every source path
+merged cleanly and no planted fault on the branch. Its full gate on the
+previous entry's commit passed. It found four things, each checked by the
+lead against the source:
+
+- **The map's family label** read "22 mercs2 repositories", drawn beside
+  Merc2-Mods-Exp, which the count leaves out: the scope this round had
+  already restated in two sentences. It now reads "22 other mercs2 repos".
+  The longer "other mercs2 repositories" ran past the map's edge on a phone.
+- **About** said the Preservation thread credits "everyone who has worked on
+  it directly", where the thread now covers only the repositories it reads.
+  About is Logan's approved text, so he was asked: "Narrow it to match"
+  (SPEC decision 37). It now says the thread credits "every contributor to
+  the repositories it reads".
+- **Corrections' fourth gap,** "clause readings in COMPLIANCE", which the
+  spec names, had been left out since round 1, because COMPLIANCE.md calls
+  none of its readings open to dispute. Logan was asked: "Show it, with its
+  evidence" (SPEC decision 38). The page now shows it first, quoting
+  COMPLIANCE.md's rows for clauses 9.3 and 9.4 at cft-fp256's pin.
+- **A citation the lead corrected wrongly.** The merge of P1's work says the
+  digests quote "sits at CONFORMANCE.md lines 317 to 319, not 312 and 316".
+  At `ab51655` the known-limit quote starts at line 312, and the sentence
+  after it at the end of line 316: P1's citation was right. The lead had
+  taken a verifier's reading of those lines without opening them. The merge
+  message stands, corrected here.
+
+The verifier also noted that "ESP" in the Film thread's quote of the
+pre-registration is not defined on the page; that stands as a note.
+
+`bash verify/run.sh --require-all`: 11 passed, nothing skipped.
+`--control` caught 393 of 393.

@@ -114,6 +114,12 @@ it, marked as the lead's. SPEC.md keeps them as decisions 31 to 36.
 So: **parcels on Sonnet; every verifier on Haiku**, the plan's, P0's, each
 parcel's, the integration verifier and the case study's.
 
+After the plan's approval, the verifiers' findings brought two more to Logan,
+at 18:33, and SPEC.md keeps them as decisions 37 and 38: About's sentence on
+the Preservation thread's credits narrowed to the repositories it reads; and
+Corrections' fourth gap, "clause readings in COMPLIANCE", shown with its
+evidence.
+
 ## Rules carried into this round
 
 Each is a standing rule, with where it was given.

@@ -82,7 +82,7 @@ SPEAKERS = {"Logan"}
 SOURCE_PATHS = {
     ".gitmodules", "ADOPTION.md", "CASE-STUDY-2.md", "CASE-STUDY-3.md", "CASE-STUDY-4.md", "CASE-STUDY-5.md",
     "CASE-STUDY-6.md", "CASE-STUDY.md", "CLAUDE.md", "CONFORMANCE.md", "LICENSE", "METHOD.md", "README.md",
-    "Research/open-weight-harness-requirements.md", "docs/CERTIFICATES.md", "docs/DETERMINISM.md",
+    "Research/open-weight-harness-requirements.md", "docs/CERTIFICATES.md", "docs/COMPLIANCE.md", "docs/DETERMINISM.md",
     "docs/HARDWARE-RESULTS.md", "docs/HOSTAPI.md", "docs/LANGUAGE.md", "docs/PARCEL-ROUNDS.md",
     "docs/PREREGISTRATION.md", "docs/README.md", "docs/TRANSCENDENTALS.md", "docs/VALIDATION.md",
     "docs/VERIFICATION.md", "docs/prints/ibm-kingston-pauli-4x4-print.png", "docs/prints/ibm-kingston-pauli-4x4.json",

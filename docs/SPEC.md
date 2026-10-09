@@ -275,7 +275,7 @@ totals on parcels, agents, token use, time, etc. See the new case studies
 for examples, particularly in HonestHarness as thats the most 'tracked'
 examples currently." The plan is [ROUND2.md](ROUND2.md). His answers to the
 lead's questions, verbatim, the first four at 13:32, the next two at 14:18,
-and a second answer for decision 34 at 15:24. Each answer is the option he
+a second answer for decision 34 at 15:24, and the last two at 18:33. Each answer is the option he
 chose, in the words the lead wrote for that option; his choice is his
 word.
 
@@ -312,6 +312,15 @@ word.
     the first such line was Map & Ledger's "a revision-7 round is under way
     off main", which the build refused once cft-fp256's pin moved; it now
     reads cft-fp256's newest ledger entry.
+37. **About's credits sentence,** after the integration verifier found it
+    claimed more than the Preservation page now does: "Narrow it to match":
+    "\"...has its own thread, crediting every contributor to the
+    repositories it reads directly:\" (only that clause changes)."
+38. **Corrections' fourth gap,** "clause readings in COMPLIANCE", left out
+    since round 1 because COMPLIANCE.md calls none of its readings open to
+    dispute: "Show it, with its evidence": "Add the fourth gap, quoting
+    COMPLIANCE.md's clause readings (9.3, 9.4) at cft-fp256's pin; a lead's
+    restate, checked like the others."
 
 ---
 

@@ -46,21 +46,28 @@ def engagement():
 # ---------------------------------------------------------------------------
 # II. "Where I'd attack first" - the gaps the record already names, quoted at
 # cft-fp256's pin. The names are the spec's (Logan's); the quoted sentences
-# are cft-fp256's, re-read at its pin ab51655 in round 2: all three stand and
-# none is closed. The spec also names "clause readings in COMPLIANCE"; that
-# document's own conformance statement (docs/COMPLIANCE.md, "The conformance
-# statement") states its coverage plainly and calls no clause reading of its
-# own open to dispute anywhere in the file - checked, not found, at both pins
-# (the file is the same at 77b8440 and ab51655) - so it is left out here
-# rather than asserted without a source. The file does say, in its own rows,
-# how some clauses are met by a chosen mechanism (lines 92, 110, 111 and 158
-# to 162 at ab51655); whether that makes it a gap to show is Logan's choice
-# (docs/SPEC.md, decision 36), and it stays out until he says.
+# are cft-fp256's, re-read at its pin ab51655 in round 2: none is closed. The
+# spec's first, "clause readings in COMPLIANCE", was left out in round 1,
+# since docs/COMPLIANCE.md calls none of its readings open to dispute. Round 2
+# found that its own rows say how some clauses are met by a mechanism of its
+# choosing, and Logan chose to show it, with that evidence: "Show it, with
+# its evidence" (docs/SPEC.md, decision 38). Its quotes are rows 9.3 and 9.4.
 # ---------------------------------------------------------------------------
 
 def attack_first():
     P = facts.prose
     items = [
+        ["Clause readings in COMPLIANCE: clause ",
+         P("cft-fp256", "docs/COMPLIANCE.md", r"^\| (9\.3) \| getBinaryRoundingDirection,", num=True), ", “",
+         P("cft-fp256", "docs/COMPLIANCE.md",
+           r"^\| 9\.3 \| [^|]* \| (yes \(contexts\), with the mechanism being a context object that CARRIES the "
+           r"rounding attribute rather than five separately named calls):"),
+         "”; and clause ",
+         P("cft-fp256", "docs/COMPLIANCE.md", r"^\| (9\.4) \| sum, dot,", num=True), ", “",
+         P("cft-fp256", "docs/COMPLIANCE.md",
+           r"^\| 9\.4 \| [^|]* \| (yes - over a contractual tree, where the clause leaves the order to the "
+           r"implementation) \|$"),
+         "”."],
         ["Cross-device determinism: ",
          P("cft-fp256", "docs/DETERMINISM.md",
            r"(What no second card carrying this\s+tile has yet shown is the cross-DEVICE half of the promise)"),

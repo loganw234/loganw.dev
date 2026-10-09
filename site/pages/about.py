@@ -91,7 +91,8 @@ def refused_block():
 
 def game_work_block(ctx):
     body = render([
-        "The game-community project has its own thread, crediting everyone who has worked on it directly: ",
+        "The game-community project has its own thread, crediting every contributor to the repositories it reads "
+        "directly: ",
         page_link(ctx, "Threads", "thread-preservation.html", "its own page"), "."
     ])
     return '<p>%s</p>' % body

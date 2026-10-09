@@ -44,7 +44,7 @@
              "pattern": "storydocs paper about (HonestFramework and ParcelRound)", "bend": [18, -6]}
  },
  "families": [
-  {"label": "mercs2 repositories", "lane": 2, "row": 2, "match": "(mercs2-|merc2-|wad-simulator)", "exclude": ["Merc2-Mods-Exp"]}
+  {"label": "other mercs2 repos", "lane": 2, "row": 2, "match": "(mercs2-|merc2-|wad-simulator)", "exclude": ["Merc2-Mods-Exp"]}
  ],
  "edges": [
   {"tail": "PrettyCloud", "head": "atlas-darkroom", "kind": "grew-into", "bend": 0,
