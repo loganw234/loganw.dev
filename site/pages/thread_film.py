@@ -5,7 +5,8 @@ the print rule the pre-registration fixed. A print is image content, which no ga
 about it is read from records and held together here: the print's own record names the device and the job, the
 results document's jobs table and the committed job line must name the same two, and the image must be the one that
 record lays. What no check on this site reads is the picture itself (docs/ROUND2.md, P3's trap): the project's
-own `python tools/first_prints.py --check` holds each print to its record's digests.
+own `python tools/first_prints.py --check` holds each print's arrays to its record's digests (its line 395),
+not the committed PNG (verifier-P3).
 """
 import json
 import re
@@ -181,7 +182,7 @@ def account():
         ", was ", P("StoryDocs", "README.md", r"(taken out of atlas-darkroom)"),
         " — the book side is the pipeline the Eidograph volumes were made with; the paper side, new, is a hybrid "
         "of a research paper and that book's own idiom. It is ", facts.api_visibility(["StoryDocs"]),
-        " for now, born ", facts.born("StoryDocs"), ". It has since touched half of the map's other projects, "
+        " for now, born ", facts.born("StoryDocs"), ". It has since touched many of the map's other projects, "
         "which the arrows out of it show, derived from its projects/ directories rather than typed by hand."])
     return "".join('<p>%s</p>' % x for x in paras) + figure + "".join('<p>%s</p>' % x for x in (after, why, story))
 

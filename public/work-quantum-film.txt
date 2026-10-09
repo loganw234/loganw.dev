@@ -45,7 +45,7 @@ Cheapest first; the site-wide rules of engagement are stated once, on the Correc
 
 - Look at the first prints yourself and compare the structure-factor claim against what the eye can actually see in the published images — free.
 - Re-make a table of docs/HARDWARE-RESULTS.md from the committed records, and read whether any cell differs. “Every table below is quantum_film/compare.py's own, made from the records committed under docs/records/2026-10-05/ibm/, and every number in the prose is computed from them [fact 1910]”: python -m quantum_film.compare table --prediction <a prediction> docs/records/2026-10-05/ibm/<device>/run [fact 1911].
-- make verify-quick on a clean clone, and read whether The negative control, and its twin [fact 1912] still catches a moved crystal.
+- make verify-quick on a clean clone, and read whether the README's “The negative control, and its twin [fact 1912]” still catch a moved crystal.
 - Feed the fixer a record with one crystal moved yourself, by hand, and confirm it is refused for its digest and for no other reason.
 - Repeat the same Atlas job and check whether the bytes really differ: “Identical requests to Atlas returned different bytes wherever sampling was involved [fact 1913],” which needs an Atlas account this dossier does not supply.
 

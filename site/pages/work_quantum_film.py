@@ -117,8 +117,8 @@ def _sections(built):
              prose(NAME, RESULTS,
                    r"To remake every table here: `(python -m quantum_film\.compare table --prediction <a prediction> "
                    r"docs/records/2026-10-05/ibm/<device>/run)`", num=True), "."],
-            [C("make verify-quick"), " on a clean clone, and read whether ",
-             prose(NAME, "README.md", r"(The negative control, and its twin)"), " still catches a moved crystal."],
+            [C("make verify-quick"), " on a clean clone, and read whether the README's “",
+             prose(NAME, "README.md", r"(The negative control, and its twin)"), "” still catch a moved crystal."],
             ["Feed the fixer a record with one crystal moved yourself, by hand, and confirm it is refused for "
              "its digest and for no other reason."],
             ["Repeat the same Atlas job and check whether the bytes really differ: “",
