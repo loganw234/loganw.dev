@@ -470,7 +470,9 @@ class _Marks(html.parser.HTMLParser):
         if tag == "a" and self._mark() is not None:
             self._mark()["href"] = a.get("href", "")
         inside = lambda t, c=None: tag == t or any(n["tag"] == t and (c is None or c in n["cls"]) for n in self.stack)
-        node = dict(tag=tag, cls=cls, f=f, buf=[], href=None, beside=False, footer=inside("footer"),
+        scoped = any(c in label_scopes() for n in self.stack for c in n["cls"]) or bool(set(cls) & label_scopes())
+        node = dict(tag=tag, cls=cls, f=f, buf=[], href=None, beside=False, footer=inside("footer"), titled="title" in a,
+                    scoped=scoped,
                     svg=inside("svg"), evidence=any(n["tag"] == "details" and "evidence" in n["cls"] for n in self.stack),
                     note="sources" in cls or any("sources" in n["cls"] for n in self.stack))
         # A label opening straight after its own figure is the label beside it.
@@ -890,6 +892,15 @@ class _Holders(html.parser.HTMLParser):
             self.stack[-1]["text"] = True
 
 
+@functools.lru_cache(maxsize=None)
+def label_scopes():
+    """The classes inside which css_hides.json lets a stylesheet hide the
+    source labels (a selector ".X .src"): the resume's .cv (decision 45). A
+    figure there must carry its own label as its tooltip (check_numbers)."""
+    allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
+    return frozenset(m.group(1) for m in (re.fullmatch(r"\.([\w-]+) \.src", s.strip()) for s in allowed) if m)
+
+
 def holder_problems(page):
     """css_hides.json lets a selector hide what it styles, and names the
     elements its class may be on: "div>svg" is a div holding one svg and
@@ -1137,6 +1148,16 @@ def check_numbers(root=PUBLIC, names=None):
                 if rec is None or title != facts.label(rec):
                     problems.append("%s: a tooltip on fact %s reads %s, which is not its own label"
                                     % (rel, f, ascii(title)))
+            # A figure whose label a stylesheet may hide (label_scopes: the
+            # resume's, decision 45) carries its label as its own tooltip, so
+            # its source is always to hand, and no element around it can lend
+            # it another: a title shows on whatever it holds that carries none
+            # (verifier-print gave a figure's paragraph one, and took the
+            # figure's away).
+            for m in p.marks:
+                if m["scoped"] and "src" not in m["cls"] and not m["titled"]:
+                    problems.append("%s: fact %s's label may be hidden, and it carries no tooltip of its own"
+                                    % (rel, m["f"]))
         elif rel.endswith(".css"):
             # Text a reader sees and no page holds: a numeral typed there would
             # pass every check on the HTML (generated content, 45b8d01; quotes
@@ -2815,6 +2836,8 @@ def controls():
                 swapped(pdf_p, pdf_b[:digit.start(2)] + other + pdf_b[digit.end(2):], check_numbers, "numbers",
                         "is not the PDF printout.pdf writes", "a digit changed in the printout")
             swapped(twin_p, None, check_numbers, "numbers", "without its twin", "the printout's twin removed")
+            swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- \n-- ", 1), check_numbers, "numbers", "a twin line with no text",
+                    "the printout's twin with an empty line (verifier-print's T1)")
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- [x](https://loganw.dev/planted.html)\n-- ", 1),
                     check_links, "links", "not a published file", "the printout's twin linking no published file")
             other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"
@@ -2844,6 +2867,11 @@ def controls():
                 swapped(res, page_b.replace(fig_tip.group(1), fig_tip.group(1) + b'<span title="a tooltip no label '
                                             b'holds"></span>', 1), check_numbers, "numbers", "not its own label",
                         "a tooltip on an element inside a figure")
+                # verifier-print's W2: a figure whose label may be hidden,
+                # with no tooltip of its own, would show its paragraph's
+                bare = re.sub(rb' title="[^"]*"', b"", fig_tip.group(1), count=1)
+                swapped(res, page_b.replace(fig_tip.group(1), bare, 1), check_numbers, "numbers",
+                        "carries no tooltip of its own", "a figure in the resume with its tooltip taken away")
         planted("local-only", "a robots meta other than an unlisted page's noindex",
                 t.replace("</head>", '<meta name="robots" content="nofollow"></head>', 1), check_local_only,
                 "not an unlisted page's noindex")

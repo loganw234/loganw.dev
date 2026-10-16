@@ -396,8 +396,8 @@ word.
       the quotation marks the page sets around a quotation, and keep its
       "Where to look first" links. A project, with its bullets and links,
       starts on a new page when it doesn't fit on this one; that is the
-      break before Quantum-Film today. A few of the page's joining words
-      changed so that each sentence reads the same with its marks or
+      break before Quantum-Film today. Nine joining strings on the page
+      changed, so that each sentence reads correctly with its marks and
       without them.
 46. **The resume's own statements:** "Also statements by me are approved"
     (2026-10-16). His role, his summary, cft-fp256 as his experiment and the

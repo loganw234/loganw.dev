@@ -319,9 +319,37 @@ def print_files(ctx):
     return {"resume.pdf": printout.pdf(printout.twin(_CV[0]))}
 
 
+def _printed(cv_inner):
+    """A small resume's twin, its lines after the name, role and contact."""
+    head = '<p class="lede">Role.</p><p class="contact">Contact.</p>'
+    return printout.twin('<div class="cv">%s%s</div>' % (head, cv_inner)).split("\n")[3:-3]
+
+
 def controls():
     """The resume's statements are Logan's settled words, or labelled
     drafts: pages._settled plants each fault its check was found to miss
-    into each of BLOCKS, as on About and the front page."""
-    return _settled.controls(globals(), BLOCKS, render_page, {"built": {}, "pages": {}}, "resume",
-                             (about.APPROVED[0], "Logan", "2026-09-30"), S, D)
+    into each of BLOCKS, as on About and the front page. And the printout
+    leaves out exactly the quotation marks the page sets straight around a
+    figure, and no other (verifier-print's W1): each shape below keeps its
+    marks, and the page's own shape loses them."""
+    out = _settled.controls(globals(), BLOCKS, render_page, {"built": {}, "pages": {}}, "resume",
+                            (about.APPROVED[0], "Logan", "2026-09-30"), S, D)
+    o, c = chr(0x201C), chr(0x201D)
+    fig = '<span class="q" data-f="7">quoted</span>'
+    label = '<span class="src" data-f="7"> (a label)</span>'
+    for what, inner, want in (
+            ("the page's own shape", "<p>A %s%s%s.</p>" % (o, fig + label, c), "A quoted [fact 7]."),
+            ("a closing mark opening the next block",
+             "<p>Ends %s</p><p>%sstarts here.</p>" % (fig + label, c), c + "starts here."),
+            ("a closing mark after a figure with no label", "<p>A %s%s.</p>" % (fig, c), "A quoted [fact 7]%s." % c),
+            ("an opening mark before a label, then a figure",
+             "<p>A %s%s%s.</p>" % (o, label, fig), "A %squoted [fact 7]." % o),
+            ("an opening mark with a space before its figure",
+             "<p>A %s %s%s%s.</p>" % (o, fig, label, c), "A %s quoted [fact 7]." % o)):
+        try:
+            got = _printed(inner)
+            ok = want in got
+        except Exception as e:  # noqa: BLE001 - a refusal is a result here, and is reported
+            got, ok = [repr(e)], False
+        out.append(("resume-printout-quotes", ok, "%s: %s" % (what, ascii(got))))
+    return out

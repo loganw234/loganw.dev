@@ -91,9 +91,12 @@ class _Reader(html.parser.HTMLParser):
     It reads the subset pages/resume.py writes and refuses any other element
     by name. It leaves out only a figure's source label, which the numbers
     stage holds to exactly its fact's, and the quotation marks set straight
-    around a figure, the opening one just before it and the closing one just
-    after its label. What the page says about itself stands outside the
-    <div class="cv">, so the printout never reads it."""
+    around a figure: an opening one only when it is the very last text before
+    the figure, and a closing one only when it is the very first text after
+    the label that follows the figure straight on, with nothing between
+    (verifier-print found the first rule taking marks in other shapes). What
+    the page says about itself stands outside the <div class="cv">, so the
+    printout never reads it."""
 
     BLOCKS = {"p": None, "h2": "== ", "h3": "=== ", "li": "- "}
     INLINE = {"span", "a", "code", "em", "strong", "wbr"}
@@ -105,7 +108,11 @@ class _Reader(html.parser.HTMLParser):
         self.skip = []          # the elements whose text the printout leaves out
         self.fig = []           # [fact id, its text so far] while a figure is read
         self.link = []          # [href, its text so far] while a link is read
-        self.after = False      # a figure (and its label) has just closed
+        # Where a figure's quotation marks may be: "fig" when a figure has
+        # just closed, "label" inside the label that follows it straight on,
+        # "after" when that label has just closed; None otherwise. And
+        # whether the last thing read was text, which an opening mark must be.
+        self.mark, self.text_last = None, False
 
     def _put(self, s):
         if self.link:
@@ -124,6 +131,12 @@ class _Reader(html.parser.HTMLParser):
             if tag not in ("wbr",):
                 self.skip.append(tag)
             return
+        if tag == "span" and "src" in cls:
+            self.mark = "label" if self.mark == "fig" else None
+            self.text_last = False
+            self.skip.append(tag)
+            return
+        self.mark, last, self.text_last = None, self.text_last, False
         if tag in self.HOLDERS:
             return
         if tag in self.BLOCKS:
@@ -139,19 +152,15 @@ class _Reader(html.parser.HTMLParser):
             return
         if tag not in self.INLINE:
             raise Refused("an element the printout doesn't read: <%s>" % tag)
-        if tag == "span" and "src" in cls:
-            self.skip.append(tag)
-            return
-        self.after = False
         if tag == "span" and "when" in cls:
             self._put(" | ")
         elif tag == "span" and a.get("data-f"):
             if self.fig:
                 raise Refused("a figure inside a figure")
             buf = self.link[-1] if self.link else None
-            if buf is None and self.block and self.block[-1].endswith(OPEN):
+            if last and buf is None and self.block and self.block[-1].endswith(OPEN):
                 self.block[-1] = self.block[-1][:-1]
-            elif buf is not None and buf[1].endswith(OPEN):
+            elif last and buf is not None and buf[1].endswith(OPEN):
                 buf[1] = buf[1][:-1]
             self.fig.append([a["data-f"], ""])
         elif tag == "a":
@@ -165,13 +174,17 @@ class _Reader(html.parser.HTMLParser):
     def handle_endtag(self, tag):
         if self.skip:
             self.skip.pop()
+            if not self.skip and self.mark == "label":
+                self.mark = "after"
             return
+        self.text_last = False
         if tag == "span" and self.fig:
             f, text = self.fig.pop()
             self._put(text + " [fact %s]" % f)
-            self.after = True
+            self.mark = "fig"
             return
-        elif tag == "a" and self.link:
+        self.mark = None
+        if tag == "a" and self.link:
             href, text = self.link.pop()
             self._put("[%s](%s)" % (text, href))
         elif tag in self.BLOCKS and self.block is not None:
@@ -188,10 +201,11 @@ class _Reader(html.parser.HTMLParser):
     def handle_data(self, data):
         if self.skip:
             return
-        if self.after and data.startswith(CLOSE):
+        if self.mark == "after" and data.startswith(CLOSE):
             data = data[1:]
-        self.after = False
+        self.mark = None
         self._put(data)
+        self.text_last = True
 
 
 def twin(cv_html):
@@ -241,6 +255,13 @@ def blocks(twin_text):
         raise Refused("a twin needs its name, its role and its contact line")
     out = [("name", runs(lines[0])), ("role", runs(lines[1])), ("contact", runs(lines[2]))]
     for l in lines[3:]:
+        # a line with no text would print as nothing, and a second note
+        # would be dropped (verifier-print's T1 and T4): an edited twin is
+        # refused by name, never printed short
+        if not MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).strip(" |"):
+            raise Refused("a twin line with no text: %r" % l[:20])
+        if l.startswith("-- ") and any(b[0] == "note" for b in out):
+            raise Refused("a twin with a second note")
         if l.startswith("=== "):
             name, sep, when = l[4:].partition(" | ")
             out.append(("project", runs(name), runs(when)))
