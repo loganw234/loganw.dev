@@ -370,6 +370,28 @@ word.
     is in the Film & photography lane. Its one edge, Quantum-Film underlies
     QRO-Crate, quotes QRO-Crate's README: "Its first data are
     Quantum-Film's runs".
+45. **The resume's printout and its sources on request.** In Logan's words,
+    on 2026-10-16: "This looks good, the only 2 minor changes is adjusting
+    to have a pdf output (without all the styling, more in line with the
+    draft I sent just to have a 'basic' printout, note in simple monospace
+    type at the bottom that the pdf is built not written with a link back)
+    and if its possible a 'citations toggle', where all the lengthy
+    citation marks are hidden to make reading easier. Perhaps replacing with
+    a simpler dashed underline that on hover shows the full line? I feel the
+    full citations everywhere may be 'too much' for a resume, constantly
+    interrupted by citation marks". *What the site does:*
+    - The resume reads without its sources first. Every figure there is
+      underlined and carries its own label as a tooltip. The labels beside
+      the figures are hidden until a reader opens "Show every source beside
+      its line". The labels stay beside their figures in the page, so every
+      rule on them still holds.
+    - `resume.pdf` is the page printed plainly, in Helvetica, with a note
+      at its foot in Courier, linking back to the page. The build writes it
+      from the page's text twin, `resume.txt`, and from nothing else.
+46. **The resume's own statements:** "Also statements by me are approved"
+    (2026-10-16). His role, his summary, cft-fp256 as his experiment and the
+    Moth Hack result are stated by Logan, approved as printed, and carry no
+    draft label.
 
 ---
 

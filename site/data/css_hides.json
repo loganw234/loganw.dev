@@ -1,6 +1,8 @@
 {
  "about": "Stylesheet rules that may hide what they style, each by its selector, the declarations it may use (and no others), the elements its class may be on, and why. The lead's file: the numbers stage refuses a hiding declaration unless its selector is named here with that declaration, because a stylesheet could otherwise hide a figure or its source while every page check passes. It also refuses the selector's class on any element \"on\" does not name, since that element would be hidden with it; \"div>svg\" is a div holding one svg and nothing else. Two selectors that swap by width name each other as \"pair\": on every page they come in pairs, and each pair draws the same figures. A layout that swaps one view for another names both selectors here. The check cannot tell which media query a rule sits in; the why says where each may apply, and a parcel's verifier checks it in a browser at both widths.",
  "selectors": {
+  ".cv .src": {"allow": ["display:none"], "on": ["span"],
+               "why": "decision 45, 2026-10-16: the resume's source labels, hidden until a reader opens its toggle, Show every source beside its line, which shows them (.srcs[open]~.cv .src). Each figure on that page also carries its own label as a tooltip, which the numbers stage holds to exactly that label, so no figure there is shown without its source to hand"},
   ".map .axis": {"allow": ["fill:none"], "on": ["path"],
                  "why": "the map's axis: SVG paths drawn as strokes, with fill:none so they are not filled in; they hold no text"},
   ".map .edge": {"allow": ["fill:none"], "on": ["path", "line"],

@@ -135,6 +135,17 @@ tr.signature td{font-style:italic;color:var(--muted)}
 .cv .contact{font:14px/1.6 var(--mono)}
 .cv .how,.cv .look{font-size:15px;color:var(--muted)}
 .cv .look{margin:.2em 0 0}
+/* Decision 45: the resume reads without its sources first. Each figure is
+   underlined and carries its label as a tooltip; the labels beside the
+   figures are hidden until "Show every source beside its line" is opened
+   (site/data/css_hides.json names the one hiding rule). */
+.cv .src{display:none}
+.srcs[open]~.cv .src{display:inline}
+.cv .q,.cv .fig,.cv .stated{text-decoration:underline dashed;text-decoration-color:var(--muted);text-decoration-thickness:1px;text-underline-offset:4px;cursor:help}
+.srcs[open]~.cv .q,.srcs[open]~.cv .fig,.srcs[open]~.cv .stated{text-decoration:none;cursor:auto}
+.tools{margin:.1em 0 0;font-size:15px;color:var(--muted)}
+.srcs{margin:.4em 0 1.4em;font:italic 16px var(--serif);color:var(--muted)}
+.srcs summary{cursor:pointer}
 /* P2: the Threads section pages. Most of the look comes free from
    site/style.css (measure, lede, h2, table, cta, map); this is only what
    those rules do not already cover. */

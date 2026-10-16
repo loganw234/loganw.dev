@@ -1,0 +1,39 @@
+Logan W.
+Independent project lead [fact 991]
+[logan@loganw.dev](mailto:logan@loganw.dev) · [loganw.dev](https://loganw.dev/) · [github.com/loganw234](https://github.com/loganw234)
+I direct AI agents through engineering and research work beyond my own implementation expertise. I set the direction, review the evidence and decide what the record supports; the agents write essentially all of the code. What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail, verifiers scored against planted faults, and dated records that keep the failed runs. [fact 992]
+
+== Selected projects
+
+=== ParcelRound, HonestFramework and HonestHarness | since Sep 2026 [fact 1009]
+- ParcelRound: “A method for splitting one body of work across several coding agents at once, without the pieces failing to meet [fact 993]”. It exists because “the obvious approach fails in a specific, repeatable way [fact 994]”: “Give four agents four well-scoped parcels of one feature and you can get four green gates and a feature that does not work [fact 995]”. 6 [fact 996] rounds are recorded as case studies, and the sixth put “planted faults on every parcel's verifier [fact 997]”.
+- HonestFramework: “A way to lay out a project so that an AI can write nearly all of it and no claim about it ever rests on the AI's judgement [fact 998]”. Whether a claim is true “is answered by something that cannot hold an opinion: a reference implementation, a bit-identity comparison, a hash, a gate that has been watched to fail, an append-only record with dates on it [fact 999]”.
+- HonestHarness holds “the requirements, H1 to H17, derived from the record of cft-fp256's rounds [fact 1000]”. Its first round asked: “can a cheaper model, reached over an API, do the skills a ParcelRound round measures [fact 1001]”? Replaying the planted faults of ParcelRound's sixth round, DeepSeek's flash model caught 31 of 40 [fact 1002], where that round's own verifiers, on Opus, had caught 10 of 10 [fact 1003]. “Every plant that changed a figure or a reference was caught in every run, 24 of 24 [fact 1004]”; “Plants that changed meaning or shape were caught 7 of 16 [fact 1005]”.
+- Where a suite stops telling strong models apart, the record says so: 659 of 660 runs exact [fact 1006], and “So the QS6 slice cannot tell strong models apart [fact 1007]”.
+- This site is built the same way. In its second round each verifier, on Haiku, checked a copy of a parcel's work holding planted faults: “8 of 8 caught, each on its first pass [fact 1008]”.
+
+=== cft-fp256 | since Aug 2026 [fact 1026]
+- “A math coprocessor that gets the same answer everywhere [fact 1011]”: “It does IEEE 754 arithmetic at four precisions - 32, 64, 128 and 256 bits - and guarantees that the same inputs give the same bits whether the work runs on a laptop CPU, in a browser tab, on a microcontroller, or on the FPGA card it was designed for [fact 1012]”, the “AMD/Xilinx Alveo U50 through the open Vitis RTL kernel flow [fact 1013]”.
+- Used cft-fp256 to test how far one person without formal computing training can take a serious engineering effort with AI. [fact 1014] Its rule: “The rule is that a number in a document has a run behind it, and the runs that failed stay in the record [fact 1015]”.
+- Checked by “29 simulation targets checking every result and every flag against the golden model, and 38 machine-checked proofs, plus a negative control that must be refuted or the gate has stopped being able to catch a bug [fact 1016]”; and “MPFR arbitrates all four formats [fact 1017]”.
+- “The card replayed the conformance sets on silicon [fact 1018]”. “The published set is 1,068,915 cases [fact 1019]”, and that “exact set was replayed on the card, one tile, at each point of the 2026-09-23/24 clock sweep from 145 to 170 MHz [fact 1020]”. A binary256 soak on the card ran “541 passes in 70 minutes, each a resident run of a million elements at fma, add and mul [fact 1021]”, with “0 failures [fact 1022]”.
+- In cft-rebound, “REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1023]”. “At binary64 it is REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build [fact 1024]”.
+
+=== Quantum-Film | since Sep 2026 [fact 1036]
+- “Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll the same, bit for bit, on every machine [fact 1027]”; “its tone curve and grain scale are borrowed from a real stock in atlas-film, so only the placement of the crystals is new [fact 1028]”.
+- Its Pauli stock's law “ran on Moth's Atlas emulator, and holds [fact 1029]”, and the stock was “printed, with one print laid entirely by Atlas [fact 1030]”. Then “On 2026-10-05 the design docs/PREREGISTRATION.md fixed beforehand ran on each of the three IBM Quantum devices the owner's Open-plan instance reaches [fact 1031]”. The result is reported as it fell: “All three devices carry the law's two quantum signatures, well clear of the classical twin [fact 1032]”. “And all three fall short of what their own noise models predicted [fact 1033]”.
+- Winner, Quantum Native Repo category, Moth Hack 2026 [fact 1034] ([the hackathon's results](https://airtable.com/appfaqE6MpACGX3LN/shrKxNCu6BKEnDRVs?detail=eyJwYWdlSWQiOiJwYWdoWnN1YzFERmRxeVFweiIsInJvd0lkIjoicmVjN1ZzcmlDU2FaazVJNHgiLCJzaG93Q29tbWVudHMiOmZhbHNlLCJxdWVyeU9yaWdpbkhpbnQiOnsidHlwZSI6InBhZ2VFbGVtZW50IiwiZWxlbWVudElkIjoicGVsQ0pZYlE0ZGhBTmJqZ0wiLCJxdWVyeUNvbnRhaW5lcklkIjoicGVsNEVPbWVZZFhDYkVIVjIiLCJzYXZlZEZpbHRlclNldElkIjoic2ZzRjlpVGlzZWE2RWx5ZEsifX0)). The entry: “Entered for the Expert challenge #9: a repository of a quantum application that runs a process on media through the Atlas API [fact 1035]”.
+
+=== QRO-Crate | since Oct 2026 [fact 1043]
+- “An RO-Crate profile for quantum computing runs, built so that the difference between two runs can be attributed: to the question, the compile, what was submitted, the sampling, readout, the device's state and time, or drift within a run [fact 1037]”. “Its first data are Quantum-Film's runs, on IBM's processors and on Moth's Atlas emulator [fact 1038]”.
+- P0 is built, its parts including “the canonical writer and the strict reader [fact 1039]”, “the checker's steps 1, 2, 3 and 9 [fact 1040]” and “the custody log and the audit record [fact 1041]”. “Nothing else is built: no adapter, no measures, no comparison, no profile crate, no contributor kit [fact 1042]”.
+
+== Other public work
+- Mercenaries2: “A revival project for Mercenaries 2: World in Flames [fact 1044]”. “Restores online services and exposes the game's statically-linked Lua 5.1.2 runtime for modding [fact 1045]”.
+- PrettyCloud: “Atlas of Mathematical Forms [fact 1046]”, “A WebGL2 point-cloud atlas [fact 1047]”.
+
+== Background
+I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents have written essentially all of the code in these projects; gates decide what is true, and the record keeps what they said. [fact 1048]
+I have a GED, and one month of formal computer science. [fact 1049]
+
+-- This PDF is built, not written: the site's build prints it from the page at [https://loganw.dev/resume.html](https://loganw.dev/resume.html), which names the source of every line, or marks it as Logan's own word.

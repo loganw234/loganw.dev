@@ -22,6 +22,10 @@ A page module defines:
       plain-text twin, for instance. Its figures go through render.plain(),
       which writes each as `text [fact N]`, and the numbers stage holds a
       text file to the same rule as a page.
+  print_files(ctx) (optional) -> {flat .pdf name: bytes}: a printout of the
+      page, which only printout.pdf() may write, from the twin of the same
+      name that extra_files publishes (the resume's, decision 45). The
+      numbers stage refuses a printout that isn't exactly those bytes.
 
 A name with a numeral in it that is not a figure, such as "Mercenaries 2", is
 allowed only through site/data/numeral_names.json, which is the lead's, and

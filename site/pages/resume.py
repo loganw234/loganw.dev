@@ -9,19 +9,28 @@ more come from cited sources than my claims where able", 2026-10-15) most of
 it is the projects' own words, each quoted at its pin and labelled with the
 file and line. What only Logan can say is a statement:
   - his role, his summary, cft-fp256 as his experiment, and the Moth Hack
-    result are drafted from his draft resume of 2026-10-15, and carry the
-    draft label until he approves them as printed;
+    result were drafted from his draft resume of 2026-10-15, and Logan
+    approved them as printed on 2026-10-16: "Also statements by me are
+    approved" (decision 46);
   - the background is Home's biography and About's first approved sentence,
     printed as Logan approved them, so they carry no draft label.
 pages._settled holds every statement here to those two kinds, as it holds
 About's and the front page's.
+
+At Logan's word of 2026-10-16 (decision 45), it reads without its sources
+first: every figure carries its own label as a tooltip, and the stylesheet
+hides the labels beside the figures until a reader opens "Show every source
+beside its line" (site/data/css_hides.json names the rule). The page prints
+as resume.pdf, which printout.py writes from the page's text twin,
+resume.txt, and from nothing else.
 """
 import dataclasses
 
 import facts
+import printout
 from facts import V, fact, prose
 from pages import _settled, about, front
-from render import L, esc, render
+from render import L, esc, render as _render
 
 PAGE = {"file": "resume.html", "nav": None, "unlisted": True, "title": "Resume — loganw.dev",
         "description": "Logan's resume: each line quoted from its project at the commit this site pins, and his "
@@ -46,17 +55,32 @@ RESULTS = ("https://airtable.com/appfaqE6MpACGX3LN/shrKxNCu6BKEnDRVs?detail=eyJw
            "Z2VFbGVtZW50IiwiZWxlbWVudElkIjoicGVsQ0pZYlE0ZGhBTmJqZ0wiLCJxdWVyeUNvbnRhaW5lcklkIjoicGVsNEVPbWVZZFhDYkVI"
            "VjIiLCJzYXZlZEZpbHRlclNldElkIjoic2ZzRjlpVGlzZWE2RWx5ZEsifX0")
 
+# The day Logan approved the page's own statements as printed (decision 46).
+APPROVED_ON = "2026-10-16"
+
 # Every statement this page may print without a draft label, with the label
 # it must carry: its words, who said them, and when (pages._settled).
 SETTLED = {front.WHO: "stated by Logan, 2026-09-29",
            about.APPROVED[0]: "stated by Logan, 2026-09-30"}
+SETTLED.update({s: "stated by Logan, %s" % APPROVED_ON for s in (ROLE, SUMMARY, EXPERIMENT, WIN)})
 
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 HH_R1 = "Rounds/HonestHarness-R1/CASE-STUDY.md"
 
 
+def render(segs):
+    """Every figure here carries its label as a tooltip too (decision 45)."""
+    return _render(segs, tip=True)
+
+
 def S(text, **kw):
     return facts.stated(text, "Logan", DRAFTED, **kw)
+
+
+def A(text):
+    """Words Logan approved as printed: "Also statements by me are approved"
+    (2026-10-16, decision 46)."""
+    return facts.stated(text, "Logan", APPROVED_ON)
 
 
 def D(text):
@@ -104,16 +128,16 @@ def project(name, since, items, evidence=None):
 
 
 def head_block():
-    return ('<h1>Resume</h1><div class="measure"><p class="lede">%s</p>'
+    return ('<div class="measure"><p class="lede">%s</p>'
             '<p class="contact"><a href="mailto:logan@loganw.dev">logan@loganw.dev</a> · '
             '<a href="index.html">loganw.dev</a> · <a href="https://github.com/loganw234">github.com/loganw234</a></p>'
             '<p>%s</p>'
-            '<p class="how">Each quotation below is its source&#x27;s own words, labelled with the file and line: a '
-            'project&#x27;s at the commit this site pins, or this site&#x27;s own ledger&#x27;s. Every other figure '
-            'names where it was read. What only Logan can say is marked as his statement, with its date; a statement '
-            'he has not yet approved as printed says so.</p>'
+            '<p class="how">Every underlined passage is read from its source, or is Logan&#x27;s own word. Hover over '
+            'it to see where it was read, or who said it and when, or open &#x201c;Show every source beside its '
+            'line&#x201d; above. Each quotation is its source&#x27;s own words: a project&#x27;s at the commit this '
+            'site pins, or this site&#x27;s own ledger&#x27;s.</p>'
             '</div>'
-            % (render([D(ROLE)]), render([D(SUMMARY)])))
+            % (render([A(ROLE)]), render([A(SUMMARY)])))
 
 
 def oversight_block():
@@ -172,7 +196,7 @@ def cft_block():
              r"the same inputs give the same bits whether\s+the work runs on a laptop CPU, in a browser tab, on a "
              r"microcontroller,\s+or on the FPGA card it was designed for)\.")),
          ", the ", q(P(r"built for the\s+(AMD/Xilinx Alveo U50 through the open Vitis RTL kernel flow)")), "."],
-        [D(EXPERIMENT), " Its rule: ",
+        [A(EXPERIMENT), " Its rule: ",
          q(P(r"(The rule is that a number in a document has a run behind it, and the\s+runs that failed stay in the "
              r"record)\.")), "."],
         ["Checked by ",
@@ -218,7 +242,7 @@ def film_block():
          q(H(r"\*\*In one paragraph\.\*\* (All three devices carry the law's two quantum signatures, well clear of "
              r"the classical twin):")),
          ". ", q(H(r"(And all three fall short of what their own noise models predicted)\.")), "."],
-        [D(WIN), " (", L(RESULTS, "the hackathon's results"), "). The entry: ",
+        [A(WIN), " (", L(RESULTS, "the hackathon's results"), "). The entry: ",
          q(P(r"(Entered for the Expert challenge #\d+: a repository of a quantum application that\s+runs a process "
              r"on media through the Atlas API)\.")), "."],
     ]
@@ -265,10 +289,33 @@ def background_block():
 BLOCKS = ("head_block", "oversight_block", "cft_block", "film_block", "qro_block", "other_block", "background_block")
 
 
+# Above the resume: its printout, and the toggle that shows every source
+# beside its line (resume.css; decision 45). Neither is printed.
+TOOLS = ('<p class="tools"><a href="resume.pdf">A plain PDF of this page</a>, printed from it by the build</p>'
+         '<details class="srcs"><summary>Show every source beside its line</summary></details>')
+
+# The resume's markup as the last render_page made it, which the build then
+# prints: render_all calls extra_files and print_files straight after it.
+_CV = []
+
+
 def render_page(ctx):
-    body = ('<div class="cv">' + head_block() + oversight_block() + cft_block() + film_block() + qro_block()
-            + other_block() + background_block() + '</div>')
-    return _settled.refuse(body, PAGE["file"], SETTLED)
+    cv = ('<div class="cv">' + head_block() + oversight_block() + cft_block() + film_block() + qro_block()
+          + other_block() + background_block() + '</div>')
+    body = _settled.refuse('<h1>Resume</h1>' + TOOLS + cv, PAGE["file"], SETTLED)
+    _CV[:] = [cv]
+    return body
+
+
+def extra_files(ctx):
+    """The page's text twin: the resume, a block a line, each figure with its
+    id, as the dossiers' twins write them (printout.twin)."""
+    return {"resume.txt": printout.twin(_CV[0])}
+
+
+def print_files(ctx):
+    """The page's printout, written from its twin alone (printout.pdf)."""
+    return {"resume.pdf": printout.pdf(printout.twin(_CV[0]))}
 
 
 def controls():

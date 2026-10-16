@@ -183,6 +183,25 @@ could hold one; that is a stated limit. Unlisted isn't
 private: the page is published, MANIFEST names it, facts.json holds its
 figures like any other page's, and every rule above holds on it.
 
+Its sources come on request (SPEC decision 45). Each figure on the page is
+underlined and carries its own label as a tooltip, which the numbers stage
+holds to exactly that label. The labels beside the figures are there in the
+page, as on every other page, and its stylesheet hides them until a reader
+opens "Show every source beside its line"; `site/data/css_hides.json` names
+that one rule. Only a reader who hovers, or opens the toggle, sees a source,
+and a tooltip does not show on a phone without the toggle; that is a stated
+limit.
+
+The page also prints, as `resume.pdf`. The build reads the page into a text
+twin, `resume.txt`, a block a line, with each figure written `text [fact N]`
+as a dossier's twin writes it, and writes the PDF from the twin and from
+nothing else (`site/printout.py`). The numbers stage reads the twin like any
+text file, and refuses a PDF that isn't exactly the bytes the writer makes
+from it, so the PDF holds no text, link or object the twin doesn't. The
+links stage reads the PDF's links from its twin; a page's own printout is
+the one file that may link to it while it is unlisted. The PDF prints no
+source labels. Its note says where they are.
+
 ## Does it still hold?
 
 ```bash

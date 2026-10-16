@@ -1,0 +1,164 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [10 0 R 14 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Length 6870 >>
+stream
+BT /F2 20 Tf 1 0 0 1 54.00 716.00 Tm (Logan W.) Tj ET
+BT /F2 11 Tf 1 0 0 1 54.00 701.00 Tm (Independent project lead) Tj ET
+BT /F1 9.5 Tf 1 0 0 1 54.00 688.00 Tm (logan@loganw.dev \267 loganw.dev \267 github.com/loganw234) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 669.00 Tm (I direct AI agents through engineering and research work beyond my own implementation expertise. I set the) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 656.00 Tm (direction, review the evidence and decide what the record supports; the agents write essentially all of the code.) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 643.00 Tm (What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail,) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 630.00 Tm (verifiers scored against planted faults, and dated records that keep the failed runs.) Tj ET
+BT /F2 11 Tf 1 0 0 1 54.00 602.00 Tm (Selected projects) Tj ET
+BT /F2 10.5 Tf 1 0 0 1 54.00 581.00 Tm (ParcelRound, HonestFramework and HonestHarness) Tj ET
+BT /F1 9.5 Tf 1 0 0 1 492.52 581.00 Tm (since Sep 2026) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 568.00 Tm (ParcelRound: \223A method for splitting one body of work across several coding agents at once, without the) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 555.00 Tm (pieces failing to meet\224. It exists because \223the obvious approach fails in a specific, repeatable way\224: \223Give four) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 542.00 Tm (agents four well-scoped parcels of one feature and you can get four green gates and a feature that does not) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 529.00 Tm (work\224. 6 rounds are recorded as case studies, and the sixth put \223planted faults on every parcel's verifier\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 568.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 514.00 Tm (HonestFramework: \223A way to lay out a project so that an AI can write nearly all of it and no claim about it ever) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 501.00 Tm (rests on the AI's judgement\224. Whether a claim is true \223is answered by something that cannot hold an opinion: a) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 488.00 Tm (reference implementation, a bit-identity comparison, a hash, a gate that has been watched to fail, an) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 475.00 Tm (append-only record with dates on it\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 514.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 460.00 Tm (HonestHarness holds \223the requirements, H1 to H17, derived from the record of cft-fp256's rounds\224. Its first) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 447.00 Tm (round asked: \223can a cheaper model, reached over an API, do the skills a ParcelRound round measures\224?) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 434.00 Tm (Replaying the planted faults of ParcelRound's sixth round, DeepSeek's flash model caught 31 of 40, where that) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 421.00 Tm (round's own verifiers, on Opus, had caught 10 of 10. \223Every plant that changed a figure or a reference was) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 408.00 Tm (caught in every run, 24 of 24\224; \223Plants that changed meaning or shape were caught 7 of 16\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 460.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 393.00 Tm (Where a suite stops telling strong models apart, the record says so: 659 of 660 runs exact, and \223So the QS6) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 380.00 Tm (slice cannot tell strong models apart\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 393.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 365.00 Tm (This site is built the same way. In its second round each verifier, on Haiku, checked a copy of a parcel's work) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 352.00 Tm (holding planted faults: \2238 of 8 caught, each on its first pass\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 365.00 Tm (\225) Tj ET
+BT /F2 10.5 Tf 1 0 0 1 54.00 330.00 Tm (cft-fp256) Tj ET
+BT /F1 9.5 Tf 1 0 0 1 492.52 330.00 Tm (since Aug 2026) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 317.00 Tm (\223A math coprocessor that gets the same answer everywhere\224: \223It does IEEE 754 arithmetic at four precisions -) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 304.00 Tm (32, 64, 128 and 256 bits - and guarantees that the same inputs give the same bits whether the work runs on a) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 291.00 Tm (laptop CPU, in a browser tab, on a microcontroller, or on the FPGA card it was designed for\224, the \223AMD/Xilinx) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 278.00 Tm (Alveo U50 through the open Vitis RTL kernel flow\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 317.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 263.00 Tm (Used cft-fp256 to test how far one person without formal computing training can take a serious engineering) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 250.00 Tm (effort with AI. Its rule: \223The rule is that a number in a document has a run behind it, and the runs that failed stay) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 237.00 Tm (in the record\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 263.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 222.00 Tm (Checked by \22329 simulation targets checking every result and every flag against the golden model, and 38) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 209.00 Tm (machine-checked proofs, plus a negative control that must be refuted or the gate has stopped being able to) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 196.00 Tm (catch a bug\224; and \223MPFR arbitrates all four formats\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 222.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 181.00 Tm (\223The card replayed the conformance sets on silicon\224. \223The published set is 1,068,915 cases\224, and that \223exact) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 168.00 Tm (set was replayed on the card, one tile, at each point of the 2026-09-23/24 clock sweep from 145 to 170 MHz\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 155.00 Tm (A binary256 soak on the card ran \223541 passes in 70 minutes, each a resident run of a million elements at fma,) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 142.00 Tm (add and mul\224, with \2230 failures\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 181.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 127.00 Tm (In cft-rebound, \223REBOUND's IAS15 integrator with its arithmetic routed through libcft\224. \223At binary64 it is) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 114.00 Tm (REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 127.00 Tm (\225) Tj ET
+BT /F2 10.5 Tf 1 0 0 1 54.00 92.00 Tm (Quantum-Film) Tj ET
+BT /F1 9.5 Tf 1 0 0 1 492.52 92.00 Tm (since Sep 2026) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 79.00 Tm (\223Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll the same,) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 66.00 Tm (bit for bit, on every machine\224; \223its tone curve and grain scale are borrowed from a real stock in atlas-film, so) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 79.00 Tm (\225) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Annot /Subtype /Link /Rect [54 685.91 134.93 695.79] /Border [0 0 0] /A << /S /URI /URI (mailto:logan@loganw.dev) >> >>
+endobj
+8 0 obj
+<< /Type /Annot /Subtype /Link /Rect [142.85 685.91 190.9 695.79] /Border [0 0 0] /A << /S /URI /URI (https://loganw.dev/) >> >>
+endobj
+9 0 obj
+<< /Type /Annot /Subtype /Link /Rect [198.83 685.91 293.88 695.79] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234) >> >>
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R /Annots [7 0 R 8 0 R 9 0 R] >>
+endobj
+11 0 obj
+<< /Length 3827 >>
+stream
+BT /F1 10 Tf 1 0 0 1 66.00 725.00 Tm (only the placement of the crystals is new\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 710.00 Tm (Its Pauli stock's law \223ran on Moth's Atlas emulator, and holds\224, and the stock was \223printed, with one print laid) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 697.00 Tm (entirely by Atlas\224. Then \223On 2026-10-05 the design docs/PREREGISTRATION.md fixed beforehand ran on) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 684.00 Tm (each of the three IBM Quantum devices the owner's Open-plan instance reaches\224. The result is reported as it) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 671.00 Tm (fell: \223All three devices carry the law's two quantum signatures, well clear of the classical twin\224. \223And all three fall) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 658.00 Tm (short of what their own noise models predicted\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 710.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 643.00 Tm (Winner, Quantum Native Repo category, Moth Hack 2026 \050the hackathon's results\051. The entry: \223Entered for the) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 630.00 Tm (Expert challenge #9: a repository of a quantum application that runs a process on media through the Atlas) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 617.00 Tm (API\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 643.00 Tm (\225) Tj ET
+BT /F2 10.5 Tf 1 0 0 1 54.00 595.00 Tm (QRO-Crate) Tj ET
+BT /F1 9.5 Tf 1 0 0 1 494.63 595.00 Tm (since Oct 2026) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 582.00 Tm (\223An RO-Crate profile for quantum computing runs, built so that the difference between two runs can be) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 569.00 Tm (attributed: to the question, the compile, what was submitted, the sampling, readout, the device's state and time,) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 556.00 Tm (or drift within a run\224. \223Its first data are Quantum-Film's runs, on IBM's processors and on Moth's Atlas) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 543.00 Tm (emulator\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 582.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 528.00 Tm (P0 is built, its parts including \223the canonical writer and the strict reader\224, \223the checker's steps 1, 2, 3 and 9\224 and) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 515.00 Tm (\223the custody log and the audit record\224. \223Nothing else is built: no adapter, no measures, no comparison, no) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 502.00 Tm (profile crate, no contributor kit\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 528.00 Tm (\225) Tj ET
+BT /F2 11 Tf 1 0 0 1 54.00 477.00 Tm (Other public work) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 463.00 Tm (Mercenaries2: \223A revival project for Mercenaries 2: World in Flames\224. \223Restores online services and exposes) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 450.00 Tm (the game's statically-linked Lua 5.1.2 runtime for modding\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 463.00 Tm (\225) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 435.00 Tm (PrettyCloud: \223Atlas of Mathematical Forms\224, \223A WebGL2 point-cloud atlas\224.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 435.00 Tm (\225) Tj ET
+BT /F2 11 Tf 1 0 0 1 54.00 410.00 Tm (Background) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 396.00 Tm (I'm Logan. I have worked as a carpenter since I was fifteen, and I have no formal training in computing. AI agents) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 383.00 Tm (have written essentially all of the code in these projects; gates decide what is true, and the record keeps what) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 370.00 Tm (they said.) Tj ET
+BT /F1 10 Tf 1 0 0 1 54.00 352.00 Tm (I have a GED, and one month of formal computer science.) Tj ET
+BT /F3 7 Tf 1 0 0 1 54.00 63.00 Tm (This PDF is built, not written: the site's build prints it from the page at https://loganw.dev/resume.html, which names) Tj ET
+BT /F3 7 Tf 1 0 0 1 54.00 54.00 Tm (the source of every line, or marks it as Logan's own word.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Annot /Subtype /Link /Rect [327.77 640.8 429.73 651.2] /Border [0 0 0] /A << /S /URI /URI (https://airtable.com/appfaqE6MpACGX3LN/shrKxNCu6BKEnDRVs?detail=eyJwYWdlSWQiOiJwYWdoWnN1YzFERmRxeVFweiIsInJvd0lkIjoicmVjN1ZzcmlDU2FaazVJNHgiLCJzaG93Q29tbWVudHMiOmZhbHNlLCJxdWVyeU9yaWdpbkhpbnQiOnsidHlwZSI6InBhZ2VFbGVtZW50IiwiZWxlbWVudElkIjoicGVsQ0pZYlE0ZGhBTmJqZ0wiLCJxdWVyeUNvbnRhaW5lcklkIjoicGVsNEVPbWVZZFhDYkVIVjIiLCJzYXZlZEZpbHRlclNldElkIjoic2ZzRjlpVGlzZWE2RWx5ZEsifX0) >> >>
+endobj
+13 0 obj
+<< /Type /Annot /Subtype /Link /Rect [373.2 61.46 499.2 68.74] /Border [0 0 0] /A << /S /URI /URI (https://loganw.dev/resume.html) >> >>
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R /Annots [12 0 R 13 0 R] >>
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000123 00000 n 
+0000000220 00000 n 
+0000000322 00000 n 
+0000000417 00000 n 
+0000007339 00000 n 
+0000007484 00000 n 
+0000007628 00000 n 
+0000007782 00000 n 
+0000007957 00000 n 
+0000011837 00000 n 
+0000012333 00000 n 
+0000012486 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+12658
+%%EOF

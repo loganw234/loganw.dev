@@ -76,17 +76,21 @@ def mark(v):
     return '<tspan data-f="%d">%s</tspan>' % (v.id, esc(v.text))
 
 
-def fig(v, href=None, src=True):
+def fig(v, href=None, src=True, tip=False):
     """A figure, then its source. src=False leaves the source out, for a list
     whose heading says where every item was read (the footer's pins); the
-    figure still carries its id, and facts.json its source."""
+    figure still carries its id, and facts.json its source. tip=True also
+    gives the figure its own label as a tooltip, for a page that shows its
+    labels only on request (the resume, decision 45); the numbers stage
+    holds a tooltip on a figure to exactly its own label."""
     rec = checked(v)
     if v.text == "":
         return ""        # a recorded absence: logged in facts.json, printed as nothing
     t = esc(v.text)
     if href:
         t = '<a href="%s">%s</a>' % (esc(href), t)
-    out = '<span class="%s" data-f="%d">%s</span>' % (cls_of(rec), v.id, t)
+    title = ' title="%s"' % esc(facts.label(rec)) if tip else ""
+    out = '<span class="%s" data-f="%d"%s>%s</span>' % (cls_of(rec), v.id, title, t)
     if src:
         label = esc(facts.label(rec)).replace("/", "/<wbr>")
         if rec["href"]:
@@ -107,7 +111,9 @@ def source(v):
     return '<span class="src" data-f="%d"> %s</span>' % (v.id, label)
 
 
-def render(segs):
+def render(segs, tip=False):
+    """Segments as HTML; tip=True gives every figure its label as a tooltip
+    too (fig)."""
     if not isinstance(segs, list):
         segs = [segs]
     out = []
@@ -115,14 +121,14 @@ def render(segs):
         if isinstance(s, str):
             out.append(esc(s))
         elif isinstance(s, V):
-            out.append(fig(s))
+            out.append(fig(s, tip=tip))
         elif isinstance(s, C):
             out.append("<code>%s</code>" % esc(s.text))
         elif isinstance(s, L):
             if isinstance(s.inner, V):
-                out.append(fig(s.inner, href=s.href))
+                out.append(fig(s.inner, href=s.href, tip=tip))
             else:
-                out.append('<a href="%s">%s</a>' % (esc(s.href), render(s.inner)))
+                out.append('<a href="%s">%s</a>' % (esc(s.href), render(s.inner, tip=tip)))
         elif s is None:
             continue
         else:

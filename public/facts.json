@@ -17638,10 +17638,10 @@
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "Independent project lead",
-    "when": "2026-10-15",
+    "when": "2026-10-16",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -17654,14 +17654,14 @@
    "raw": "Independent project lead",
    "said": "",
    "text": "Independent project lead",
-   "where": "drafted from Logan's words of 2026-10-15, not yet approved"
+   "where": "stated by Logan, 2026-10-16"
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "I direct AI agents through engineering and research work beyond my own implementation expertise. I set the direction, review the evidence and decide what the record supports; the agents write essentially all of the code. What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail, verifiers scored against planted faults, and dated records that keep the failed runs.",
-    "when": "2026-10-15",
+    "when": "2026-10-16",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -17674,7 +17674,7 @@
    "raw": "I direct AI agents through engineering and research work beyond my own implementation expertise. I set the direction, review the evidence and decide what the record supports; the agents write essentially all of the code. What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail, verifiers scored against planted faults, and dated records that keep the failed runs.",
    "said": "",
    "text": "I direct AI agents through engineering and research work beyond my own implementation expertise. I set the direction, review the evidence and decide what the record supports; the agents write essentially all of the code. What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail, verifiers scored against planted faults, and dated records that keep the failed runs.",
-   "where": "drafted from Logan's words of 2026-10-15, not yet approved"
+   "where": "stated by Logan, 2026-10-16"
   },
   {
    "args": {
@@ -18109,10 +18109,10 @@
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "Used cft-fp256 to test how far one person without formal computing training can take a serious engineering effort with AI.",
-    "when": "2026-10-15",
+    "when": "2026-10-16",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -18125,7 +18125,7 @@
    "raw": "Used cft-fp256 to test how far one person without formal computing training can take a serious engineering effort with AI.",
    "said": "",
    "text": "Used cft-fp256 to test how far one person without formal computing training can take a serious engineering effort with AI.",
-   "where": "drafted from Logan's words of 2026-10-15, not yet approved"
+   "where": "stated by Logan, 2026-10-16"
   },
   {
    "args": {
@@ -18523,10 +18523,10 @@
   },
   {
    "args": {
-    "draft": true,
+    "draft": false,
     "holds_at": null,
     "text": "Winner, Quantum Native Repo category, Moth Hack 2026",
-    "when": "2026-10-15",
+    "when": "2026-10-16",
     "who": "Logan"
    },
    "detail": "no file backs it",
@@ -18539,7 +18539,7 @@
    "raw": "Winner, Quantum Native Repo category, Moth Hack 2026",
    "said": "",
    "text": "Winner, Quantum Native Repo category, Moth Hack 2026",
-   "where": "drafted from Logan's words of 2026-10-15, not yet approved"
+   "where": "stated by Logan, 2026-10-16"
   },
   {
    "args": {

@@ -50,6 +50,7 @@ sys.path.insert(0, str(SITE))
 import facts                    # noqa: E402
 from facts import Refusal, Unavailable   # noqa: E402
 import pages as page_modules    # noqa: E402
+import printout                 # noqa: E402
 import render                   # noqa: E402
 
 BUILD_NOTE = ("This is the committed copy of the site. The deploy replaces this file with the commit it was "
@@ -168,6 +169,27 @@ def collect_extras(m, ctx, text):
         text[name] = t
 
 
+PRINT_NAME = re.compile(r"[a-z0-9][a-z0-9-]*\.pdf")
+
+
+def collect_prints(m, ctx, text, binary):
+    """A page may publish a printout of itself - the resume's PDF, decision
+    45 - through print_files(ctx) -> {flat .pdf name: bytes}. A printout is
+    written by printout.pdf() from its twin, the text file of the same name
+    the page publishes, and the numbers stage holds it to exactly those
+    bytes; so a printout without its twin is refused here."""
+    if not hasattr(m, "print_files"):
+        return
+    for name, data in m.print_files(ctx).items():
+        if not PRINT_NAME.fullmatch(name):
+            raise Refusal("%s publishes %r; a printout is a flat, lower-case .pdf name" % (m.__name__, name))
+        if name in binary or name in text:
+            raise Refusal("%s publishes %s, which another page already publishes" % (m.__name__, name))
+        if name[:-4] + ".txt" not in text:
+            raise Refusal("%s publishes %s without its twin, %s" % (m.__name__, name, name[:-4] + ".txt"))
+        binary[name] = data
+
+
 def section_index(mods):
     """-> {navigation label: the file the navigation links to}."""
     out = {}
@@ -234,6 +256,7 @@ def render_all():
                 raise Refusal("%s publishes %s, which another page already publishes" % (m.__name__, dest))
             binary[dest] = data
         collect_extras(m, ctx, text)
+        collect_prints(m, ctx, text, binary)
     # One stylesheet per parcel under site/styles/, found by glob, so no two
     # parcels edit the same file (ParcelRound section 2: aim for a glob). It is
     # UTF-8 and says so, so no escape is needed in it; local-only refuses one.
@@ -403,6 +426,7 @@ class _Marks(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.stack, self.marks, self.loose, self.attr_text, self.problems = [], [], [], [], []
+        self.tips = []         # (fact id, title) for each tooltip a figure's own mark carries
         self.footers = 0       # a page has one footer, the site's own
         self.last = None       # the figure that just closed, until anything but its label follows it
 
@@ -413,8 +437,13 @@ class _Marks(html.parser.HTMLParser):
         # Every value, not a dict's last one: a browser keeps the first of two
         # same-named attributes, and dict() keeps the last (verifier-P0 hid
         # "3397 prints" in the first of two alt attributes).
+        f = dict(attrs).get("data-f")
         for k, v in attrs:
-            if k in ("alt", "title", "aria-label") and v:
+            # A figure's own tooltip (render.fig's tip) is held to its label
+            # in check_numbers; every other title is text like any other.
+            if k == "title" and tag == "span" and f is not None:
+                self.tips.append((f, v or ""))
+            elif k in ("alt", "title", "aria-label") and v:
                 self.attr_text.append("%s %s=%r" % (tag, k, v))
         a = dict(attrs)
         if tag == "meta" and a.get("name") == "description":
@@ -1096,6 +1125,14 @@ def check_numbers(root=PUBLIC, names=None):
                 problems += _loose_problems(rel, text, tick, names, allowed)
             for t in p.attr_text:
                 problems += _loose_problems(rel, t, False, names, allowed)
+            # A tooltip on a figure is exactly that figure's own label, as
+            # fig(tip=True) writes it (decision 45): a title is text a reader
+            # sees, and no other kind may hold a numeral.
+            for f, title in p.tips:
+                rec = by_id.get(int(f)) if f.isdigit() else None
+                if rec is None or title != facts.label(rec):
+                    problems.append("%s: a tooltip on fact %s reads %s, which is not its own label"
+                                    % (rel, f, ascii(title)))
         elif rel.endswith(".css"):
             # Text a reader sees and no page holds: a numeral typed there would
             # pass every check on the HTML (generated content, 45b8d01; quotes
@@ -1110,6 +1147,22 @@ def check_numbers(root=PUBLIC, names=None):
             for s in strings:
                 problems += _loose_problems("%s string" % rel, s, False, names, allowed)
             problems += ["%s: %s" % (rel, x) for x in hiding_problems(css)]
+        elif rel.endswith(".pdf"):
+            # A printout is exactly what printout.pdf() writes from its twin,
+            # the text file of its name, which the branch below reads as it
+            # reads any text file (decision 45). So a PDF holds no numeral,
+            # no text and no object its twin and that writer don't.
+            twin = rel[:-4] + ".txt"
+            if not (root / twin).is_file():
+                problems.append("%s is published without its twin, %s" % (rel, twin))
+            else:
+                try:
+                    want = printout.pdf((root / twin).read_text(encoding="utf-8"))
+                except printout.Refused as e:
+                    want = None
+                    problems.append("%s: its twin %s can't be printed: %s" % (rel, twin, e))
+                if want is not None and (root / rel).read_bytes() != want:
+                    problems.append("%s is not the PDF printout.pdf writes from its twin, %s" % (rel, twin))
         elif rel.endswith(".txt") and not rel.startswith("fonts/"):
             t = (root / rel).read_text(encoding="utf-8")
             cut, last = [], 0
@@ -1419,11 +1472,13 @@ def check_local_only(root=PUBLIC):
 
 
 # What may be published, by name: the page and text types these checks read,
-# the images and fonts they vouch for by their bytes, and BUILD and MANIFEST.
-# Anything else - .htm, .svg, .js, .xml - is a document or a script no check
-# reads, served by its extension (verifier-P0 published a .htm through ASSETS).
+# the images and fonts they vouch for by their bytes, a page's printout (a PDF
+# the numbers stage holds to exactly the bytes printout.pdf() writes from its
+# twin), and BUILD and MANIFEST. Anything else - .htm, .svg, .js, .xml - is a
+# document or a script no check reads, served by its extension (verifier-P0
+# published a .htm through ASSETS).
 MAGIC = {".png": b"\x89PNG\r\n\x1a\n", ".jpg": b"\xff\xd8\xff", ".jpeg": b"\xff\xd8\xff", ".webp": b"RIFF",
-         ".woff2": b"wOF2"}
+         ".woff2": b"wOF2", ".pdf": b"%PDF-1.4" + bytes([10])}
 TEXT_TYPES = {".html", ".css", ".txt", ".json"}
 
 
@@ -1896,6 +1951,24 @@ def check_links(root=PUBLIC):
                             % (rel, ascii(u), t))
         if "#" in u and u.split("#", 1)[1] and u.split("#", 1)[1] not in ids.get(t, set()):
             problems.append("%s links to %s, and %s has no such id" % (rel, ascii(u), t))
+    # A printout's links are its twin's, which printout.links reads as the PDF
+    # carries them; each is a full address, read as a page's is. A page's own
+    # printout, the PDF of its name, may link to it unlisted or not: the
+    # resume's PDF names its page at its foot (decision 45). Any other file's
+    # may not, and one that names a page of this site names a published one.
+    for rel in sorted(f for f in files if f.endswith(".pdf")):
+        twin = rel[:-4] + ".txt"
+        if twin not in files:
+            continue    # the numbers stage refuses a printout without its twin
+        for u in printout.links((root / twin).read_text(encoding="utf-8")):
+            for own in sorted(_own_pages(rel, u, files)):
+                if own == UNREADABLE:
+                    problems.append("%s links to %s, %s as a browser would" % (rel, ascii(u), UNREADABLE))
+                elif own not in files:
+                    problems.append("%s links to %s, which is not a published file" % (rel, ascii(u)))
+                elif own in unlisted and posixpath.splitext(own)[0] != posixpath.splitext(rel)[0]:
+                    problems.append("%s links to %s, the unlisted page %s, which only its own printout may link to"
+                                    % (rel, ascii(u), own))
     if not any(f.endswith(".html") for f in files):
         problems.append("no page is published")
     return problems + check_connections(root)
@@ -2690,6 +2763,56 @@ def controls():
                         "unlisted page")
         planted("links", "%s marked unlisted, though every page's navigation links to it" % MAP_PAGE,
                 t.replace("</head>", render.NOINDEX + "</head>", 1), check_links, "unlisted page")
+
+        # the resume's tooltips and printout (decision 45): a tooltip that is
+        # not its figure's label; a printout with one digit changed; one
+        # without its twin; a twin linking to no published page; and another
+        # file's printout linking to the unlisted page
+        res, twin_p, pdf_p = root / "resume.html", root / "resume.txt", root / "resume.pdf"
+        if not (res.is_file() and twin_p.is_file() and pdf_p.is_file()):
+            report("numbers", False, "could not plant into the resume's printout: resume.html, resume.txt or "
+                   "resume.pdf is not published")
+        else:
+            def swapped(path, new, check, name, want, what):
+                old = path.read_bytes() if path.exists() else None
+                if new is None:
+                    path.unlink()
+                else:
+                    path.write_bytes(new)
+                try:
+                    found = check(root)
+                    found = found[0] if isinstance(found, tuple) else found
+                    hit = [f for f in found if want in f]
+                    report(name, bool(hit), "%s: %s" % (what, hit[0] if hit else "passed"))
+                finally:
+                    if old is None:
+                        path.unlink()
+                    else:
+                        path.write_bytes(old)
+            page_b, twin_b, pdf_b = res.read_bytes(), twin_p.read_bytes(), pdf_p.read_bytes()
+            tip = re.search(rb' title="\(([^"]*)\)"', page_b)
+            if tip is None:
+                report("numbers", False, "could not plant a tooltip: no figure on resume.html carries one")
+            else:
+                swapped(res, page_b.replace(tip.group(0), b' title="(GitHub snapshot 2026-01-01)"', 1), check_numbers,
+                        "numbers", "not its own label", "a figure's tooltip that is not its own label")
+            digit = re.search(rb"\(([^()]*?)(\d)([^()]*)\) Tj", pdf_b)
+            if digit is None:
+                report("numbers", False, "could not plant into resume.pdf: no string holds a digit")
+            else:
+                other = b"9" if digit.group(2) != b"9" else b"8"
+                swapped(pdf_p, pdf_b[:digit.start(2)] + other + pdf_b[digit.end(2):], check_numbers, "numbers",
+                        "is not the PDF printout.pdf writes", "a digit changed in the printout")
+            swapped(twin_p, None, check_numbers, "numbers", "without its twin", "the printout's twin removed")
+            swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- [x](https://loganw.dev/planted.html)\n-- ", 1),
+                    check_links, "links", "not a published file", "the printout's twin linking no published file")
+            other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"
+            other_twin.write_bytes(twin_b)
+            try:
+                swapped(other_pdf, pdf_b, check_links, "links", "only its own printout may link",
+                        "another file's printout linking the unlisted resume")
+            finally:
+                other_twin.unlink()
         planted("local-only", "a robots meta other than an unlisted page's noindex",
                 t.replace("</head>", '<meta name="robots" content="nofollow"></head>', 1), check_local_only,
                 "not an unlisted page's noindex")
@@ -3127,6 +3250,12 @@ def controls():
         m = fake("x.html", "Work")
         m.extra_files = lambda ctx, bad=bad: {bad: "planted"}
         refused("seam", "an extra file named %s" % bad, lambda m=m: collect_extras(m, {}, {}))
+    # a page's printout (decision 45): a .pdf name, flat, and with its twin
+    for bad, want in (("x.html", "a flat, lower-case .pdf name"), ("work/x.pdf", "a flat, lower-case .pdf name"),
+                      ("x.pdf", "without its twin")):
+        m = fake("x.html", "Work")
+        m.print_files = lambda ctx, bad=bad: {bad: b"%PDF-1.4"}
+        refused("seam", "a printout named %s with no twin" % bad, lambda m=m: collect_prints(m, {}, {}, {}), want)
 
     listed = facts.snap()["workflows"]
     for what, plant, undo in (
