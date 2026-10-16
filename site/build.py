@@ -433,6 +433,15 @@ class _Marks(html.parser.HTMLParser):
     def _mark(self):
         return next((n for n in reversed(self.stack) if n["f"] is not None), None)
 
+    def close(self):
+        """A mark still open at the end of the page is a mark too, and is read
+        (verifier-print's N3-1: an open one escaped every rule on marks)."""
+        super().close()
+        while self.stack:
+            n = self.stack.pop()
+            if n["f"] is not None:
+                self.marks.append(n)
+
     def _attrs(self, tag, attrs):
         # Every value, not a dict's last one: a browser keeps the first of two
         # same-named attributes, and dict() keeps the last (verifier-P0 hid
@@ -892,6 +901,22 @@ class _Holders(html.parser.HTMLParser):
             self.stack[-1]["text"] = True
 
 
+def label_scope_problems():
+    """css_hides.json may let a stylesheet hide source labels only by a
+    selector written ".X .src", whose scope label_scopes() reads, so a figure
+    there must carry its own tooltip. A label-hiding entry of any other shape
+    ("div.cv span.src", a bare ".src") would hide labels the tooltip rule
+    never reads (verifier-print's W3-1), and is refused."""
+    allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
+    out = []
+    for sel in sorted(allowed):
+        m = re.search(r"\.([\w-]+)$", sel.strip())
+        if m and m.group(1) == "src" and not re.fullmatch(r"\.[\w-]+ \.src", sel.strip()):
+            out.append("%s lets %r hide source labels; an entry that may hide them is written '.X .src', the scope "
+                       "the tooltip rule reads" % (HIDES_FILE.name, sel))
+    return out
+
+
 @functools.lru_cache(maxsize=None)
 def label_scopes():
     """The classes inside which css_hides.json lets a stylesheet hide the
@@ -1067,7 +1092,7 @@ def check_numbers(root=PUBLIC, names=None):
         return ["facts.json is missing"], None
     recs = json.loads(fj.read_text(encoding="utf-8"))["facts"]
     by_id = {r["id"]: r for r in recs}
-    problems = label_problems(recs)
+    problems = label_problems(recs) + label_scope_problems()
     names = numeral_names() if names is None else names
     allowed, n_marks = {}, 0
     for n in sorted(names):
@@ -2838,6 +2863,8 @@ def controls():
             swapped(twin_p, None, check_numbers, "numbers", "without its twin", "the printout's twin removed")
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- \n-- ", 1), check_numbers, "numbers", "a twin line with no text",
                     "the printout's twin with an empty line (verifier-print's T1)")
+            swapped(twin_p, twin_b + b"-- a second note\n", check_numbers, "numbers", "a twin with a second note",
+                    "the printout's twin with a second note (verifier-print's N3-4)")
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- [x](https://loganw.dev/planted.html)\n-- ", 1),
                     check_links, "links", "not a published file", "the printout's twin linking no published file")
             other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"
@@ -3315,6 +3342,26 @@ def controls():
         m = fake("x.html", "Work")
         m.print_files = lambda ctx, bad=bad: {bad: b"%PDF-1.4"}
         refused("seam", "a printout named %s with no twin" % bad, lambda m=m: collect_prints(m, {}, {}, {}), want)
+    # verifier-print's W3-1: css_hides.json may let a stylesheet hide source
+    # labels only by a selector written '.X .src', whose scope the tooltip
+    # rule reads; an entry of another shape is refused
+    global HIDES_FILE
+    saved_hides = HIDES_FILE
+    with tempfile.TemporaryDirectory() as d:
+        for sel in ("div.cv span.src", ".src"):
+            planted_hides = pathlib.Path(d) / "css_hides.json"
+            data = json.loads(saved_hides.read_text(encoding="utf-8"))
+            data["selectors"][sel] = {"allow": ["display:none"], "on": ["span"], "why": "planted"}
+            planted_hides.write_text(json.dumps(data), encoding="utf-8")
+            HIDES_FILE = planted_hides
+            label_scopes.cache_clear()
+            try:
+                found = [f for f in label_scope_problems() if repr(sel) in f]
+                report("numbers", bool(found), "a css_hides.json entry hiding labels as %r: %s"
+                       % (sel, found[0] if found else "passed"))
+            finally:
+                HIDES_FILE = saved_hides
+                label_scopes.cache_clear()
 
     listed = facts.snap()["workflows"]
     for what, plant, undo in (

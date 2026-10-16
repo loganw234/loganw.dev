@@ -338,18 +338,22 @@ def controls():
     fig = '<span class="q" data-f="7">quoted</span>'
     label = '<span class="src" data-f="7"> (a label)</span>'
     for what, inner, want in (
-            ("the page's own shape", "<p>A %s%s%s.</p>" % (o, fig + label, c), "A quoted [fact 7]."),
-            ("a closing mark opening the next block",
+            ("the page's own shape loses both marks", "<p>A %s%s%s.</p>" % (o, fig + label, c), "A quoted [fact 7]."),
+            ("a closing mark opening the next block is kept",
              "<p>Ends %s</p><p>%sstarts here.</p>" % (fig + label, c), c + "starts here."),
-            ("a closing mark after a figure with no label", "<p>A %s%s.</p>" % (fig, c), "A quoted [fact 7]%s." % c),
-            ("an opening mark before a label, then a figure",
+            ("a closing mark after a figure with no label is kept", "<p>A %s%s.</p>" % (fig, c),
+             "A quoted [fact 7]%s." % c),
+            ("an opening mark before a label, then a figure, is kept",
              "<p>A %s%s%s.</p>" % (o, label, fig), "A %squoted [fact 7]." % o),
-            ("an opening mark with a space before its figure",
-             "<p>A %s %s%s%s.</p>" % (o, fig, label, c), "A %s quoted [fact 7]." % o)):
+            ("an opening mark with a space before its figure is kept, and the closing mark after its label is not",
+             "<p>A %s %s%s%s.</p>" % (o, fig, label, c), "A %s quoted [fact 7]." % o),
+            ("a closing mark after a label that follows no figure is kept",
+             "<p>Prose%s%s here.</p>" % (label, c), "Prose%s here." % c)):
         try:
             got = _printed(inner)
             ok = want in got
         except Exception as e:  # noqa: BLE001 - a refusal is a result here, and is reported
             got, ok = [repr(e)], False
-        out.append(("resume-printout-quotes", ok, "%s: %s" % (what, ascii(got))))
+        # caught means the rule held: a wrong reader fails here by name
+        out.append(("resume-printout-quotes", ok, "the rule holds: %s, reading %s" % (what, ascii(got))))
     return out

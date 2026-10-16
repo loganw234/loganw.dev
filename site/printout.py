@@ -91,9 +91,10 @@ class _Reader(html.parser.HTMLParser):
     It reads the subset pages/resume.py writes and refuses any other element
     by name. It leaves out only a figure's source label, which the numbers
     stage holds to exactly its fact's, and the quotation marks set straight
-    around a figure: an opening one only when it is the very last text before
-    the figure, and a closing one only when it is the very first text after
-    the label that follows the figure straight on, with nothing between
+    around a figure: an opening one only when it ends the text straight
+    before the figure, with no tag between them, and a closing one only when
+    it starts the text straight after the label that follows the figure
+    straight on, with nothing between
     (verifier-print found the first rule taking marks in other shapes). What
     the page says about itself stands outside the <div class="cv">, so the
     printout never reads it."""
@@ -473,7 +474,10 @@ def pdf(twin_text):
             h = sum(_height(g) for g in _together(bs, i))
             w.room(h if h <= PAGE_H - 2 * MARGIN else _height(b) + 2 * 13)
         w.y -= before
-        page, y = w.lines(b[1], font, size, leading, x=MARGIN + indent, avail=_avail(b))
+        first = w.lines(b[1], font, size, leading, x=MARGIN + indent, avail=_avail(b))
+        if first is None:
+            raise Refused("a %s with no words to print" % kind)      # verifier-print's N3-6
+        page, y = first
         if kind == "project":
             when = "".join(t for t, _ in b[2])
             w.text(MARGIN + WIDTH - width(when, *DATES), w.y, when, *DATES)

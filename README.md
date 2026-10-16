@@ -193,7 +193,9 @@ Its sources come on request (SPEC decision 45):
   tooltip. The numbers stage holds a title on a figure, or on anything
   inside it, to exactly that figure's label. It also refuses a figure whose
   label the stylesheet may hide if it carries no tooltip of its own, so no
-  element around it can lend it another.
+  element around it can lend it another. `css_hides.json` may let a
+  stylesheet hide labels only by a selector written `.X .src`, whose scope
+  that rule reads; the numbers stage refuses an entry of any other shape.
 - The labels beside the figures are in the page, as on every other page.
   Its stylesheet hides them until a reader opens "Show every source beside
   its line"; `site/data/css_hides.json` names that one rule.
