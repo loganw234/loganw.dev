@@ -87,6 +87,16 @@ class Refused(Refusal):
 OPEN, CLOSE = chr(0x201C), chr(0x201D)
 
 
+def blank(text):
+    """Whether text holds nothing to print: only whitespace (Python's, so a
+    tab or a no-break space too) and format characters, which draw as
+    nothing (a soft hyphen). The page's reader and the twin's both use it
+    (verifier-record2's N-3 and R-2). A character that WinAnsi can't print
+    is refused when the PDF is written, and the local-only stage refuses
+    any character that draws as nothing in a published file."""
+    return not "".join(ch for ch in "".join(text.split()) if unicodedata.category(ch) != "Cf")
+
+
 class _Reader(html.parser.HTMLParser):
     """The resume's own markup (its <div class="cv">), read into twin lines.
     It reads the subset pages/resume.py writes and refuses any other element
@@ -191,7 +201,7 @@ class _Reader(html.parser.HTMLParser):
             self._put("[%s](%s)" % (text, href))
         elif tag in self.BLOCKS and self.block is not None:
             text = " ".join("".join(self.block).split())
-            if not text:
+            if blank(MARKER.sub("", text)):
                 raise Refused("an empty <%s> in the resume, which would print as nothing" % tag)
             # a paragraph that opens like another kind of line would be read
             # back as that kind (verifier-print's N1)
@@ -260,10 +270,8 @@ def blocks(twin_text):
         # a line with no text would print as nothing, and a second note
         # would be dropped (verifier-print's T1 and T4): an edited twin is
         # refused by name, never printed short. No text is what the page's
-        # reader means by it: a tab or a no-break space is none, and nor is
-        # a character that draws as nothing (verifier-record2's N-3)
-        rest = MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).replace("|", " ")
-        if not "".join(ch for ch in "".join(rest.split()) if unicodedata.category(ch) != "Cf"):
+        # reader means by it (blank)
+        if blank(MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).replace("|", " ")):
             raise Refused("a twin line with no text: %s" % ascii(l[:20]))
         if l.startswith("-- ") and any(b[0] == "note" for b in out):
             raise Refused("a twin with a second note")

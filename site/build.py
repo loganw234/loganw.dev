@@ -460,8 +460,10 @@ class _Marks(html.parser.HTMLParser):
                 self.attr_text.append("%s %s=%r" % (tag, k, v))
         # Nothing inside a source label carries a class, and the label carries
         # src alone (handle_starttag): so the one css_hides.json shape that
-        # names src, '.X .src', is the only rule that may hide a label or its
-        # words (label_scope_problems; verifier-record2's W-1).
+        # names src, '.X .src', is the only entry that may hide a label or its
+        # words and not the figure beside it, which shares every element
+        # around the label (label_scope_problems; verifier-record2's W-1 and
+        # W-4).
         cls = classes(dict(attrs).get("class"))
         if inside is not None and "src" in inside["cls"] and cls:
             self.problems.append("a <%s> of class %r inside fact %s's label; nothing inside a label carries a class"
@@ -921,7 +923,11 @@ def label_scope_problems():
     is any entry that is a list of selectors: ".cv .src, .x" hid the
     resume's labels and was no scope (verifier-record2's W-1). A label
     carries the class src and no other, and nothing inside it carries a
-    class (_Marks), so an entry that doesn't name src can't hide one."""
+    class (_Marks), so an entry that doesn't name src can hide a label only
+    by hiding an element around it, which holds the figure beside it too
+    (verifier-record2's W-4). A rule the hiding check doesn't read, such as
+    a label placed off screen, is the Styles check's stated limit, here as
+    on every page (README; verifier-record2's W-5)."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
     out = []
     for sel in sorted(allowed):
@@ -1191,8 +1197,10 @@ def check_numbers(root=PUBLIC, names=None):
                 if rec is None or title != facts.label(rec):
                     problems.append("%s: a tooltip on fact %s reads %s, which is not its own label"
                                     % (rel, f, ascii(title)))
-            # A figure whose label a stylesheet may hide (label_scopes: the
-            # resume's, decision 45) carries its label as its own tooltip, so
+            # A figure whose label a css_hides.json entry lets the stylesheet
+            # hide (label_scopes: the resume's, decision 45; a rule the hiding
+            # check doesn't read is not seen here, verifier-record2's W-5)
+            # carries its label as its own tooltip, so
             # its source is always to hand, and no element around it can lend
             # it another: a title shows on whatever it holds that carries none
             # (verifier-print gave a figure's paragraph one, and took the
@@ -2926,7 +2934,7 @@ def controls():
                         "a figure's mark left open at the end of the resume")
             # verifier-record2's W-1: a label carries the class src alone, and
             # nothing inside it a class, so no css_hides.json entry but one
-            # written '.X .src' can hide it or its words
+            # written '.X .src' can hide it or its words and not its figure
             lab = re.search(rb'(<span class="src" data-f="\d+">) (<a href)', page_b)
             if lab is None:
                 report("numbers", False, "could not plant into a label: no label on resume.html links its source")

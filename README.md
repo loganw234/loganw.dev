@@ -191,14 +191,18 @@ holds its figures like any other page's, and every rule above holds on it.
 Its sources come on request (SPEC decision 45):
 - Each figure on the page is underlined and carries its own label as a
   tooltip. The numbers stage holds a title on a figure, or on anything
-  inside it, to exactly that figure's label. It also refuses a figure whose
-  label the stylesheet may hide if it carries no tooltip of its own, so no
-  element around it can lend it another. `css_hides.json` may let a
-  stylesheet hide labels only by one selector written `.X .src`, whose
-  scope that rule reads. The numbers stage refuses any other entry that
-  names `src`, and any entry that is a list of selectors. A label carries
-  the class `src` and no other, and nothing inside it carries a class, so
-  no other entry can hide a label or its words.
+  inside it, to exactly that figure's label.
+- It also refuses a figure that carries no tooltip of its own when a
+  `css_hides.json` entry lets the stylesheet hide its label, so no element
+  around it can lend it another. Such an entry is one selector written
+  `.X .src`, whose scope that rule reads. The numbers stage refuses any
+  other entry that names `src`, and any entry that is a list of selectors.
+- A label carries the class `src` and no other, and nothing inside it
+  carries a class. Each label on the page sits beside its figure, so any
+  other entry that hides a label hides the figure with it.
+- A rule the hiding check doesn't read, such as a near-zero size or a label
+  placed off screen, can hide a label with no entry, here as on any other
+  page. That is the stated limit under Styles, above.
 - The labels beside the figures are in the page, as on every other page.
   Its stylesheet hides them until a reader opens "Show every source beside
   its line"; `site/data/css_hides.json` names that one rule.
