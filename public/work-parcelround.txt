@@ -3,65 +3,65 @@ ParcelRound — dossier
 
 I. What it is
 
-A method for splitting one body of work across several coding agents at once, without the pieces failing to meet [fact 1930].
+A method for splitting one body of work across several coding agents at once, without the pieces failing to meet [fact 1934].
 
 II. What it is not
 
-Under “Is this for you? [fact 1931]”: “Don't” for a single task, for exploratory work where the split isn't obvious yet, or where the pieces can't be tested separately [fact 1932]. Two agents on a two-way split is usually slower than doing it yourself, because the brief costs more than the work [fact 1933].
+Under “Is this for you? [fact 1935]”: “Don't” for a single task, for exploratory work where the split isn't obvious yet, or where the pieces can't be tested separately [fact 1936]. Two agents on a two-way split is usually slower than doing it yourself, because the brief costs more than the work [fact 1937].
 
 III. The contract
 
-Under “The one failure mode [fact 1934]”: the work between the parcels belongs to nobody, and it is invisible because every parcel's own gate is green [fact 1935]. Of its own rules it says: “Every rule here is here because something broke without it, or because its practice caught a defect before it shipped, or, where the rule says so, because it rests on practice that held, on a cost, or on the owner's word [fact 1936].”
+Under “The one failure mode [fact 1938]”: the work between the parcels belongs to nobody, and it is invisible because every parcel's own gate is green [fact 1939]. Of its own rules it says: “Every rule here is here because something broke without it, or because its practice caught a defect before it shipped, or, where the rule says so, because it rests on practice that held, on a cost, or on the owner's word [fact 1940].”
 
 IV. Verified
 
-No docs/VALIDATION.md ledger and no workflow. The sixth round's case study records what that round added: “a gate of its own, tools/check_method.py, and an adoption record, ADOPTION.md, one row per proposal [fact 1937].” Of what the gate reads, its own docstring says: “It reads structure and citations, never what a rule says [fact 1938].” Further on, it says which of its checks do: “Checks 7 and 9 read text, and are such limits [fact 1939].” It gives the gate's threat model: “Threat model (the owner's decision, 2026-10-02). The gate guards against two things [fact 1940]”, namely “drift by honest, fallible authors [fact 1941]” and “accidental publication [fact 1942]”; and it states what it does not guard against: “It does not guard against deliberate evasion [fact 1943].” This page quotes the gate and does not run it; Test it, below, says how you can.
+No docs/VALIDATION.md ledger and no workflow. The sixth round's case study records what that round added: “a gate of its own, tools/check_method.py, and an adoption record, ADOPTION.md, one row per proposal [fact 1941].” Of what the gate reads, its own docstring says: “It reads structure and citations, never what a rule says [fact 1942].” Further on, it says which of its checks do: “Checks 7 and 9 read text, and are such limits [fact 1943].” It gives the gate's threat model: “Threat model (the owner's decision, 2026-10-02). The gate guards against two things [fact 1944]”, namely “drift by honest, fallible authors [fact 1945]” and “accidental publication [fact 1946]”; and it states what it does not guard against: “It does not guard against deliberate evasion [fact 1947].” This page quotes the gate and does not run it; Test it, below, says how you can.
 
 What the method's records hold, and what its case studies measured:
 
-- ADOPTION.md, which says what METHOD.md has taken in from each case study, holds 121 rows: 87 adopted, 8 adopted in part, 23 pending, 3 not adopted [fact 1944]. For a pending row it says: “A pending proposal is the owner's to settle [fact 1945].”
-- The round CASE-STUDY.md measures returned “twelve corrections from five parcels — every single parcel corrected its brief [fact 1946]”, on the strength of one line: “Report anything you found that this brief got wrong [fact 1947].”
-- The sixth round records the same of its own parcels: “Every parcel corrected its brief [fact 1948]”, and for its first wave “Thirteen brief errors from four parcels, each confirmed by the lead at its source [fact 1949].”
-- The sixth round also planted faults in the copies its verifiers worked on: “ten of ten caught, from the sources [fact 1950].” Its own reading of that figure: “A verifier that read the design first could have found every plant by comparison alone [fact 1951].”
+- ADOPTION.md, which says what METHOD.md has taken in from each case study, holds 121 rows: 87 adopted, 8 adopted in part, 23 pending, 3 not adopted [fact 1948]. For a pending row it says: “A pending proposal is the owner's to settle [fact 1949].”
+- The round CASE-STUDY.md measures returned “twelve corrections from five parcels — every single parcel corrected its brief [fact 1950]”, on the strength of one line: “Report anything you found that this brief got wrong [fact 1951].”
+- The sixth round records the same of its own parcels: “Every parcel corrected its brief [fact 1952]”, and for its first wave “Thirteen brief errors from four parcels, each confirmed by the lead at its source [fact 1953].”
+- The sixth round also planted faults in the copies its verifiers worked on: “ten of ten caught, from the sources [fact 1954].” Its own reading of that figure: “A verifier that read the design first could have found every plant by comparison alone [fact 1955].”
 
 V. Kept failures
 
-- every guess was AHEAD of the clock (by 3 to 90 minutes) [fact 1952], across every author of that round. The fix that finally held for the lead was mechanical: write the entry with a placeholder and let the append command substitute date [fact 1953] The method's own rule now: “stamps are substituted, not typed [fact 1954].” METHOD.md adds, from the third round, that “a typed stamp errs in both directions [fact 1955]”: “Most guesses there ran ahead of the clock too, but two ran behind, both by about four minutes [fact 1956].” Recorded by commit f2a0483 [fact 1957].
-- which is how a wrong number propagates - it was in the ledger for fifteen minutes and got used once [fact 1958]. a correction should EDIT nothing but should be linked from the entry it corrects [fact 1959] ("see 11:52" appended below the old entry is an append, not an edit [fact 1960]), and a number a sibling might reuse should be stated in the entry that supersedes it in the form the sibling would search for [fact 1961]. Recorded by commit 42e76cc [fact 1962].
-- The method's own gate, in its sixth round: “A parcel found a gate control that could not fail [fact 1963].” “Once a parcel cited a cft-fp256 line beside the pin, as every parcel would, the pin was named and the control could not fail [fact 1964].” The method's own rule: “A gate that cannot fail is not a gate [fact 1965].” Fixed by commit 1dc5ed4 [fact 1966].
+- every guess was AHEAD of the clock (by 3 to 90 minutes) [fact 1956], across every author of that round. The fix that finally held for the lead was mechanical: write the entry with a placeholder and let the append command substitute date [fact 1957] The method's own rule now: “stamps are substituted, not typed [fact 1958].” METHOD.md adds, from the third round, that “a typed stamp errs in both directions [fact 1959]”: “Most guesses there ran ahead of the clock too, but two ran behind, both by about four minutes [fact 1960].” Recorded by commit f2a0483 [fact 1961].
+- which is how a wrong number propagates - it was in the ledger for fifteen minutes and got used once [fact 1962]. a correction should EDIT nothing but should be linked from the entry it corrects [fact 1963] ("see 11:52" appended below the old entry is an append, not an edit [fact 1964]), and a number a sibling might reuse should be stated in the entry that supersedes it in the form the sibling would search for [fact 1965]. Recorded by commit 42e76cc [fact 1966].
+- The method's own gate, in its sixth round: “A parcel found a gate control that could not fail [fact 1967].” “Once a parcel cited a cft-fp256 line beside the pin, as every parcel would, the pin was named and the control could not fail [fact 1968].” The method's own rule: “A gate that cannot fail is not a gate [fact 1969].” Fixed by commit 1dc5ed4 [fact 1970].
 
 VI. Test it
 
-- python tools/check_method.py: “The front door: python tools/check_method.py says whether the method still holds together [fact 1967].” Its docstring adds: “There is no cache: each run reads everything again [fact 1968].”
-- python tools/check_method.py --control: “--control shows each of its checks can fail [fact 1969]”; in its docstring's words, it will “plant faults, each in a copy of the tree or in a scratch repository, at least one per check; each must be caught [fact 1970].”
-- Read CASE-STUDY.md's worked example yourself and check that its account holds together — free, and README.md calls it “The clearest single argument for it [fact 1971].”
-- Compare templates/brief.md and templates/verifier.md with METHOD.md: ADOPTION.md says “Each rule in a template is tagged, in parentheses, with the METHOD.md section it comes from, or "own" for the templates' own guidance, as each template's legend says [fact 1972],” so follow a tag, and read the section it names.
+- python tools/check_method.py: “The front door: python tools/check_method.py says whether the method still holds together [fact 1971].” Its docstring adds: “There is no cache: each run reads everything again [fact 1972].”
+- python tools/check_method.py --control: “--control shows each of its checks can fail [fact 1973]”; in its docstring's words, it will “plant faults, each in a copy of the tree or in a scratch repository, at least one per check; each must be caught [fact 1974].”
+- Read CASE-STUDY.md's worked example yourself and check that its account holds together — free, and README.md calls it “The clearest single argument for it [fact 1975].”
+- Compare templates/brief.md and templates/verifier.md with METHOD.md: ADOPTION.md says “Each rule in a template is tagged, in parentheses, with the METHOD.md section it comes from, or "own" for the templates' own guidance, as each template's legend says [fact 1976],” so follow a tag, and read the section it names.
 - Try the step the method takes before any split, on a codebase you already know: list every file each of several independent changes would touch, and see whether one file appears in several such lists at once.
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page.
 
-- Build a fault the gate's threat model covers, in a copy of the tree, and run python tools/check_method.py. Its docstring claims: “Inside the threat model, the gate must catch it or a limit below must state it [fact 1973].” A fault inside the model that passes, with no stated limit covering it, is a disproof.
-- Pick a row of ADOPTION.md marked adopted, or a line of a template tagged with a section, and read the METHOD.md section it names. The gate states what it cannot see there: “it holds that an adopted row's headings exist, not that the rule is under them [fact 1974],” and “It holds that a section named exists, not that it holds the rule the line beside it claims [fact 1975].” A section that does not hold the rule is a disproof.
-- Check the sources of the timeline in CASE-STUDY-6.md [fact 1976]. Its heading says “from the ledger's own timestamps, and from the commits' times where a row says so [fact 1977].” Compare a row that says so with the times of the commits it describes, and any other row with the stamp of the ledger entry it comes from. A row that disagrees with its source is a disproof.
-- Recount the sixth round against the ledger its case study archives: “The ledger is archived beside this file as archive/round6-ledger.zip [fact 1978].” The figures Verified quotes from that case study are counts a recount can disagree with; a count the archived ledger does not bear out is a disproof.
+- Build a fault the gate's threat model covers, in a copy of the tree, and run python tools/check_method.py. Its docstring claims: “Inside the threat model, the gate must catch it or a limit below must state it [fact 1977].” A fault inside the model that passes, with no stated limit covering it, is a disproof.
+- Pick a row of ADOPTION.md marked adopted, or a line of a template tagged with a section, and read the METHOD.md section it names. The gate states what it cannot see there: “it holds that an adopted row's headings exist, not that the rule is under them [fact 1978],” and “It holds that a section named exists, not that it holds the rule the line beside it claims [fact 1979].” A section that does not hold the rule is a disproof.
+- Check the sources of the timeline in CASE-STUDY-6.md [fact 1980]. Its heading says “from the ledger's own timestamps, and from the commits' times where a row says so [fact 1981].” Compare a row that says so with the times of the commits it describes, and any other row with the stamp of the ledger entry it comes from. A row that disagrees with its source is a disproof.
+- Recount the sixth round against the ledger its case study archives: “The ledger is archived beside this file as archive/round6-ledger.zip [fact 1982].” The figures Verified quotes from that case study are counts a recount can disagree with; a count the archived ledger does not bear out is a disproof.
 - Apply the method to a real, multi-agent piece of work of your own and see whether the one failure mode still finds something the briefs missed; a clean round is evidence against the method's reach, not proof it is wrong, since “found nothing” is a stated, acceptable result here too.
 
 VIII. Connections
 
-- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 1991]
-- ParcelRound underlies HonestHarness: A harness for running ParcelRound and HonestFramework on open-weight models [fact 1993]
-- StoryDocs documents ParcelRound: HonestFramework and ParcelRound [fact 2002]
+- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 1995]
+- ParcelRound underlies HonestHarness: A harness for running ParcelRound and HonestFramework on open-weight models [fact 1997]
+- StoryDocs documents ParcelRound: HonestFramework and ParcelRound [fact 2006]
 
 IX. Provenance
 
-ParcelRound read at f42242e [fact 2005].
+ParcelRound read at f42242e [fact 2009].
 
-- README.md [fact 2006]
-- METHOD.md [fact 2007]
-- ADOPTION.md [fact 2008]
-- CASE-STUDY.md [fact 2009]
-- CASE-STUDY-2.md [fact 2010]
-- CASE-STUDY-6.md [fact 2011]
-- tools/check_method.py [fact 2012]
+- README.md [fact 2010]
+- METHOD.md [fact 2011]
+- ADOPTION.md [fact 2012]
+- CASE-STUDY.md [fact 2013]
+- CASE-STUDY-2.md [fact 2014]
+- CASE-STUDY-6.md [fact 2015]
+- tools/check_method.py [fact 2016]

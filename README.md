@@ -172,7 +172,9 @@ What that doesn't cover:
 One page, `resume.html` (Logan's resume, docs/SPEC.md decision 42), is
 unlisted. The navigation doesn't link to it, it asks search engines not to
 index it, and the links stage refuses a link to it from any other page, by a
-relative link or by a full address on the site's own hosts. Unlisted isn't
+relative link or by a full address on the site's own hosts, each read as a
+browser reads it. The stage reads links, not an address written out as text,
+as a dossier's plain-text twin could hold one; that is a stated limit. Unlisted isn't
 private: the page is published, MANIFEST names it, facts.json holds its
 figures like any other page's, and every rule above holds on it.
 

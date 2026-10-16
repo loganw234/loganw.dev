@@ -108,9 +108,10 @@ def head_block():
             '<p class="contact"><a href="mailto:logan@loganw.dev">logan@loganw.dev</a> · '
             '<a href="index.html">loganw.dev</a> · <a href="https://github.com/loganw234">github.com/loganw234</a></p>'
             '<p>%s</p>'
-            '<p class="how">Each quotation below is its project&#x27;s own words at the commit this site pins, '
-            'labelled with the file and line; every other figure names where it was read. What only Logan can say '
-            'is marked as his statement, with its date; a statement he has not yet approved as printed says so.</p>'
+            '<p class="how">Each quotation below is its source&#x27;s own words, labelled with the file and line: a '
+            'project&#x27;s at the commit this site pins, or this site&#x27;s own ledger&#x27;s. Every other figure '
+            'names where it was read. What only Logan can say is marked as his statement, with its date; a statement '
+            'he has not yet approved as printed says so.</p>'
             '</div>'
             % (render([D(ROLE)]), render([D(SUMMARY)])))
 
@@ -145,7 +146,7 @@ def oversight_block():
          "had caught ", CS(r"Round 6's Opus\s+verifiers caught (\d+ of \d+)\.", num=True), ". ",
          q(CS(r"\*\*(Every plant that changed a figure or a reference was caught in\s+every run, \d+ of \d+)\.\*\*")),
          "; ", q(CS(r"\*\*(Plants that changed meaning or shape were caught \d+ of \d+):\*\*")), "."],
-        ["Where a suite stops telling models apart, the record says so: ",
+        ["Where a suite stops telling strong models apart, the record says so: ",
          CS(r"\*\*QS6:\*\* (\d+ of \d+ runs exact)", num=True), ", and ",
          q(CS(r"\*\*(So the QS6 slice cannot tell strong models apart)\.\*\*")), "."],
         ["This site is built the same way. In its second round each verifier, on Haiku, checked a copy of a "
@@ -207,12 +208,14 @@ def film_block():
              r"of a roll the same, bit for bit, on every machine)\.\*\*")),
          "; ", q(P(r"(its tone curve and\s+grain scale are borrowed from a real stock in\s+\[atlas-film\]\([^)]*\), "
                    r"so only the placement\s+of the crystals is new)")), "."],
-        ["On Moth's Atlas, its Pauli stock was ", q(P(r"(printed, with one print laid entirely by Atlas);")),
-         "; then ",
+        ["Its Pauli stock's law ", q(P(r"\*\*The shelf's Pauli law (ran on Moth's Atlas emulator, and holds)\*\*")),
+         ", and the stock was ", q(P(r"(printed, with one print laid entirely by Atlas);")), ". Then ",
          q(H(r"(On \d{4}-\d{2}-\d{2} the design docs/PREREGISTRATION\.md fixed beforehand ran on each of the three "
              r"IBM Quantum devices the owner's Open-plan instance reaches)\.")),
          ". The result is reported as it fell: ",
-         q(H(r"(And all three fall short of what their own noise models predicted)\.")), "."],
+         q(H(r"\*\*In one paragraph\.\*\* (All three devices carry the law's two quantum signatures, well clear of "
+             r"the classical twin):")),
+         ". ", q(H(r"(And all three fall short of what their own noise models predicted)\.")), "."],
         [D(WIN), " (", L(RESULTS, "the hackathon's results"), "). The entry: ",
          q(P(r"(Entered for the Expert challenge #\d+: a repository of a quantum application that\s+runs a process "
              r"on media through the Atlas API)\.")), "."],
@@ -228,7 +231,7 @@ def qro_block():
              r"device's state and time, or drift\s+within a run)\.")),
          ". ", q(P(r"(Its first data are Quantum-Film's runs, on IBM's processors and\s+on Moth's Atlas "
                    r"emulator)\.")), "."],
-        ["Built so far: ", q(P(r"^  - (the canonical writer and the strict reader);")), ", ",
+        ["P0 is built, its parts including ", q(P(r"^  - (the canonical writer and the strict reader);")), ", ",
          q(P(r"^  - (the checker's steps [\d, ]+and \d+);")), " and ",
          q(P(r"^  - (the custody log and the audit record);")), ". ",
          q(P(r"(Nothing else is built: no adapter, no measures, no comparison, no profile\s+crate, no contributor "

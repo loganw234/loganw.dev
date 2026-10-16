@@ -340,7 +340,9 @@ word.
     able." *What the site does:*
     - `resume.html` claims no navigation entry and asks search engines not
       to index it. The links stage refuses a link to it from any other
-      page, so it is reached by its address alone. Unlisted is not private:
+      page, relative or by a full address on the site's own hosts, each
+      read as a browser reads it, so it is reached by its address alone.
+      The stage reads links, not an address written out as text. Unlisted is not private:
       the page is published, MANIFEST names it, and facts.json holds its
       figures like any other page's.
     - Most of it quotes the projects at their pins, each quote with its file

@@ -194,7 +194,8 @@ def rows():
                    [L(url.raw, P("Quantum-Film", "README.md", r"^- \*\*(The web demo)\*\*, live at"))]))
     out.append(row(T, "QRO-Crate",
                    [P("QRO-Crate", "README.md", r"^(An RO-Crate profile for quantum computing runs)")],
-                   [P("QRO-Crate", "README.md", r"^- (P0 is built):"), ", and nothing after it yet"],
+                   [P("QRO-Crate", "README.md", r"^- (P0 is built):"), "; “",
+                    P("QRO-Crate", "README.md", r"^- (Nothing else is built): no adapter"), "”"],
                    [C("bash " + facts.exists("QRO-Crate", "verify/run.sh").text + " --budget quick")]))
     T = "Preservation"
     out.append(row(T, "Mercenaries2",

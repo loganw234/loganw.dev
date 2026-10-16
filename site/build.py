@@ -1747,27 +1747,75 @@ class _Refs(html.parser.HTMLParser):
 # Where the site is served (README): a full address on one of these names a
 # published page as a relative link does, so the unlisted rule reads both.
 SITE_HOSTS = {"loganw.dev": "/", "www.loganw.dev": "/", "loganw234.github.io": "/loganw.dev/"}
+SITE_BASES = ("https://loganw.dev/", "https://loganw234.github.io/loganw.dev/")
+UNREADABLE = "an address this check can't read"
 
 
-def _own_page(u, files=()):
-    """The published path a full address on one of the site's own hosts
-    names, or None for any other address. It is read as a browser and GitHub
-    Pages read it: percent-encoding decoded, doubled slashes and dot segments
-    resolved, a bare directory as its index.html, and a path with no
-    extension as the page of that name, since GitHub Pages serves
-    resume.html at /resume (files: the published paths)."""
-    s = urllib.parse.urlsplit("https:" + u if u.startswith("//") else u)
-    base = SITE_HOSTS.get((s.hostname or "").lower())
-    if base is None or s.scheme.lower() not in ("http", "https"):
+def _browser_form(u):
+    """An address as a browser reads it before splitting it (the URL
+    Standard): C0 controls and spaces cut from both ends, every tab and line
+    break removed, and, in an http(s) or scheme-relative address, every
+    backslash read as a slash. Built from code points (CLAUDE.md trap 8)."""
+    u = u.strip("".join(map(chr, range(33))))
+    u = "".join(c for c in u if c not in (chr(9), chr(10), chr(13)))
+    slash, back = chr(47), chr(92)
+    if re.match(r"(?i)https?:", u) or u[:1] in (slash, back):
+        u = u.replace(back, slash)
+    return u
+
+
+def _page_at(url, files):
+    """The published page a resolved http(s) address on one of the site's own
+    hosts reaches, as GitHub Pages would serve it, or None for any other
+    address. The host is read as a browser reads it: percent-decoded, folded
+    to its compatibility form and lower case (a fullwidth letter is its
+    ASCII letter), and without a trailing dot. The path has its
+    percent-encoding decoded, doubled slashes and dot segments resolved, a
+    bare directory read as its index.html, and a name with no extension read
+    as the page of that name, since GitHub Pages serves resume.html at
+    /resume. Case is ignored, which can only refuse more."""
+    s = urllib.parse.urlsplit(url)
+    if s.scheme.lower() not in ("http", "https") or not s.hostname:
+        return None
+    host = unicodedata.normalize("NFKC", urllib.parse.unquote(s.hostname)).lower().rstrip(".")
+    base = SITE_HOSTS.get(host)
+    if base is None:
         return None
     path = posixpath.normpath(re.sub(r"/+", "/", "/" + urllib.parse.unquote(s.path)))
     root = base.rstrip("/")
-    if path != root and not path.startswith(root + "/"):
+    if path.lower() != root and not path.lower().startswith(root + "/"):
         return None
     rel = path[len(root):].lstrip("/") or "index.html"
-    if not posixpath.splitext(rel)[1] and rel + ".html" in files:
+    by_lower = {f.lower(): f for f in files}
+    if not posixpath.splitext(rel)[1] and (rel + ".html").lower() in by_lower:
         rel += ".html"
-    return rel
+    return by_lower.get(rel.lower(), rel)
+
+
+def _own_pages(rel, u, files):
+    """Every published page a full or scheme-relative address in rel could
+    reach: resolved from rel as served on each of SITE_BASES, and, for an
+    http(s) address written without its two slashes ("http:loganw.dev/x"),
+    also read with them, as a browser reads it when the page's scheme
+    differs. -> a set of pages, holding UNREADABLE if Python can't split
+    the address as a browser would."""
+    u = _browser_form(u)
+    try:
+        tries = [urllib.parse.urljoin(b + rel, u) for b in SITE_BASES]
+    except ValueError:
+        return {UNREADABLE}
+    m = re.match(r"(?i)(https?):/*(.*)", u, re.S)
+    if m:
+        tries.append("%s://%s" % (m.group(1), m.group(2)))
+    out = set()
+    for t in tries:
+        try:
+            p = _page_at(t, files)
+        except ValueError:
+            p = UNREADABLE
+        if p:
+            out.add(p)
+    return out
 
 
 def _target(rel, u, files):
@@ -1807,10 +1855,12 @@ def check_links(root=PUBLIC):
         # a full address on one of the site's own hosts. So no page the
         # navigation links to can carry NOINDEX either.
         if SCHEME.match(u) or u.startswith("//"):
-            own = _own_page(u, files)
-            if own in unlisted and own != rel:
-                problems.append("%s links to %s, the unlisted page %s, which no other page may link to"
-                                % (rel, u, own))
+            for own in sorted(_own_pages(rel, u, files)):
+                if own == UNREADABLE:
+                    problems.append("%s links to %r, %s as a browser would" % (rel, u, UNREADABLE))
+                elif own in unlisted and own != rel:
+                    problems.append("%s links to %r, the unlisted page %s, which no other page may link to"
+                                    % (rel, u, own))
             continue
         t = _target(rel, u, files)
         if t is None:
@@ -2589,13 +2639,21 @@ def controls():
         if not hidden:
             report("links", False, "could not plant a link to an unlisted page: no published page is unlisted")
         for h in hidden[:1]:
+            # the shapes a browser resolves to it (verifier-resume found the
+            # host and backslash ones; each is built from code points, trap 8)
+            back = chr(92)
             for href in (h, "https://loganw.dev/" + h, "https://www.loganw.dev/" + h,
                          "https://loganw234.github.io/loganw.dev/" + h, "//loganw.dev/" + h,
                          "https://LOGANW.DEV:443/" + h, "https://loganw.dev/x/../" + h, "https://loganw.dev//" + h,
                          "https://loganw.dev/" + posixpath.splitext(h)[0], "https://loganw.dev/%2e/" + h,
-                         "https://loganw234.github.io/loganw.dev/x/./../" + posixpath.splitext(h)[0]):
-                planted("links", "a link to the unlisted %s as %s" % (h, href),
-                        t.replace("</footer>", '<a href="%s">x</a></footer>' % href, 1), check_links, "unlisted page")
+                         "https://loganw234.github.io/loganw.dev/x/./../" + posixpath.splitext(h)[0],
+                         "https://%6Coganw.dev/" + h, "https://" + chr(0xFF4C) + "oganw.dev/" + h,
+                         "https://loganw.dev" + back + h, "https:" + back * 2 + "loganw.dev" + back + h,
+                         "https://loganw.dev./" + h, "http:loganw.dev/" + h, "https:/loganw.dev/" + h,
+                         "https://logan" + chr(9) + "w.dev/" + h):
+                planted("links", "a link to the unlisted %s as %s" % (h, ascii(href)),
+                        t.replace("</footer>", '<a href="%s">x</a></footer>' % html.escape(href, quote=True), 1), check_links,
+                        "unlisted page")
         planted("links", "%s marked unlisted, though every page's navigation links to it" % MAP_PAGE,
                 t.replace("</head>", render.NOINDEX + "</head>", 1), check_links, "unlisted page")
         planted("local-only", "a robots meta other than an unlisted page's noindex",
