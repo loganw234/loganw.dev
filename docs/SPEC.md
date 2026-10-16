@@ -399,8 +399,10 @@ word.
       break before Quantum-Film today. Nine joining strings on the page
       changed, so that each sentence reads correctly with its marks and
       without them.
-    - Asked whether the PDF's links should show on paper: "Underlined for
-      clarity". Every link in the PDF is underlined.
+    - Asked whether the PDF's "Where to look first" links should be
+      underlined or left plain like the rest: "Underlined for clarity".
+      Every link in the PDF is underlined: the lead underlined the rest
+      alike.
 46. **The resume's own statements:** "Also statements by me are approved"
     (2026-10-16). His role, his summary, cft-fp256 as his experiment and the
     Moth Hack result are stated by Logan, approved as printed, and carry no

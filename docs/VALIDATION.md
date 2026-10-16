@@ -2378,3 +2378,172 @@ was not taken, and it withdrew it: the lead's read is in its transcript at
   main carries his git author address in its metadata, which the privacy
   stage's address check does not read.
 - Whether to push.
+
+## 2026-10-16 - the resume pushed; then its printout, a plain PDF built from its text twin, its sources shown on request, and Logan's statements on it approved; a verifier on Haiku caught both planted faults
+
+**The push.** At Logan's word, "Go ahead and push it", main moved from
+`580352f` to `e56a7b4`, after `bash verify/run.sh --require-all` passed on
+it: VERDICT: PASS, nothing skipped; 450 controls caught. The site's
+workflow passed its gate and deployed. Live, every published file but
+BUILD was byte-identical to the build, and BUILD named `e56a7b4`.
+
+**What Logan asked next** (SPEC decisions 45 and 46): "This looks good, the
+only 2 minor changes is adjusting to have a pdf output (without all the
+styling, more in line with the draft I sent just to have a 'basic'
+printout, note in simple monospace type at the bottom that the pdf is built
+not written with a link back) and if its possible a 'citations toggle',
+where all the lengthy citation marks are hidden to make reading easier.
+Perhaps replacing with a simpler dashed underline that on hover shows the
+full line? I feel the full citations everywhere may be 'too much' for a
+resume, constantly interrupted by citation marks". Then: "Also statements
+by me are approved"; "The plain PDF may also need its quotation marks
+stripped, as without the citations, the large amount of them can be a bit
+confusing. We can also return the links below the projects (The quick
+"where to look" links), as well as add a page break before Quantum-film as
+it splits it there."; and, asked whether the PDF's "Where to look first"
+links should be underlined or left plain like the rest, "Underlined for
+clarity".
+
+**What is added.**
+- The resume reads without its sources first. Each figure in the resume
+  itself, the page's `div.cv`, is underlined and carries its own label as
+  a tooltip. The labels beside those figures are hidden until a reader
+  opens "Show every source beside its line" (`css_hides.json` names
+  `.cv .src`). The header's stamp keeps its labels in view, and the footer
+  prints its figures bare, as on every page.
+- The numbers stage holds a title on a figure, or inside one, to exactly
+  that figure's label. It refuses a figure that carries no tooltip of its
+  own when a `css_hides.json` entry lets the stylesheet hide its label.
+  Such an entry is one selector written `.X .src`, whose scope that rule
+  reads; any other entry naming `src`, and any list of selectors, is
+  refused. A label carries the class `src` and no other, and nothing
+  inside it carries a class, so any other entry that hides a label hides
+  the figure beside it too. A rule the hiding check doesn't read, such as
+  one placing a label off screen, needs no entry, as on every page: the
+  README states it as a limit, under Styles.
+- `site/printout.py` reads the resume's markup into a text twin,
+  `resume.txt`, and writes `resume.pdf` from the twin alone, laid out like
+  Logan's draft: Helvetica, the dates set right, each project kept on one
+  page when it fits, and a note at its foot in Courier linking back to the
+  page. It prints no source labels, and none of the quotation marks the
+  page sets straight around a quotation. Every link in it is underlined:
+  the question named the "Where to look first" links, and the lead
+  underlined the rest alike.
+- The numbers stage refuses a PDF that isn't exactly what the writer makes
+  from its twin. A PDF is published only under a printout's flat,
+  lower-case name. The links stage reads the links text files outside
+  `fonts/` write, and only a page's own printout and twin may link to it
+  while it is unlisted.
+- Logan's four statements on the page, his role, his summary, cft-fp256 as
+  his experiment and the Moth Hack result, are stated by Logan,
+  2026-10-16, and settled.
+- `--control` holds it with 35 more controls than main's 450.
+
+**Verified.** verifier-print, on claude-haiku-5-5 (read from its own
+transcript), read a copy of the work holding two planted faults, in a clone
+holding no other branch. The key's sha256,
+`f981570a1b514c7f1c5c1c98ffa080d771b0b1382ad95a8f4de2b8ca22745338`, was
+recorded at 04:17:25, before its dispatch at 04:17:55. It caught both on
+its first pass: P-1, a toggle whose selector never showed a label, and
+P-2, the README naming the links stage for the tooltip rule.
+
+Its real findings, each checked at its source before it was taken:
+- **Pass 1.** A PDF named in upper case was never read; a text file could
+  link to the resume; a title inside a figure was not held; the reader
+  dropped the page's how paragraph and the look lines whole; the PDF's
+  note and the page's description claimed every line was sourced. Four
+  latent cases each now refuse by name.
+- **Pass 2.** W1: the reader's quotation-mark rule took marks in shapes the
+  page doesn't make, so it became a state machine with the shapes as
+  controls. W2: a figure with no tooltip of its own would show an
+  ancestor's, so a figure whose label may be hidden must carry its own.
+  Five restates of the records were taken. The lead's first form of the
+  W2 rule caught the header's three figures, whose labels are never
+  hidden, and was scoped to the labels `css_hides.json` may hide.
+- **Pass 3**, its last. W3-1: the tooltip rule read only the `.X .src`
+  shape of label-hiding entry. Under the lead's three-pass cap it went to
+  Logan, with the lead's fix, `528bb49`. Its six notes were taken.
+
+The lead's own, before the first report:
+- the bullet of an item that broke across a page landed on the next page;
+- the twin, built inside the page's render, broke the page's own controls.
+
+**The record's verifier.** verifier-record2, on claude-haiku-5-5, read this
+entry, `9177ae1` and `528bb49`. Its first pass found the fix short: W-1,
+`528bb49` read only an entry's last class, so a list, `.cv .src, .x`, hid
+the resume's labels and was no scope of the tooltip rule, while the README
+said an entry of any other shape was refused. `8daec16` refuses a list,
+and any other entry naming `src` that isn't `.X .src`. While fixing it,
+the lead found that a label carrying a second class could be hidden by an
+entry that never names `src`, so a label now carries `src` alone and
+nothing inside it a class. Of verifier-record2's notes, the twin now
+refuses a line with nothing to print, and verifier-print's N3-1 has its
+control. verifier-record2 also found this entry's first form wrong twice:
+it placed a pass-2 bullet before the first report, and its cost counted
+the call that measured it. It also restated the question Logan answered on
+underlines.
+
+Its second pass tried 23 ways to hide a label, and a control. Every list,
+compound, pseudo-class, attribute, escape, second-class and classed-child
+shape was refused, and it found two claims wider than the checks:
+- W-4, on the claim that no entry that doesn't name `src` could hide a
+  label: an entry for a class around the resume hides its labels, with
+  their figures.
+- W-5, on the claim that a figure whose label the stylesheet may hide must
+  carry a tooltip: the rule reads only `css_hides.json`'s entries, and a
+  rule the hiding check doesn't read, such as one placing labels off
+  screen, needs none.
+
+`8cf32e8` makes each claim say what its rule reads, and has the page's
+reader refuse what the twin refuses as blank, a soft hyphen alone
+included; `8daec16`'s message had said the two already agreed (its R-2).
+
+Its third pass, its last, found two more wrong answers, which go to Logan
+under the lead's three-pass cap:
+- W-6, on the claim that each figure on the page is underlined and
+  carries a tooltip: the 58 in the resume itself do, while the header's
+  stamp keeps its three labels in view and the footer prints its 26
+  figures bare.
+- W-7, on the claim that the reader and the twin refuse the same blank
+  text: the twin took a project line's bar as nothing and the reader
+  didn't, so a paragraph of a bar alone passed the reader, though the
+  build still refused it through the twin.
+
+`48aff18` is the lead's fix for each. The README says which figures carry
+tooltips, and `printout.blank` holds the bar rule for both, with a control
+on each side. No verifier has read it.
+
+Each finding was checked at its source and is answered here, except pass
+1's note N-2, which stands as `site/pages/resume.py` documents it.
+
+**The gate.** `bash verify/run.sh --require-all` on `48aff18`, the work's
+last commit before this entry: VERDICT: PASS, nothing skipped; 11 passed;
+`--control` caught 485 of 485.
+
+**Cost**, from the session's transcripts, from Logan's request at 03:48:14
+to 08:12:08, 264 minutes of wall clock, by round 2's script with this work's
+prefix, "RES ", in a window that ends before the run that measured it:
+
+| agent | model | runs | minutes | tool uses | output | fresh | cache reads |
+|---|---|---:|---:|---:|---:|---:|---:|
+| verifier-print | claude-haiku-5-5 | 3 | 64 | 180 | 557 k | 3.1 M | 69.9 M |
+| verifier-record2 | claude-haiku-5-5 | 3 | 82 | 289 | 634 k | 2.8 M | 167.3 M |
+| the lead | claude-opus-5-5 | - | 264 (wall) | 267 | 315 k | 829 k | 122.2 M |
+| all | | 6 | 147 | 736 | 1.5 M | 6.7 M | 359.3 M |
+
+The "all" row's minutes are the verifiers'; the lead's are wall clock, and
+are not added to them. The verifiers wrote 79.1% of the output.
+
+**Left with Logan:**
+- W3-1's fix: the stricter rule, which the lead made, widened after
+  verifier-record2's W-1, and stated as its rule reads after its W-4 and
+  W-5. An entry that may hide a label and not its figure is one `.X .src`;
+  a rule the hiding check doesn't read stays a stated limit.
+- W-6 and W-7, from verifier-record2's last pass, and the lead's fixes in
+  `48aff18`, which no verifier has read.
+- Every link in the PDF underlined, where the question named the "Where to
+  look first" links.
+
+At 06:12, before the verifier had reported, Logan wrote: "You can push
+once the verifier and final gate finish". Its last pass ended NOT READY,
+so the push waits on his word.
