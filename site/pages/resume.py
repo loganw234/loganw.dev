@@ -33,8 +33,8 @@ from pages import _settled, about, front
 from render import L, esc, render as _render
 
 PAGE = {"file": "resume.html", "nav": None, "unlisted": True, "title": "Resume — loganw.dev",
-        "description": "Logan's resume: each line quoted from its project at the commit this site pins, and his "
-                       "own words marked as his."}
+        "description": "Logan's resume: every passage read from its project at the commit this site pins names "
+                       "its source, and his own words are marked as his."}
 
 DRAFTED = "2026-10-15"   # the day Logan gave his draft resume
 
@@ -132,10 +132,6 @@ def head_block():
             '<p class="contact"><a href="mailto:logan@loganw.dev">logan@loganw.dev</a> · '
             '<a href="index.html">loganw.dev</a> · <a href="https://github.com/loganw234">github.com/loganw234</a></p>'
             '<p>%s</p>'
-            '<p class="how">Every underlined passage is read from its source, or is Logan&#x27;s own word. Hover over '
-            'it to see where it was read, or who said it and when, or open &#x201c;Show every source beside its '
-            'line&#x201d; above. Each quotation is its source&#x27;s own words: a project&#x27;s at the commit this '
-            'site pins, or this site&#x27;s own ledger&#x27;s.</p>'
             '</div>'
             % (render([A(ROLE)]), render([A(SUMMARY)])))
 
@@ -171,9 +167,9 @@ def oversight_block():
          CS(r"\*\*The plants: (\d+ of \d+), by pass", num=True), ", where that round's own verifiers, on Opus, "
          "had caught ", CS(r"Round 6's Opus\s+verifiers caught (\d+ of \d+)\.", num=True), ". ",
          q(CS(r"\*\*(Every plant that changed a figure or a reference was caught in\s+every run, \d+ of \d+)\.\*\*")),
-         "; ", q(CS(r"\*\*(Plants that changed meaning or shape were caught \d+ of \d+):\*\*")), "."],
+         ". ", q(CS(r"\*\*(Plants that changed meaning or shape were caught \d+ of \d+):\*\*")), "."],
         ["Where a suite stops telling strong models apart, the record says so: ",
-         CS(r"\*\*QS6:\*\* (\d+ of \d+ runs exact)", num=True), ", and ",
+         CS(r"\*\*QS6:\*\* (\d+ of \d+ runs exact)", num=True), ". ",
          q(CS(r"\*\*(So the QS6 slice cannot tell strong models apart)\.\*\*")), "."],
         ["This site is built the same way. In its second round each verifier, on Haiku, checked a copy of a "
          "parcel's work holding planted faults: ",
@@ -196,7 +192,7 @@ def cft_block():
              r"the same inputs give the same bits whether\s+the work runs on a laptop CPU, in a browser tab, on a "
              r"microcontroller,\s+or on the FPGA card it was designed for)\.")),
          ", the ", q(P(r"built for the\s+(AMD/Xilinx Alveo U50 through the open Vitis RTL kernel flow)")), "."],
-        [A(EXPERIMENT), " Its rule: ",
+        [A(EXPERIMENT), " ",
          q(P(r"(The rule is that a number in a document has a run behind it, and the\s+runs that failed stay in the "
              r"record)\.")), "."],
         ["Checked by ",
@@ -211,7 +207,7 @@ def cft_block():
          ". A binary256 soak on the card ran ",
          q(V_(r"(\d+ passes in \d+ minutes, each a\s+resident run of a million elements at fma, add and mul)")),
          ", with ", q(V_(r"reference orbit to its checkpoint - (0 failures)")), "."],
-        ["In cft-rebound, ",
+        ["cft-rebound is ",
          q(prose("cft-rebound", "README.md", r"^(REBOUND's IAS15 integrator with its arithmetic routed through "
                                              r"libcft)")),
          ". ", q(prose("cft-rebound", "README.md", r"(At binary64 it is\s+REBOUND's own IAS15 bit for bit, which is "
@@ -221,8 +217,8 @@ def cft_block():
     evidence = ["Where to look first: ",
                 L(facts.pin("cft-fp256").href("docs/VALIDATION.md"), "the validation ledger"), ", ",
                 L(facts.pin("cft-fp256").href("CONFORMANCE.md"), "the conformance contract"), ", and ",
-                L(replay.raw, "the browser replay"), ", where ",
-                q(P(r"(It replays\s+the published conformance vectors in front of you)")), "."]
+                L(replay.raw, "the browser replay"), ", which ",
+                q(P(r"It (replays\s+the published conformance vectors in front of you)")), "."]
     return project("cft-fp256", first_month("cft-fp256"), items, evidence)
 
 
@@ -235,14 +231,14 @@ def film_block():
          "; ", q(P(r"(its tone curve and\s+grain scale are borrowed from a real stock in\s+\[atlas-film\]\([^)]*\), "
                    r"so only the placement\s+of the crystals is new)")), "."],
         ["Its Pauli stock's law ", q(P(r"\*\*The shelf's Pauli law (ran on Moth's Atlas emulator, and holds)\*\*")),
-         ", and the stock was ", q(P(r"(printed, with one print laid entirely by Atlas);")), ". Then ",
+         ", and the stock was ", q(P(r"(printed, with one print laid entirely by Atlas);")), ". ",
          q(H(r"(On \d{4}-\d{2}-\d{2} the design docs/PREREGISTRATION\.md fixed beforehand ran on each of the three "
              r"IBM Quantum devices the owner's Open-plan instance reaches)\.")),
          ". The result is reported as it fell: ",
          q(H(r"\*\*In one paragraph\.\*\* (All three devices carry the law's two quantum signatures, well clear of "
              r"the classical twin):")),
          ". ", q(H(r"(And all three fall short of what their own noise models predicted)\.")), "."],
-        [A(WIN), " (", L(RESULTS, "the hackathon's results"), "). The entry: ",
+        [A(WIN), " (", L(RESULTS, "the hackathon's results"), "). ",
          q(P(r"(Entered for the Expert challenge #\d+: a repository of a quantum application that\s+runs a process "
              r"on media through the Atlas API)\.")), "."],
     ]
@@ -272,7 +268,7 @@ def other_block():
                                                                  r"Flames\*\*)")),
          ". ", q(prose("Mercenaries2", "README.md", r"(Restores online services and exposes the\s+game's "
                                                      r"statically-linked Lua [\d.]+ runtime for modding)\.")), "."],
-        ["PrettyCloud: ", q(prose("PrettyCloud", "README.md", r"^# (Atlas of Mathematical Forms)$")), ", ",
+        ["PrettyCloud, the ", q(prose("PrettyCloud", "README.md", r"^# (Atlas of Mathematical Forms)$")), ": ",
          q(prose("PrettyCloud", "README.md", r"^(A WebGL2 point-cloud atlas)\.")), "."],
     ]
     return '<h2>Other public work</h2><ul class="plain">%s</ul>' % "".join(item(i) for i in items)
@@ -289,10 +285,15 @@ def background_block():
 BLOCKS = ("head_block", "oversight_block", "cft_block", "film_block", "qro_block", "other_block", "background_block")
 
 
-# Above the resume: its printout, and the toggle that shows every source
-# beside its line (resume.css; decision 45). Neither is printed.
+# Above the resume: its printout, the toggle that shows every source beside
+# its line (resume.css; decision 45), and how to read the page. None of them
+# is printed: printout.twin reads the <div class="cv"> alone.
 TOOLS = ('<p class="tools"><a href="resume.pdf">A plain PDF of this page</a>, printed from it by the build</p>'
-         '<details class="srcs"><summary>Show every source beside its line</summary></details>')
+         '<details class="srcs"><summary>Show every source beside its line</summary></details>'
+         '<div class="measure"><p class="how">Every underlined passage is read from its source, or is Logan&#x27;s '
+         'own word. Hover over it to see where it was read, or who said it and when, or open &#x201c;Show every '
+         'source beside its line&#x201d; above. Each quotation is its source&#x27;s own words: a project&#x27;s at '
+         'the commit this site pins, or this site&#x27;s own ledger&#x27;s.</p></div>')
 
 # The resume's markup as the last render_page made it, which the build then
 # prints: render_all calls extra_files and print_files straight after it.

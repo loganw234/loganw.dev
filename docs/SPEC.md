@@ -388,6 +388,17 @@ word.
     - `resume.pdf` is the page printed plainly, in Helvetica, with a note
       at its foot in Courier, linking back to the page. The build writes it
       from the page's text twin, `resume.txt`, and from nothing else.
+    - Then, the same day: "The plain PDF may also need its quotation marks
+      stripped, as without the citations, the large amount of them can be a
+      bit confusing. We can also return the links below the projects (The
+      quick "where to look" links), as well as add a page break before
+      Quantum-film as it splits it there." So the twin and the PDF leave out
+      the quotation marks the page sets around a quotation, and keep its
+      "Where to look first" links. A project, with its bullets and links,
+      starts on a new page when it doesn't fit on this one; that is the
+      break before Quantum-Film today. A few of the page's joining words
+      changed so that each sentence reads the same with its marks or
+      without them.
 46. **The resume's own statements:** "Also statements by me are approved"
     (2026-10-16). His role, his summary, cft-fp256 as his experiment and the
     Moth Hack result are stated by Logan, approved as printed, and carry no

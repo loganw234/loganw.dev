@@ -437,11 +437,15 @@ class _Marks(html.parser.HTMLParser):
         # Every value, not a dict's last one: a browser keeps the first of two
         # same-named attributes, and dict() keeps the last (verifier-P0 hid
         # "3397 prints" in the first of two alt attributes).
-        f = dict(attrs).get("data-f")
+        inside = self._mark()
+        f = dict(attrs).get("data-f") or (inside["f"] if inside is not None else None)
         for k, v in attrs:
-            # A figure's own tooltip (render.fig's tip) is held to its label
-            # in check_numbers; every other title is text like any other.
-            if k == "title" and tag == "span" and f is not None:
+            # A title on a figure's mark, or on anything inside it, is that
+            # figure's tooltip, and check_numbers holds it to the figure's own
+            # label (render.fig's tip; verifier-print hid another on a child
+            # and on the figure's link). Every other title is text like any
+            # other.
+            if k == "title" and f is not None:
                 self.tips.append((f, v or ""))
             elif k in ("alt", "title", "aria-label") and v:
                 self.attr_text.append("%s %s=%r" % (tag, k, v))
@@ -1175,6 +1179,10 @@ def check_numbers(root=PUBLIC, names=None):
                 cut.append(t[last:m.start() - len(rec["text"])])
                 last = m.end()
             cut.append(t[last:])
+            # A printout's twin writes each link [text](url), and its url is the
+            # link's target, which the PDF does not print: read as a page's
+            # href is, not as its text (decision 45).
+            cut = [printout.LINK.sub(lambda m: m.group(1), c) for c in cut]
             problems += _loose_problems(rel, " ".join(cut), False, names, allowed)
     return problems, (n_marks, allowed, len(files))
 
@@ -1490,6 +1498,10 @@ def type_problems(rel, data):
         return ["a %s file, which is not a type this site publishes" % (ext or "extensionless")]
     if not data.startswith(MAGIC[ext]) or (ext == ".webp" and data[8:12] != b"WEBP"):
         return ["not a %s by its bytes" % ext]
+    if ext == ".pdf" and not PRINT_NAME.fullmatch(rel):
+        # only a page's printout, which the numbers stage reads by that name
+        # (verifier-print published one as resume-x.PDF, which it never read)
+        return ["a PDF is published only as a page's printout: a flat, lower-case .pdf name"]
     if ext == ".png":
         return png_chunk_problems(data)
     return []
@@ -1951,24 +1963,23 @@ def check_links(root=PUBLIC):
                             % (rel, ascii(u), t))
         if "#" in u and u.split("#", 1)[1] and u.split("#", 1)[1] not in ids.get(t, set()):
             problems.append("%s links to %s, and %s has no such id" % (rel, ascii(u), t))
-    # A printout's links are its twin's, which printout.links reads as the PDF
-    # carries them; each is a full address, read as a page's is. A page's own
-    # printout, the PDF of its name, may link to it unlisted or not: the
-    # resume's PDF names its page at its foot (decision 45). Any other file's
-    # may not, and one that names a page of this site names a published one.
-    for rel in sorted(f for f in files if f.endswith(".pdf")):
-        twin = rel[:-4] + ".txt"
-        if twin not in files:
-            continue    # the numbers stage refuses a printout without its twin
-        for u in printout.links((root / twin).read_text(encoding="utf-8")):
+    # A text file's links are the ones it writes [text](url), as a printout's
+    # twin writes them and the PDF carries them (printout.links); each is a
+    # full address, read as a page's is. A page's own printout and its twin,
+    # the files of its name, may link to it unlisted or not: the resume's PDF
+    # names its page at its foot (decision 45). Any other file may not
+    # (verifier-print linked it from a dossier's twin), and a link that names
+    # a page of this site names a published one.
+    for rel in sorted(f for f in files if f.endswith(".txt") and not f.startswith("fonts/")):
+        for u in printout.links((root / rel).read_text(encoding="utf-8")):
             for own in sorted(_own_pages(rel, u, files)):
                 if own == UNREADABLE:
                     problems.append("%s links to %s, %s as a browser would" % (rel, ascii(u), UNREADABLE))
                 elif own not in files:
                     problems.append("%s links to %s, which is not a published file" % (rel, ascii(u)))
                 elif own in unlisted and posixpath.splitext(own)[0] != posixpath.splitext(rel)[0]:
-                    problems.append("%s links to %s, the unlisted page %s, which only its own printout may link to"
-                                    % (rel, ascii(u), own))
+                    problems.append("%s links to %s, the unlisted page %s, which only its own printout and its twin "
+                                    "may link to" % (rel, ascii(u), own))
     if not any(f.endswith(".html") for f in files):
         problems.append("no page is published")
     return problems + check_connections(root)
@@ -2809,10 +2820,30 @@ def controls():
             other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"
             other_twin.write_bytes(twin_b)
             try:
-                swapped(other_pdf, pdf_b, check_links, "links", "only its own printout may link",
+                swapped(other_pdf, pdf_b, check_links, "links", "only its own printout and its twin may link",
                         "another file's printout linking the unlisted resume")
             finally:
                 other_twin.unlink()
+            # verifier-print's three: a PDF under another kind of name, which
+            # the numbers stage would never read; a dossier's twin linking the
+            # resume; and a tooltip on an element inside a figure
+            swapped(root / "planted-x.PDF", pdf_b, check_local_only, "local-only", "only as a page's printout",
+                    "a PDF published under a name in upper case")
+            dossier = sorted(r for r in published(root) if r.startswith("work-") and r.endswith(".txt"))
+            if not dossier:
+                report("links", False, "could not plant: no dossier's twin is published")
+            else:
+                d_p = root / dossier[0]
+                d_b = d_p.read_bytes()
+                swapped(d_p, d_b + b"[x](https://loganw.dev/resume.html)\n", check_links, "links",
+                        "only its own printout and its twin may link", "a dossier's twin linking the unlisted resume")
+            fig_tip = re.search(rb'(<span class="q" data-f="\d+" title="[^"]*">)', page_b)
+            if fig_tip is None:
+                report("numbers", False, "could not plant a child's tooltip: no quoted figure on resume.html")
+            else:
+                swapped(res, page_b.replace(fig_tip.group(1), fig_tip.group(1) + b'<span title="a tooltip no label '
+                                            b'holds"></span>', 1), check_numbers, "numbers", "not its own label",
+                        "a tooltip on an element inside a figure")
         planted("local-only", "a robots meta other than an unlisted page's noindex",
                 t.replace("</head>", '<meta name="robots" content="nofollow"></head>', 1), check_local_only,
                 "not an unlisted page's noindex")

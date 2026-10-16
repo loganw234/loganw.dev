@@ -15,6 +15,7 @@ The twin's lines:
   "== "             a section's heading;
   "=== "            a project's heading, then " | " and its dates;
   "- "              a bullet;
+  "> "              where to look first, under a project, with its links;
   "-- "             the note at the foot of the last page, in monospace;
   any other         a paragraph.
 A blank line separates blocks and says nothing.
@@ -33,7 +34,7 @@ from facts import Refusal
 NAME = "Logan W."
 SITE = "https://loganw.dev/"
 NOTE = ("This PDF is built, not written: the site's build prints it from the page at [%sresume.html](%sresume.html), "
-        "which names the source of every line, or marks it as Logan's own word." % (SITE, SITE))
+        "where every passage read from a source names it, and Logan's own words are marked as his." % (SITE, SITE))
 
 PAGE_W, PAGE_H, MARGIN = 612, 792, 54
 WIDTH = PAGE_W - 2 * MARGIN
@@ -79,17 +80,24 @@ class Refused(Refusal):
 # The page, read into its twin
 # ---------------------------------------------------------------------------
 
+# The quotation marks the page sets around a quotation, which the printout
+# leaves out (decision 45: without its sources beside them, so many marks
+# read as noise). A mark inside a figure's own text is the source's, and stays.
+OPEN, CLOSE = chr(0x201C), chr(0x201D)
+
+
 class _Reader(html.parser.HTMLParser):
     """The resume's own markup (its <div class="cv">), read into twin lines.
     It reads the subset pages/resume.py writes and refuses any other element
-    by name, so a change to the page can't drop text from the printout
-    unseen. A source label is left out, and so are the paragraphs about the
-    page itself ("how") and its links for the web ("look")."""
+    by name. It leaves out only a figure's source label, which the numbers
+    stage holds to exactly its fact's, and the quotation marks set straight
+    around a figure, the opening one just before it and the closing one just
+    after its label. What the page says about itself stands outside the
+    <div class="cv">, so the printout never reads it."""
 
     BLOCKS = {"p": None, "h2": "== ", "h3": "=== ", "li": "- "}
     INLINE = {"span", "a", "code", "em", "strong", "wbr"}
     HOLDERS = {"div", "ul"}
-    LEFT_OUT = {"how", "look"}
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -97,6 +105,7 @@ class _Reader(html.parser.HTMLParser):
         self.skip = []          # the elements whose text the printout leaves out
         self.fig = []           # [fact id, its text so far] while a figure is read
         self.link = []          # [href, its text so far] while a link is read
+        self.after = False      # a figure (and its label) has just closed
 
     def _put(self, s):
         if self.link:
@@ -120,24 +129,30 @@ class _Reader(html.parser.HTMLParser):
         if tag in self.BLOCKS:
             if self.block is not None:
                 raise Refused("<%s> inside another block" % tag)
-            if tag == "p" and cls & self.LEFT_OUT:
-                self.skip.append(tag)
-                return
             self.block, self.prefix = [], self.BLOCKS[tag] or ""
             if "lede" in cls:
                 self.prefix = "role"
             elif "contact" in cls:
                 self.prefix = "contact"
+            elif "look" in cls:
+                self.prefix = "> "
             return
         if tag not in self.INLINE:
             raise Refused("an element the printout doesn't read: <%s>" % tag)
         if tag == "span" and "src" in cls:
             self.skip.append(tag)
-        elif tag == "span" and "when" in cls:
+            return
+        self.after = False
+        if tag == "span" and "when" in cls:
             self._put(" | ")
         elif tag == "span" and a.get("data-f"):
             if self.fig:
                 raise Refused("a figure inside a figure")
+            buf = self.link[-1] if self.link else None
+            if buf is None and self.block and self.block[-1].endswith(OPEN):
+                self.block[-1] = self.block[-1][:-1]
+            elif buf is not None and buf[1].endswith(OPEN):
+                buf[1] = buf[1][:-1]
             self.fig.append([a["data-f"], ""])
         elif tag == "a":
             if self.link or self.fig:
@@ -154,17 +169,29 @@ class _Reader(html.parser.HTMLParser):
         if tag == "span" and self.fig:
             f, text = self.fig.pop()
             self._put(text + " [fact %s]" % f)
+            self.after = True
+            return
         elif tag == "a" and self.link:
             href, text = self.link.pop()
             self._put("[%s](%s)" % (text, href))
         elif tag in self.BLOCKS and self.block is not None:
             text = " ".join("".join(self.block).split())
+            if not text:
+                raise Refused("an empty <%s> in the resume, which would print as nothing" % tag)
+            # a paragraph that opens like another kind of line would be read
+            # back as that kind (verifier-print's N1)
+            if self.prefix == "" and re.match(r"(?:={2,3}|-{1,2}|>) ", text):
+                raise Refused("a paragraph opening %r, which the twin reads as another kind of line" % text[:4])
             self.lines.append((self.prefix, text))
             self.block = None
 
     def handle_data(self, data):
-        if not self.skip:
-            self._put(data)
+        if self.skip:
+            return
+        if self.after and data.startswith(CLOSE):
+            data = data[1:]
+        self.after = False
+        self._put(data)
 
 
 def twin(cv_html):
@@ -221,6 +248,8 @@ def blocks(twin_text):
             out.append(("section", runs(l[3:])))
         elif l.startswith("-- "):
             out.append(("note", runs(l[3:])))
+        elif l.startswith("> "):
+            out.append(("look", runs(l[2:])))
         elif l.startswith("- "):
             out.append(("bullet", runs(l[2:])))
         else:
@@ -237,21 +266,25 @@ def links(twin_text):
 # The PDF
 # ---------------------------------------------------------------------------
 
+def _cp1252(text):
+    try:
+        return text.encode("cp1252")
+    except UnicodeEncodeError as e:
+        raise Refused("%r has a character WinAnsi can't print" % text[max(0, e.start - 10):e.end + 10])
+
+
 def width(text, font, size):
     if font == "F3":
         return 0.6 * size * len(text)
     table = HELVETICA if font == "F1" else HELVETICA_BOLD
-    return sum(table[b - 32] if b >= 32 else 0 for b in text.encode("cp1252")) * size / 1000.0
+    return sum(table[b - 32] if b >= 32 else 0 for b in _cp1252(text)) * size / 1000.0
 
 
 def _string(text):
     """A PDF literal string: every byte outside printable ASCII, and the
     parentheses and the backslash, written as an octal escape (built from
     code points, CLAUDE.md trap 8)."""
-    try:
-        raw = text.encode("cp1252")
-    except UnicodeEncodeError as e:
-        raise Refused("%r has a character WinAnsi can't print" % text[max(0, e.start - 10):e.end + 10])
+    raw = _cp1252(text)
     back = chr(92)
     return "(" + "".join(chr(b) if 32 <= b < 127 and b not in (40, 41, 92) else back + "%03o" % b
                          for b in raw) + ")"
@@ -279,6 +312,9 @@ def _wrap(rs, font, size, avail):
     space = width(" ", font, size)
     for word in _words(rs):
         w = sum(width(t, font, size) for t, _ in word)
+        if w > avail:
+            # it would run off the page, and nothing would say so (verifier-print's N2)
+            raise Refused("%r is wider than the line it would print on" % "".join(t for t, _ in word)[:40])
         if cur and cur_w + space + w > avail:
             lines.append(cur)
             cur, cur_w = [], 0.0
@@ -346,43 +382,80 @@ def _num(v):
     return ("%.2f" % v).rstrip("0").rstrip(".")
 
 
+# How each kind of block is set: font, size, leading, the space before it and
+# after it, and its indent. One table, so the measure that keeps a project
+# together and the setting itself can't part.
+STYLE = {
+    "name": ("F2", 20, 22, 0, 0, 0),
+    "role": ("F2", 11, 15, 0, 0, 0),
+    "contact": ("F1", 9.5, 13, 0, 6, 0),
+    "section": ("F2", 11, 14, 9, 1, 0),
+    "project": ("F2", 10.5, 14, 6, 0, 0),
+    "bullet": ("F1", 10, 13, 0, 2, 12),
+    "look": ("F1", 9, 12, 1, 2, 12),
+    "para": ("F1", 10, 13, 0, 5, 0),
+}
+DATES = ("F1", 9.5)
+
+
+def _avail(b):
+    """The width a block's text may fill: a project's heading leaves room for
+    its dates, set right on its last line."""
+    if b[0] == "project":
+        return WIDTH - width("".join(t for t, _ in b[2]), *DATES) - 12
+    return WIDTH - STYLE[b[0]][5]
+
+
+def _height(b):
+    font, size, leading, before, after, _ = STYLE[b[0]]
+    return before + leading * len(_wrap(b[1], font, size, _avail(b))) + after
+
+
+def _together(bs, i):
+    """The blocks a section's heading or a project's starts and keeps on one
+    page if they fit: a project with its bullets and where to look first,
+    and a section's heading with the first project, or block, after it."""
+    if bs[i][0] == "section":
+        if i + 1 < len(bs) and bs[i + 1][0] == "project":
+            return [bs[i]] + _together(bs, i + 1)
+        return bs[i:i + 2]
+    out = [bs[i]]
+    for b in bs[i + 1:]:
+        if b[0] not in ("bullet", "look"):
+            break
+        out.append(b)
+    return out
+
+
 def pdf(twin_text):
     """The PDF a twin prints as: Logan's draft's shape, in Helvetica, with the
-    note at the foot of the last page in Courier."""
+    note at the foot of the last page in Courier. A project, with its bullets
+    and its links, starts on a new page when it doesn't fit on this one but
+    would on a page of its own (Logan, 2026-10-16: Quantum-Film split across
+    two)."""
     w = _Writer()
     note = None
-    for b in blocks(twin_text):
+    bs = blocks(twin_text)
+    for i, b in enumerate(bs):
         kind = b[0]
-        if kind == "name":
-            w.lines(b[1], "F2", 20, 22)
-        elif kind == "role":
-            w.lines(b[1], "F2", 11, 15)
-        elif kind == "contact":
-            w.lines(b[1], "F1", 9.5, 13)
-            w.y -= 6
-        elif kind == "section":
-            w.room(9 + 14 + 3 * 13)
-            w.y -= 9
-            w.lines(b[1], "F2", 11, 14)
-            w.y -= 1
-        elif kind == "project":
-            w.room(6 + 14 + 2 * 13)
-            w.y -= 6
+        if kind == "note":
+            note = b[1]
+            continue
+        font, size, leading, before, after, indent = STYLE[kind]
+        if kind in ("section", "project"):
+            h = sum(_height(g) for g in _together(bs, i))
+            w.room(h if h <= PAGE_H - 2 * MARGIN else _height(b) + 2 * 13)
+        w.y -= before
+        page, y = w.lines(b[1], font, size, leading, x=MARGIN + indent, avail=_avail(b))
+        if kind == "project":
             when = "".join(t for t, _ in b[2])
-            name_w = WIDTH - width(when, "F1", 9.5) - 12
-            w.lines(b[1], "F2", 10.5, 14, avail=name_w)
-            w.text(MARGIN + WIDTH - width(when, "F1", 9.5), w.y, when, "F1", 9.5)
+            w.text(MARGIN + WIDTH - width(when, *DATES), w.y, when, *DATES)
         elif kind == "bullet":
-            page, y = w.lines(b[1], "F1", 10, 13, x=MARGIN + 12, avail=WIDTH - 12)
             # the bullet goes beside the item's first line, on whichever page
             # that line was set
-            w.pages[page][0].append("BT /F1 10 Tf 1 0 0 1 %.2f %.2f Tm %s Tj ET" % (MARGIN + 2, y, _string(chr(0x2022))))
-            w.y -= 2
-        elif kind == "para":
-            w.lines(b[1], "F1", 10, 13)
-            w.y -= 5
-        elif kind == "note":
-            note = b[1]
+            w.pages[page][0].append("BT /%s %s Tf 1 0 0 1 %.2f %.2f Tm %s Tj ET"
+                                    % (font, _num(size), MARGIN + 2, y, _string(chr(0x2022))))
+        w.y -= after
     if note is not None:
         lines = _wrap(note, "F3", 7, WIDTH)
         h = 9 * len(lines) + 6

@@ -18344,7 +18344,7 @@
     "name": "cft-fp256",
     "num": false,
     "path": "README.md",
-    "pattern": "(It replays\\s+the published conformance vectors in front of you)"
+    "pattern": "It (replays\\s+the published conformance vectors in front of you)"
    },
    "detail": "",
    "href": "https://github.com/loganw234/cft-fp256/blob/ab51655bad2db9ac2daad44ee9387412dcd775d0/README.md?plain=1#L30",
@@ -18353,9 +18353,9 @@
    "method": "facts.prose",
    "num": false,
    "private": false,
-   "raw": "It replays the published conformance vectors in front of you",
+   "raw": "replays the published conformance vectors in front of you",
    "said": "",
-   "text": "It replays the published conformance vectors in front of you",
+   "text": "replays the published conformance vectors in front of you",
    "where": "cft-fp256 ab51655 README.md:30"
   },
   {

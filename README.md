@@ -170,37 +170,50 @@ What that doesn't cover:
 ## The unlisted page
 
 One page, `resume.html` (Logan's resume, docs/SPEC.md decision 42), is
-unlisted. The navigation doesn't link to it, it asks search engines not to
-index it, and the links stage refuses a link to it from any other page, by a
-relative link or by a full address on the site's own hosts. A full address is
-cleaned as the URL Standard cleans one and resolved from each of the site's
-two hosts, and an http(s) address that lacks its slashes is read with them
-too. Its host is read as a browser reads it, through IDNA's mapping, and
-again with every character outside ASCII dropped, which is broader than any
-browser's reading and can only refuse more. The stage reads
-links, not an address written out as text, as a dossier's plain-text twin
-could hold one; that is a stated limit. Unlisted isn't
-private: the page is published, MANIFEST names it, facts.json holds its
-figures like any other page's, and every rule above holds on it.
+unlisted. The navigation doesn't link to it, and it asks search engines not
+to index it. The links stage refuses a link to it from any other file, by a
+relative link or by a full address on the site's own hosts:
+- A full address is cleaned as the URL Standard cleans one, and resolved
+  from each of the site's two hosts. An http(s) address that lacks its
+  slashes is read with them too.
+- Its host is read as a browser reads it, through IDNA's mapping, and again
+  with every character outside ASCII dropped. That second reading is broader
+  than any browser's, so it can only refuse more.
+- The stage reads the links a page or a stylesheet carries, and the ones a
+  text file writes as a printout's twin writes them (below). It doesn't read
+  an address written out as plain text; that is a stated limit.
 
-Its sources come on request (SPEC decision 45). Each figure on the page is
-underlined and carries its own label as a tooltip, which the numbers stage
-holds to exactly that label. The labels beside the figures are there in the
-page, as on every other page, and its stylesheet hides them until a reader
-opens "Show every source beside its line"; `site/data/css_hides.json` names
-that one rule. Only a reader who hovers, or opens the toggle, sees a source,
-and a tooltip does not show on a phone without the toggle; that is a stated
-limit.
+Unlisted isn't private: the page is published, MANIFEST names it, facts.json
+holds its figures like any other page's, and every rule above holds on it.
 
-The page also prints, as `resume.pdf`. The build reads the page into a text
-twin, `resume.txt`, a block a line, with each figure written `text [fact N]`
-as a dossier's twin writes it, and writes the PDF from the twin and from
-nothing else (`site/printout.py`). The numbers stage reads the twin like any
-text file, and refuses a PDF that isn't exactly the bytes the writer makes
-from it, so the PDF holds no text, link or object the twin doesn't. The
-links stage reads the PDF's links from its twin; a page's own printout is
-the one file that may link to it while it is unlisted. The PDF prints no
-source labels. Its note says where they are.
+Its sources come on request (SPEC decision 45):
+- Each figure on the page is underlined and carries its own label as a
+  tooltip. The numbers stage holds a title on a figure, or on anything
+  inside it, to exactly that figure's label.
+- The labels beside the figures are in the page, as on every other page.
+  Its stylesheet hides them until a reader opens "Show every source beside
+  its line"; `site/data/css_hides.json` names that one rule.
+- Only a reader who hovers, or opens the toggle, sees a source, and a
+  tooltip does not show on a phone; that is a stated limit.
+
+The page also prints, as `resume.pdf` (`site/printout.py`):
+- The build reads the page's resume into a text twin, `resume.txt`, a block
+  a line. Each figure is written `text [fact N]`, as a dossier's twin writes
+  it, and each link as its text in square brackets, then its target in
+  parentheses.
+- The build writes the PDF from the twin and from nothing else. The numbers
+  stage reads the twin like any text file, and refuses a PDF that isn't
+  exactly the bytes the writer makes from it. So the PDF holds no text, link
+  or object the twin doesn't.
+- A PDF may be published only as a page's printout, under a flat,
+  lower-case name the numbers stage reads.
+- A link's target in a twin is read as a page's href is, not as its text,
+  since the PDF doesn't print it.
+- A page's own printout and its twin are the only files that may link to it
+  while it is unlisted.
+- The PDF prints no source labels, and leaves out the quotation marks the
+  page sets around each quotation; its note says where both are. It keeps
+  each project on one page when it fits.
 
 ## Does it still hold?
 
