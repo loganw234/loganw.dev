@@ -2202,3 +2202,179 @@ draft (`10b6b17`), which said `render.render()` refuses a figure typed by
 hand, where it passes a plain string through and only the numbers stage
 refuses one. The round's case study, `docs/ROUND2-CASE-STUDY.md`, lists every
 slip the round's ledger records.
+
+## 2026-10-15 - an unlisted resume page, quoted from the pins; HonestHarness's pin moved to its round 1, and QRO-Crate pinned and on the map; a verifier on Haiku caught both planted faults
+
+**What Logan asked.** On 2026-10-15: "I'd like to add an unlisted resume page,
+that way my resume itself is held to the same standards as the rest of my
+work. I have a rough draft of a resume, but it still needs work and likely a
+bit of sharpening, the initial focus is towards Anthropic Fellows Program.
+This is just meant to be a general draft, nothing is finalized about it."
+While it was built: "Id also prefer more come from cited sources than my
+claims where able", and "You may add the map node for QRO-Crate". SPEC
+decisions 42 to 44 hold his words.
+
+**What is added.** `resume.html`, unlisted: it claims no navigation entry and
+carries render.NOINDEX. The links stage refuses a link to it from any other
+page, relative, or a full address on the site's own hosts. A full address
+is cleaned as the URL Standard cleans one and resolved from each of the
+site's two hosts, and an http(s) address that lacks its slashes is read with
+them too. Its host is read as a browser reads it, and again more broadly.
+Most of the page quotes Logan's projects at their pins, each quotation
+labelled with its file and line. Four lines are drafted from his draft
+resume and carry the draft label: his role, his summary, cft-fp256 as his
+experiment, and the Moth Hack result. Its background is Home's
+biography and About's first approved sentence, as he approved them.
+`--control` holds the new rules with 57 more controls: 32 spellings of a
+link to the page, a navigation page marked unlisted, a robots tag other than
+noindex, the page seam's two rules, and the resume's own statements held as
+About's are.
+
+**What moved.** pins.json: HonestHarness from `b310f82` to `b69ed76`,
+GitHub's main, on which its round 1 is merged; QRO-Crate pinned at
+`8858978`, its main. Both were GitHub's main when the lead read them with
+`gh api` at 19:11 on 2026-10-15. The snapshot is
+`sources/github-2026-10-15-1921.json`: 62 repositories, QRO-Crate and two
+of the Mercenaries-Fan-Build organisation's new since the last. Map &
+Ledger's HonestHarness row is restated at the new pin. QRO-Crate has a row
+in Film & photography, a map node and one edge, Quantum-Film underlies
+QRO-Crate, quoting its README. Beyond every footer's pins and the snapshot's
+date, the other pages change by reading what moved:
+- the map on Map & Ledger and on the three thread pages draws QRO-Crate's
+  node and edge, and the Film & photography thread lists QRO-Crate among
+  its lane's nodes;
+- Quantum-Film's dossier lists the edge among its connections;
+- Work lists QRO-Crate;
+- the Record reads QRO-Crate's ledger;
+- Method reads this entry's count of the controls, its newest;
+- a label naming HonestHarness's pin names the new one;
+- the dossiers' plain-text twins number their figures afresh, since the
+  resume's figures come before theirs;
+- the stylesheet every page loads gains the resume's rules.
+
+**Verified.** verifier-resume, on claude-haiku-5-5 (read from its own
+transcript), read a copy of the work holding two planted faults, in a clone
+holding no other branch. The key's sha256,
+`d687ba7821ce03fc6bc0bc08da56ce5b8d05a09fff501206c612dacf8906a1c8`, was
+recorded at 19:43:10, before its dispatch at 19:45:58. It caught both on its
+first pass: R-1, "ParcelRound's fifth round" for "sixth" on the page, and
+R-2, SPEC 44's "Determinism lane" for "Film & photography lane". The first
+planted copy sat on the work's own commit, so a diff would have shown both
+plants; it was made again as one commit on main before the dispatch.
+
+Its real findings, each checked at its source before it was taken:
+- **W2, a wrong answer, over two passes:** full addresses on the site's
+  hosts that reached the page past the links stage. Pass 1 found a
+  percent-encoded or fullwidth host, backslashes and a trailing dot; its
+  dot-segment forms the lead had already found and fixed in `e3b59c2`.
+  Pass 2 found IDNA's full stops and ignorable code points in a host. Pass
+  1's were answered in `68450d3`, and pass 2's in `de03335`. The lead's own
+  forms joined them: an http(s) address without its slashes, and U+180F,
+  which Python's Unicode 3.2 IDNA tables pass and a browser's current
+  tables delete.
+- **R1 to R4, restates, taken in `68450d3`:**
+  - the Atlas line said the stock was printed on Atlas;
+  - QRO-Crate's three listed parts read as all six;
+  - the IBM result left out its first sentence;
+  - "strong models" was dropped.
+- **Notes taken:**
+  - the page's note on its quotations;
+  - Map & Ledger's "nothing after it yet";
+  - two forms missing from the controls;
+  - `ascii()` for every address the links stage prints;
+  - ParcelRound's reason, quoted as its README gives it.
+- **Notes not taken:**
+  - N-P2-4 misread `68450d3`'s message, which reads "_own_page() gave way to
+    _own_pages()".
+  - N-P2-3 read a key in a commit message, after the one verifier on a
+    planted copy had reported, as a breach of ParcelRound's proposed rule
+    on keys. That proposal keeps keys out of the ledger only until every
+    verifier on a planted copy in the round has reported, later waves'
+    included.
+
+The lead's own findings, logged before the first report:
+- an address with no extension, with dot segments, or with a doubled slash;
+- the page's note, which said every line names a file and line;
+- two parts of Logan's draft the page had left out: cft-fp256 as his
+  experiment, and the methods' origin in cft-fp256's rounds;
+- "facts.json names it", which was false. MANIFEST names the page, and
+  facts.json holds its figures.
+
+The gate on `68450d3` failed at its controls stage, on a crash printing the
+fullwidth control's address to the console; `ddb9b8b` fixed it.
+
+**Pass 3, on `de03335`: READY.** Its sweep used Node 22.19.0's URL parser,
+with Unicode 16.0. It put every code point outside ASCII in place of each
+letter and dot of `loganw.dev`, and of the first of each letter of the
+GitHub host, and inserted each at four places in the host. A browser sends
+1,604 of those spellings to a site host, 1,080 of them insertions of 270
+code points a browser deletes. The links stage refused all 1,604, and as
+many again percent-encoded. It refused none of 20 links it should pass: to
+other pages and hosts, from the page to itself, and to an email address. The
+verifier withdrew N-P2-4, its misreading, and its wording of N-P2-3. One
+restate was taken: README and SPEC 42 said a host is read "more broadly than
+a browser reads it" through both readings, where only the one that drops
+every character outside ASCII is broader. Two of its notes correct
+`de03335`'s message, which stands as written:
+- NFKC maps U+FF0E to a dot, so its "NFKC does neither" is wrong of that one.
+- The rule on planted-fault keys is a proposal of ParcelRound's sixth case
+  study (`CASE-STUDY-6.md:346`), still pending in its `ADOPTION.md`, not a
+  rule of its METHOD.md. It keeps keys out of the ledger until every
+  verifier on a planted copy in the round has reported, later waves'
+  included.
+
+**The gate.** `bash verify/run.sh --require-all` on `de03335`: VERDICT: PASS,
+nothing skipped; 11 passed; `--control` caught 450 of 450.
+
+**Cost**, from the session's transcripts, from Logan's request at 19:07:13
+to 21:11:46, 125 minutes of wall clock. Round 2's script measured it, with
+this work's agent prefix, "RES ":
+
+| agent | model | runs | minutes | tool uses | output | fresh | cache reads |
+|---|---|---:|---:|---:|---:|---:|---:|
+| verifier-resume | claude-haiku-5-5 | 3 | 64 | 207 | 543 k | 2.3 M | 86.0 M |
+| the lead | claude-opus-5-5 | - | 125 (wall) | 238 | 260 k | 790 k | 67.2 M |
+| all | | 3 | 64 | 445 | 803 k | 3.1 M | 153.2 M |
+
+Fresh tokens are input, cache writes and output. The "all" row's minutes are
+the verifier's; the lead's are wall clock, and are not added to them. The
+verifier wrote 67.6% of the output. A notification's "subagent_tokens" is
+the context at the run's end (769,751 after pass 3), not usage. The
+verifier of this entry ran after it was written, and is not counted here.
+
+Pass 2's report listed seven notes still open from pass 1. Three are
+answered under "Left with Logan" below. Four stand as they are, three of
+them from pass 1's messages rather than its report:
+- two of Logan's approved sentences side by side, "no formal training in
+  computing" and "one month of formal computer science";
+- the stamp's pages built, which counts navigation entries with a page;
+- the group's month, read from ParcelRound, the earliest of the three;
+- Mercenaries2's README's notice that its mod development moved.
+
+Pass 1's report has one note of its own, which also stands: the links stage
+alone passes a robots tag written two ways, a duplicated attribute and
+another crawler's name, which the local-only stage refuses.
+
+**verifier-record**, on Haiku, read this entry against the lead's log, the
+verifier's reports, the key, the gate's records and the transcripts. Its
+first pass found two wrong answers, the dispatch's time and the cost's
+window, four restates and seven notes, each taken here before the entry
+reached main. Its second pass found that pass 1's notes were listed from
+pass 2's report, not pass 1's, and that this entry's sentence on how an
+address is read still had the README's old words; both were taken. Its
+wrong answer there, that the lead never read the two repositories' main,
+was not taken, and it withdrew it: the lead's read is in its transcript at
+19:11.
+
+**Left with Logan:**
+- Approving the four drafted lines as printed, or changing them. The
+  summary's "research" and its sentence on what makes the work workable
+  are the lead's sharpening of his draft.
+- The Moth Hack line. No text in Quantum-Film's repository at its pin
+  records the win. The entry is "Expert challenge #9" in its README, which
+  also says the entry is "not a candidate for cash prizes", and the line
+  sits beside that entry.
+- Whether commits should carry a noreply author address. Every commit on
+  main carries his git author address in its metadata, which the privacy
+  stage's address check does not read.
+- Whether to push.

@@ -173,9 +173,11 @@ One page, `resume.html` (Logan's resume, docs/SPEC.md decision 42), is
 unlisted. The navigation doesn't link to it, it asks search engines not to
 index it, and the links stage refuses a link to it from any other page, by a
 relative link or by a full address on the site's own hosts. A full address is
-resolved as the URL Standard resolves one, and its host is read more broadly
-than a browser reads it: through IDNA's mapping, and again with every
-character outside ASCII dropped, which can only refuse more. The stage reads
+cleaned as the URL Standard cleans one and resolved from each of the site's
+two hosts, and an http(s) address that lacks its slashes is read with them
+too. Its host is read as a browser reads it, through IDNA's mapping, and
+again with every character outside ASCII dropped, which is broader than any
+browser's reading and can only refuse more. The stage reads
 links, not an address written out as text, as a dossier's plain-text twin
 could hold one; that is a stated limit. Unlisted isn't
 private: the page is published, MANIFEST names it, facts.json holds its
