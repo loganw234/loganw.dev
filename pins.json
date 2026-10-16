@@ -1,7 +1,7 @@
 {
  "about": "The one list of what this site reads. Every figure on it is read at one of these commits, or from the GitHub snapshot named here, and nowhere else. A pin moves only by a dated commit that changes this file (docs/SPEC.md, decisions 3 and 4). A key 'owner/name' is another owner's repository. A pin with a dir is read from the owner's clone of that name; one without is read only from the site's own clone under .cache/, fetched with LOGANW_FETCH=1. workflows classifies every GitHub Actions workflow the snapshot lists for a repository, read from what it runs: 'verifies' runs checks that can fail on a wrong result, 'builds' compiles, packages or lints without them, 'deploys' publishes a site, an image or a release. An unclassified workflow refuses the build.",
  "owner": "loganw234",
- "snapshot": "sources/github-2026-10-08-1345.json",
+ "snapshot": "sources/github-2026-10-15-1921.json",
  "repos": {
   "PrettyCloud": {"dir": "PrettyCloud", "commit": "5161daa", "workflows": {"pages-build-deployment": "deploys"}},
   "atlas-darkroom": {"dir": "atlas-darkroom", "commit": "c1b9b6e","workflows": {"tests": "verifies", "cadence-image": "deploys"}},
@@ -12,7 +12,8 @@
   "cft-rebound": {"dir": "cft-rebound", "commit": "039e3c3", "verified_by": {"ledger": {"path": "docs/VALIDATION.md", "passes": {"a gate row marked **PASS**": "\\*\\*PASS\\*\\*", "hw/verify-image.sh, N of N PASS": "`hw/verify-image\\.sh`:?\\s+\\**(\\d+) of \\1 PASS", "device-test, 0 failed": "`device-test`[^\\n]*\\n?[^\\n]*?\\*{0,2}(?<![\\d,.])0 failed"}}}, "workflows": {}},
   "ParcelRound": {"dir": "ParcelRound", "commit": "f42242e", "workflows": {}},
   "HonestFramework": {"dir": "HonestFramework", "commit": "65447fd", "workflows": {}},
-  "HonestHarness": {"dir": "HonestHarness", "commit": "b310f82", "workflows": {}},
+  "HonestHarness": {"dir": "HonestHarness", "commit": "b69ed76", "workflows": {}},
+  "QRO-Crate": {"dir": "QRO-Crate", "commit": "8858978", "workflows": {}},
   "Quantum-Film": {"dir": "moth-quantum", "commit": "3a73823", "verified_by": {"ledger": {"path": "docs/VALIDATION.md", "passes": {"the full runner, N passed, none skipped": "`(?:make verify|run\\.sh)(?: --require-all)?`(?: with `--require-all`)?(?: \\(run [^)]*\\))?:?\\s+\\d+ passed,\\s+none skipped"}}}, "workflows": {"Pages": "deploys"}},
   "binary-sites": {"dir": "binary-sites", "commit": "dacdcb8", "workflows": {"build": "verifies", "deploy-domains": "deploys", "pages-build-deployment": "deploys"}},
   "StoryDocs": {"dir": "StoryDocs", "commit": "8548802", "workflows": {}},

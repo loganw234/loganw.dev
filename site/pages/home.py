@@ -164,10 +164,9 @@ def rows():
                    [P("HonestHarness", "README.md",
                       r"^(A harness for running \[ParcelRound\]\([^)]*\)\s+and \[HonestFramework\]\([^)]*\) on\s+"
                       r"open-weight models)\.")],
-                   [P("HonestHarness", "README.md", r"^\*\*Status: (research)\.\*\*"), ", with ",
-                    P("HonestHarness", "README.md", r"\*\* There is (no code yet)\."), " on main"],
-                   [L(facts.pin("HonestHarness").href("Research/open-weight-harness-requirements.md"),
-                      facts.exists("HonestHarness", "Research/open-weight-harness-requirements.md"))]))
+                   [P("HonestHarness", "README.md", r"^\*\*Status: (research, with its first code)\.\*\*"), "; ",
+                    P("HonestHarness", "README.md", r"HonestHarness's\s+(round 1, closed \d{4}-\d{2}-\d{2})\.", num=True)],
+                   [C("python " + facts.exists("HonestHarness", "tools/check.py").text)]))
     T = "Film & photography"
     for name in ("CanonBracketTool", "Microscope-Stacker"):
         out.append(row(T, name, [facts.api_description(name)], [S("a beginning project, from before the method")],
@@ -193,6 +192,10 @@ def rows():
                    [P("Quantum-Film", "README.md", r"^\*\*(Film stocks whose crystals are laid by quantum circuits)")],
                    [facts.stage_count("Quantum-Film", "verify/run.sh"), " runner stages"],
                    [L(url.raw, P("Quantum-Film", "README.md", r"^- \*\*(The web demo)\*\*, live at"))]))
+    out.append(row(T, "QRO-Crate",
+                   [P("QRO-Crate", "README.md", r"^(An RO-Crate profile for quantum computing runs)")],
+                   [P("QRO-Crate", "README.md", r"^- (P0 is built):"), ", and nothing after it yet"],
+                   [C("bash " + facts.exists("QRO-Crate", "verify/run.sh").text + " --budget quick")]))
     T = "Preservation"
     out.append(row(T, "Mercenaries2",
                    [P("Mercenaries2", "README.md", r"^(A revival project for \*\*Mercenaries 2: World in Flames\*\*)")],

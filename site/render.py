@@ -30,6 +30,13 @@ SOURCE_REPO = "https://github.com/%s/loganw.dev" % facts.OWNER
 CSP = ("default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self' data:; "
        "base-uri 'none'; form-action 'none'")
 
+# An unlisted page (decision 42: the resume) is reached by its address
+# alone. It claims no navigation entry, asks search engines not to index it
+# with this tag, and no other published page may link to it
+# (build.check_links). Unlisted is not private: the page is published, and
+# MANIFEST and facts.json name it and its figures like any other.
+NOINDEX = '<meta name="robots" content="noindex">'
+
 
 def esc(s):
     return html.escape(str(s), quote=True)
@@ -208,16 +215,18 @@ def footer(note=""):
         % (SOURCE_REPO, fig(facts.snapshot_date(), src=False), "".join(li)))
 
 
-def page(title, current, built, body, description, note=""):
+def page(title, current, built, body, description, note="", unlisted=False):
     """Home's heading is the name; every other page's is its own, in its body.
-    note is the page's own footer note, if it has one."""
+    note is the page's own footer note, if it has one. An unlisted page
+    claims no navigation entry (current is None) and carries NOINDEX."""
     tag = "h1" if current == "Home" else "p"
     return ('<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
             '<meta http-equiv="Content-Security-Policy" content="%s">'
-            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">%s'
             '<title>%s</title><meta name="description" content="%s">'
             '<link rel="stylesheet" href="style.css"><link rel="icon" href="data:,"></head>\n'
             '<body><main>'
             '<header><div class="site">loganw.dev</div><%s class="name">Logan W.</%s><nav>%s</nav>'
             '<p class="stamp">%s</p></header>\n%s\n<footer>%s</footer></main></body></html>\n'
-            % (esc(CSP), esc(title), esc(description), tag, tag, nav(current, built), stamp(), body, footer(note)))
+            % (esc(CSP), NOINDEX if unlisted else "", esc(title), esc(description), tag, tag, nav(current, built),
+               stamp(), body, footer(note)))

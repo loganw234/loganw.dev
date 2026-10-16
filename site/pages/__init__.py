@@ -5,7 +5,10 @@ A page module defines:
   PAGE = {"file", "nav", "title", "description"} and, in a section of more
       than one page, "index": True on the one page the navigation links to.
       "file" is a flat, lower-case .html name; every page is published beside
-      index.html, so one set of relative links works on both hosts.
+      index.html, so one set of relative links works on both hosts. An
+      unlisted page (decision 42, the resume) has "nav": None and
+      "unlisted": True: it carries render.NOINDEX, and check_links refuses a
+      link to it from any other page.
   render_page(ctx) -> the page's body HTML. ctx["built"] maps each navigation
       label to the file it links to; ctx["pages"] maps each label to every
       file in its section. Every figure goes through render.render() or

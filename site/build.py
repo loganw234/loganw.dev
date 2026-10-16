@@ -82,8 +82,9 @@ SPEAKERS = {"Logan"}
 SOURCE_PATHS = {
     ".gitmodules", "ADOPTION.md", "CASE-STUDY-2.md", "CASE-STUDY-3.md", "CASE-STUDY-4.md", "CASE-STUDY-5.md",
     "CASE-STUDY-6.md", "CASE-STUDY.md", "CLAUDE.md", "CONFORMANCE.md", "LICENSE", "METHOD.md", "README.md",
-    "Research/open-weight-harness-requirements.md", "docs/CERTIFICATES.md", "docs/COMPLIANCE.md", "docs/DETERMINISM.md",
-    "docs/HARDWARE-RESULTS.md", "docs/HOSTAPI.md", "docs/LANGUAGE.md", "docs/PARCEL-ROUNDS.md",
+    "Research/open-weight-harness-requirements.md", "Rounds/HonestHarness-R1/CASE-STUDY.md", "docs/CERTIFICATES.md",
+    "docs/COMPLIANCE.md", "docs/DETERMINISM.md", "docs/HARDWARE-RESULTS.md", "docs/HOSTAPI.md", "docs/LANGUAGE.md",
+    "docs/PARCEL-ROUNDS.md",
     "docs/PREREGISTRATION.md", "docs/README.md", "docs/TRANSCENDENTALS.md", "docs/VALIDATION.md",
     "docs/VERIFICATION.md", "docs/prints/ibm-kingston-pauli-4x4-print.png", "docs/prints/ibm-kingston-pauli-4x4.json",
     "docs/prints/pauli-print.png", "docs/prints/poisson-print.png", "docs/prints/trix-print.png",
@@ -112,7 +113,13 @@ def validate(mods):
         for need in ("PAGE", "render_page"):
             if not hasattr(m, need):
                 raise Refusal("%s defines no %s" % (m.__name__, need))
-        if m.PAGE["nav"] not in render.NAV:
+        # An unlisted page (decision 42) claims no navigation entry, and only
+        # a page marked unlisted may claim none (render.NOINDEX says the rest).
+        if m.PAGE.get("unlisted"):
+            if m.PAGE["nav"] is not None:
+                raise Refusal("%s is unlisted and claims nav entry %r; an unlisted page claims none"
+                              % (m.__name__, m.PAGE["nav"]))
+        elif m.PAGE["nav"] not in render.NAV:
             raise Refusal("%s claims nav entry %r, which is not in the navigation" % (m.__name__, m.PAGE["nav"]))
         # Every page is published flat, beside index.html, so that one set of
         # relative links works at loganw.dev/ and at loganw234.github.io/loganw.dev/.
@@ -125,7 +132,7 @@ def validate(mods):
     # A navigation entry may have several pages (a section: the three threads,
     # the dossiers); exactly one of them is the section's own page, which the
     # navigation links to. A lone page is its section's own page.
-    for label in {m.PAGE["nav"] for m in mods}:
+    for label in {m.PAGE["nav"] for m in mods} - {None}:
         group = [m for m in mods if m.PAGE["nav"] == label]
         heads = [m for m in group if m.PAGE.get("index", len(group) == 1)]
         if len(heads) != 1:
@@ -165,6 +172,8 @@ def section_index(mods):
     """-> {navigation label: the file the navigation links to}."""
     out = {}
     for m in mods:
+        if m.PAGE["nav"] is None:
+            continue    # an unlisted page: no navigation entry links to it
         group = [g for g in mods if g.PAGE["nav"] == m.PAGE["nav"]]
         if m.PAGE.get("index", len(group) == 1):
             out[m.PAGE["nav"]] = m.PAGE["file"]
@@ -209,13 +218,15 @@ def render_all():
     built = section_index(mods)
     pages_by_nav = {}
     for m in mods:
-        pages_by_nav.setdefault(m.PAGE["nav"], []).append(m.PAGE["file"])
+        if m.PAGE["nav"] is not None:
+            pages_by_nav.setdefault(m.PAGE["nav"], []).append(m.PAGE["file"])
     text, binary = {}, {}
     for m in mods:
         ctx = {"built": built, "pages": pages_by_nav}
         body = m.render_page(ctx)
         note = m.footer_note(ctx) if hasattr(m, "footer_note") else ""
-        text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"], note)
+        text[m.PAGE["file"]] = render.page(m.PAGE["title"], m.PAGE["nav"], built, body, m.PAGE["description"], note,
+                                           unlisted=bool(m.PAGE.get("unlisted")))
         for dest, repo, path in getattr(m, "ASSETS", []):
             data = facts.pin(repo).show(path, binary=True)
             check_asset(dest, data)
@@ -1298,10 +1309,13 @@ class _Tags(html.parser.HTMLParser):
             self.problems.append("<meta http-equiv=%r content=%r> is not the site's Content-Security-Policy"
                                  % (a["http-equiv"], a.get("content")))
         elif tag == "meta" and "http-equiv" not in a and a != {"charset": "utf-8"} \
-                and a.get("name") not in ("viewport", "description"):
-            # Only the four this site writes: a preview card's text (a
+                and a.get("name") not in ("viewport", "description", "robots"):
+            # Only the five this site writes: a preview card's text (a
             # twitter:description, say) is text a reader sees that no check reads.
             self.problems.append("<meta %s> is not one of the site's own" % " ".join("%s=%r" % kv for kv in attrs))
+        if tag == "meta" and a.get("name") == "robots" and a.get("content") != "noindex":
+            # an unlisted page's render.NOINDEX, and nothing else under that name
+            self.problems.append("<meta name=robots content=%r> is not an unlisted page's noindex" % a.get("content"))
         if tag == "meta" and a.get("name") == "viewport" and a.get("content") != "width=device-width,initial-scale=1":
             self.problems.append("<meta name=viewport content=%r> is not the site's" % a.get("content"))
         if tag == "path" and "marker-end" in a and not re.fullmatch(r"url\(#[\w-]+\)", a["marker-end"]):
@@ -1715,9 +1729,12 @@ def check_asset(dest, data):
 class _Refs(html.parser.HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.refs, self.ids = [], set()
+        self.refs, self.ids, self.noindex = [], set(), False
 
     def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "meta" and (a.get("name") or "").lower() == "robots" and "noindex" in (a.get("content") or "").lower():
+            self.noindex = True
         for k, v in attrs:
             if k == "id" and v:
                 self.ids.add(v)
@@ -1725,6 +1742,21 @@ class _Refs(html.parser.HTMLParser):
                 self.refs.append(v)
 
     handle_startendtag = handle_starttag
+
+
+# Where the site is served (README): a full address on one of these names a
+# published page as a relative link does, so the unlisted rule reads both.
+SITE_HOSTS = {"loganw.dev": "/", "www.loganw.dev": "/", "loganw234.github.io": "/loganw.dev/"}
+
+
+def _own_page(u):
+    """The published path a full address on one of the site's own hosts
+    names (index.html for a bare directory), or None for any other address."""
+    s = urllib.parse.urlsplit("https:" + u if u.startswith("//") else u)
+    base = SITE_HOSTS.get((s.hostname or "").lower())
+    if base is None or s.scheme.lower() not in ("http", "https") or not s.path.startswith(base):
+        return None
+    return urllib.parse.unquote(s.path[len(base):]) or "index.html"
 
 
 def _target(rel, u, files):
@@ -1742,13 +1774,15 @@ def _target(rel, u, files):
 
 def check_links(root=PUBLIC):
     files = set(published(root))
-    ids, refs, problems = {}, [], []
+    ids, refs, problems, unlisted = {}, [], [], set()
     for rel in sorted(files):
         if rel.endswith(".html"):
             p = _Refs()
             p.feed((root / rel).read_text(encoding="utf-8"))
             ids[rel] = p.ids
             refs += [(rel, u) for u in p.refs]
+            if p.noindex:
+                unlisted.add(rel)
         elif rel.endswith(".css"):
             refs += [(rel, u) for u in css_parts((root / rel).read_text(encoding="utf-8"))[2]]
     for rel, u in refs:
@@ -1757,12 +1791,23 @@ def check_links(root=PUBLIC):
         if re.match(r"https://github\.com/[^?#]+\.(?:md|markdown)#L\d+(?:-L\d+)?$", u, re.I):
             problems.append("%s links to %s: GitHub opens a Markdown file at its top whatever the #L; put "
                             "?plain=1 before it" % (rel, u))
+        # An unlisted page (render.NOINDEX, decision 42) is reached by its
+        # address alone: no other page links to it, by a relative link or by
+        # a full address on one of the site's own hosts. So no page the
+        # navigation links to can carry NOINDEX either.
         if SCHEME.match(u) or u.startswith("//"):
+            own = _own_page(u)
+            if own in unlisted and own != rel:
+                problems.append("%s links to %s, the unlisted page %s, which no other page may link to"
+                                % (rel, u, own))
             continue
         t = _target(rel, u, files)
         if t is None:
             problems.append("%s links to %s, which is not a published file" % (rel, u))
-        elif "#" in u and u.split("#", 1)[1] and u.split("#", 1)[1] not in ids.get(t, set()):
+            continue
+        if t in unlisted and t != rel:
+            problems.append("%s links to %s, the unlisted page %s, which no other page may link to" % (rel, u, t))
+        if "#" in u and u.split("#", 1)[1] and u.split("#", 1)[1] not in ids.get(t, set()):
             problems.append("%s links to %s, and %s has no such id" % (rel, u, t))
     if not any(f.endswith(".html") for f in files):
         problems.append("no page is published")
@@ -2525,8 +2570,26 @@ def controls():
             planted("links", "a link to %s" % bad, t.replace("</footer>", '<a href="%s">x</a></footer>' % bad, 1),
                     check_links, bad)
 
+        # links: an unlisted page (decision 42) linked from another page, by a
+        # relative link and by a full address on each of the site's hosts; and
+        # a page the navigation links to marked unlisted
+        hidden = sorted(r for r in published(root) if r.endswith(".html")
+                        and render.NOINDEX in (root / r).read_text(encoding="utf-8"))
+        if not hidden:
+            report("links", False, "could not plant a link to an unlisted page: no published page is unlisted")
+        for h in hidden[:1]:
+            for href in (h, "https://loganw.dev/" + h, "https://www.loganw.dev/" + h,
+                         "https://loganw234.github.io/loganw.dev/" + h, "//loganw.dev/" + h):
+                planted("links", "a link to the unlisted %s as %s" % (h, href),
+                        t.replace("</footer>", '<a href="%s">x</a></footer>' % href, 1), check_links, "unlisted page")
+        planted("links", "%s marked unlisted, though every page's navigation links to it" % MAP_PAGE,
+                t.replace("</head>", render.NOINDEX + "</head>", 1), check_links, "unlisted page")
+        planted("local-only", "a robots meta other than an unlisted page's noindex",
+                t.replace("</head>", '<meta name="robots" content="nofollow"></head>', 1), check_local_only,
+                "not an unlisted page's noindex")
+
         # local-only: loads and scripts in several forms, and a missing policy
-        for what, plant in (("an external stylesheet", '<link rel="stylesheet" href="https://fonts.googleapis.com/css2">'),
+        for what, plant in (("an external stylesheet",'<link rel="stylesheet" href="https://fonts.googleapis.com/css2">'),
                             ("a script", "<script>1</script>"),
                             ("srcset", '<img src="assets/pauli-print.png" srcset="https://x.invalid/a.png 2x" alt="">'),
                             ("a style attribute", '<p style="background:url(https://x.invalid/a.png)">x</p>'),
@@ -2945,6 +3008,15 @@ def controls():
     m = fake("x.html", "Work")
     m.NUMERAL_NAMES = ["4096 tests"]
     refused("seam", "a page module allowing names of its own", lambda m=m: validate([m]), "numeral_names.json")
+    # an unlisted page (decision 42) claims no navigation entry, and only one marked so may claim none
+    m = fake("x.html", "Work")
+    m.PAGE["unlisted"] = True
+    refused("seam", "an unlisted page claiming a navigation entry",
+            lambda m=m: validate([m, fake(FRONT_PAGE, "Home"), fake(MAP_PAGE, "Map & Ledger")]),
+            "an unlisted page claims none")
+    refused("seam", "a page claiming no navigation entry without being marked unlisted",
+            lambda: validate([fake("x.html", None), fake(FRONT_PAGE, "Home"), fake(MAP_PAGE, "Map & Ledger")]),
+            "not in the navigation")
     for bad in ("work/x.txt", "X.TXT", "index.html"):
         m = fake("x.html", "Work")
         m.extra_files = lambda ctx, bad=bad: {bad: "planted"}

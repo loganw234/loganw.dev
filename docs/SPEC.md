@@ -330,6 +330,42 @@ word.
     what Im focusing on now".
 41. **Method's sentence "This is the one place the site states it":** "Keep
     it".
+42. **An unlisted resume page.** In Logan's words, on 2026-10-15: "I'd like
+    to add an unlisted resume page, that way my resume itself is held to the
+    same standards as the rest of my work. I have a rough draft of a resume,
+    but it still needs work and likely a bit of sharpening, the initial
+    focus is towards Anthropic Fellows Program. This is just meant to be a
+    general draft, nothing is finalized about it." And, while it was being
+    built: "Id also prefer more come from cited sources than my claims where
+    able." *What the site does:*
+    - `resume.html` claims no navigation entry and asks search engines not
+      to index it. The links stage refuses a link to it from any other
+      page, so it is reached by its address alone. Unlisted is not private:
+      MANIFEST and facts.json name it like any other page.
+    - Most of it quotes the projects at their pins, each quote with its file
+      and line.
+    - His role, his summary and the Moth Hack result are drafted from his
+      draft resume, and carry the draft label until he approves them as
+      printed.
+    - Its background is Home's biography and About's first approved
+      sentence, as he approved them (decisions 14 and 26).
+    - On his draft's "billion-scale binary256 stress testing", he said: "I
+      had counted cumulative revision tests rather than any singular one
+      for the stress testing. All the hardware verification runs." No
+      record at cft-fp256's pin states that total, so the page cites the
+      hardware runs the record does state.
+43. **HonestHarness's pin moved to GitHub's main, and QRO-Crate pinned,**
+    so that the resume reads both from their sources (decision 42's
+    "cited sources ... where able"). HonestHarness's round 1 is on its main,
+    so its Map & Ledger row is restated at the new pin. QRO-Crate gets a
+    row in the Film & photography thread, beside Quantum-Film, whose runs
+    are its first data, and the Record now reads its ledger like any other
+    pinned ledger. HonestHarness's full dossier (decision 31) is not built
+    here; it is left for an update round.
+44. **QRO-Crate's map node:** "You may add the map node for QRO-Crate". It
+    is in the Film & photography lane. Its one edge, Quantum-Film underlies
+    QRO-Crate, quotes QRO-Crate's README: "Its first data are
+    Quantum-Film's runs".
 
 ---
 
