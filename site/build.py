@@ -1855,12 +1855,14 @@ def check_links(root=PUBLIC):
         # a full address on one of the site's own hosts. So no page the
         # navigation links to can carry NOINDEX either.
         if SCHEME.match(u) or u.startswith("//"):
+            # ascii(): an address can hold any character, and every console
+            # this prints to, CI's public log among them, can show these
             for own in sorted(_own_pages(rel, u, files)):
                 if own == UNREADABLE:
-                    problems.append("%s links to %r, %s as a browser would" % (rel, u, UNREADABLE))
+                    problems.append("%s links to %s, %s as a browser would" % (rel, ascii(u), UNREADABLE))
                 elif own in unlisted and own != rel:
-                    problems.append("%s links to %r, the unlisted page %s, which no other page may link to"
-                                    % (rel, u, own))
+                    problems.append("%s links to %s, the unlisted page %s, which no other page may link to"
+                                    % (rel, ascii(u), own))
             continue
         t = _target(rel, u, files)
         if t is None:
