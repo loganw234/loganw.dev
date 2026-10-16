@@ -1764,21 +1764,43 @@ def _browser_form(u):
     return u
 
 
+# The full stops IDNA reads as a dot (RFC 3490, section 3.1), from code points.
+IDNA_DOTS = (chr(0x3002), chr(0xFF0E), chr(0xFF61))
+
+
+def _hosts(hostname):
+    """Every reading of a host that the unlisted rule holds to the site's
+    hosts, percent-decoded and folded to its compatibility form first, with
+    every IDNA full stop read as a dot: as it then stands; through Python's
+    IDNA codec, whose mapping deletes the ignorable code points a browser
+    deletes (a soft hyphen, a zero-width space); and with every code point
+    outside ASCII dropped, since that codec's Unicode 3.2 tables pass one
+    added later (U+180F) that a browser's current tables delete
+    (verifier-resume). That last reading is broader than any browser's, so
+    it can only refuse more. Each without case or a trailing dot."""
+    h = unicodedata.normalize("NFKC", urllib.parse.unquote(hostname))
+    for d in IDNA_DOTS:
+        h = h.replace(d, ".")
+    forms = {h, "".join(c for c in h if ord(c) < 128)}
+    try:
+        forms.add(h.encode("idna").decode("ascii"))
+    except UnicodeError:
+        pass
+    return {f.lower().rstrip(".") for f in forms}
+
+
 def _page_at(url, files):
     """The published page a resolved http(s) address on one of the site's own
     hosts reaches, as GitHub Pages would serve it, or None for any other
-    address. The host is read as a browser reads it: percent-decoded, folded
-    to its compatibility form and lower case (a fullwidth letter is its
-    ASCII letter), and without a trailing dot. The path has its
-    percent-encoding decoded, doubled slashes and dot segments resolved, a
-    bare directory read as its index.html, and a name with no extension read
-    as the page of that name, since GitHub Pages serves resume.html at
-    /resume. Case is ignored, which can only refuse more."""
+    address. The host is the site's if any of _hosts() reads it as one. The
+    path has its percent-encoding decoded, doubled slashes and dot segments
+    resolved, a bare directory read as its index.html, and a name with no
+    extension read as the page of that name, since GitHub Pages serves
+    resume.html at /resume. Case is ignored, which can only refuse more."""
     s = urllib.parse.urlsplit(url)
     if s.scheme.lower() not in ("http", "https") or not s.hostname:
         return None
-    host = unicodedata.normalize("NFKC", urllib.parse.unquote(s.hostname)).lower().rstrip(".")
-    base = SITE_HOSTS.get(host)
+    base = next((SITE_HOSTS[h] for h in sorted(_hosts(s.hostname)) if h in SITE_HOSTS), None)
     if base is None:
         return None
     path = posixpath.normpath(re.sub(r"/+", "/", "/" + urllib.parse.unquote(s.path)))
@@ -1849,14 +1871,15 @@ def check_links(root=PUBLIC):
         # #L; ?plain=1 shows the line (facts.line_anchor; verifier-seam).
         if re.match(r"https://github\.com/[^?#]+\.(?:md|markdown)#L\d+(?:-L\d+)?$", u, re.I):
             problems.append("%s links to %s: GitHub opens a Markdown file at its top whatever the #L; put "
-                            "?plain=1 before it" % (rel, u))
+                            "?plain=1 before it" % (rel, ascii(u)))
         # An unlisted page (render.NOINDEX, decision 42) is reached by its
         # address alone: no other page links to it, by a relative link or by
         # a full address on one of the site's own hosts. So no page the
         # navigation links to can carry NOINDEX either.
+        # Every address is printed with ascii(): it can hold any character,
+        # and every console this prints to, CI's public log among them, can
+        # show what ascii() writes (the gate crashed on one, 2026-10-15).
         if SCHEME.match(u) or u.startswith("//"):
-            # ascii(): an address can hold any character, and every console
-            # this prints to, CI's public log among them, can show these
             for own in sorted(_own_pages(rel, u, files)):
                 if own == UNREADABLE:
                     problems.append("%s links to %s, %s as a browser would" % (rel, ascii(u), UNREADABLE))
@@ -1866,12 +1889,13 @@ def check_links(root=PUBLIC):
             continue
         t = _target(rel, u, files)
         if t is None:
-            problems.append("%s links to %s, which is not a published file" % (rel, u))
+            problems.append("%s links to %s, which is not a published file" % (rel, ascii(u)))
             continue
         if t in unlisted and t != rel:
-            problems.append("%s links to %s, the unlisted page %s, which no other page may link to" % (rel, u, t))
+            problems.append("%s links to %s, the unlisted page %s, which no other page may link to"
+                            % (rel, ascii(u), t))
         if "#" in u and u.split("#", 1)[1] and u.split("#", 1)[1] not in ids.get(t, set()):
-            problems.append("%s links to %s, and %s has no such id" % (rel, u, t))
+            problems.append("%s links to %s, and %s has no such id" % (rel, ascii(u), t))
     if not any(f.endswith(".html") for f in files):
         problems.append("no page is published")
     return problems + check_connections(root)
@@ -2652,7 +2676,15 @@ def controls():
                          "https://%6Coganw.dev/" + h, "https://" + chr(0xFF4C) + "oganw.dev/" + h,
                          "https://loganw.dev" + back + h, "https:" + back * 2 + "loganw.dev" + back + h,
                          "https://loganw.dev./" + h, "http:loganw.dev/" + h, "https:/loganw.dev/" + h,
-                         "https://logan" + chr(9) + "w.dev/" + h):
+                         "https://logan" + chr(9) + "w.dev/" + h, "//loganw.dev/./" + h, "https://www.loganw.dev./" + h,
+                         # IDNA's spellings (verifier-resume's pass 2): its full stops, and code points it deletes,
+                         # U+180F among them, which Python's Unicode 3.2 IDNA tables do not know
+                         "https://loganw" + chr(0x3002) + "dev/" + h, "//loganw" + chr(0x3002) + "dev/" + h,
+                         "https://loganw" + chr(0xFF61) + "dev/" + h, "https://loganw.dev" + chr(0x3002) + "/" + h,
+                         "https://loganw%E3%80%82dev/" + h, "https://loganw234" + chr(0x3002) + "github.io/loganw.dev/" + h,
+                         "https://lo" + chr(0xAD) + "ganw.dev/" + h, "https://lo%C2%ADganw.dev/" + h,
+                         "https://lo" + chr(0x200B) + "ganw.dev/" + h, "https://lo" + chr(0xFEFF) + "ganw.dev/" + h,
+                         "https://lo" + chr(0x180F) + "ganw.dev/" + h):
                 planted("links", "a link to the unlisted %s as %s" % (h, ascii(href)),
                         t.replace("</footer>", '<a href="%s">x</a></footer>' % html.escape(href, quote=True), 1), check_links,
                         "unlisted page")

@@ -3,65 +3,65 @@ Quantum-Film — dossier
 
 I. What it is
 
-Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll the same, bit for bit, on every machine [fact 2046].
+Film stocks whose crystals are laid by quantum circuits, and a fixer that makes every print of a roll the same, bit for bit, on every machine [fact 2047].
 
 II. What it is not
 
-- Not a quantum advantage. At these sizes both quantum laws are classically simulable. That is exactly what makes them checkable [fact 2047]
-- Not deterministic at the shot. A roll from a device is unique [fact 2048]
-- The comparison measures; it does not gate. It says how far each device is from the law and from the twin, not whether a device "passed" [fact 2049]
-- Not a model of any real film's grain. [fact 2050]
+- Not a quantum advantage. At these sizes both quantum laws are classically simulable. That is exactly what makes them checkable [fact 2048]
+- Not deterministic at the shot. A roll from a device is unique [fact 2049]
+- The comparison measures; it does not gate. It says how far each device is from the law and from the twin, not whether a device "passed" [fact 2050]
+- Not a model of any real film's grain. [fact 2051]
 
 III. The contract
 
-“The authority is quantum_film/golden: pure Python and mpmath at 256 bits, with exact counter-based uniforms (SHA-256) [fact 2051] It imports nothing it could share with what it judges [fact 2052]; a test holds that mechanically [fact 2053].” The circuits, the float paths and Atlas's results are all scored against it [fact 2054].
+“The authority is quantum_film/golden: pure Python and mpmath at 256 bits, with exact counter-based uniforms (SHA-256) [fact 2052] It imports nothing it could share with what it judges [fact 2053]; a test holds that mechanically [fact 2054].” The circuits, the float paths and Atlas's results are all scored against it [fact 2055].
 
 IV. Verified
 
-Last verified: 2026-09-26 [fact 2055]. It counts only a full run of the runner with nothing skipped; the newest full run the ledger records skipped one stage: “The front door at 83933cc: 17 stages passed and 0 failed. atlas skipped by name, because no Atlas key was used [fact 2056]”.
+Last verified: 2026-09-26 [fact 2056]. It counts only a full run of the runner with nothing skipped; the newest full run the ledger records skipped one stage: “The front door at 83933cc: 17 stages passed and 0 failed. atlas skipped by name, because no Atlas key was used [fact 2057]”.
 
-- 2026-09-25 - P0 finished for round 1: libcft built, the authority held to its own law, device rolls, and a test layout parcels cannot outgrow [fact 2057]
-- 2026-09-26 - P3 merged: the shelf's Pauli law ran on Atlas as a hardware-shaped circuit, and holds [fact 2058]
-- 2026-10-05 - round 3's P1 and P2, merged after their verifiers: the frozen bundle and its runner, the comparison and the predictions [fact 2059]
-- 2026-10-05 - round 3's IBM bundles, their predictions and the pre-registration, committed before any job [fact 2060]
-- 2026-10-05 - round 3's IBM runs: the shelf's Pauli law on three Heron r2 devices, as pre-registered [fact 2061]
+- 2026-09-25 - P0 finished for round 1: libcft built, the authority held to its own law, device rolls, and a test layout parcels cannot outgrow [fact 2058]
+- 2026-09-26 - P3 merged: the shelf's Pauli law ran on Atlas as a hardware-shaped circuit, and holds [fact 2059]
+- 2026-10-05 - round 3's P1 and P2, merged after their verifiers: the frozen bundle and its runner, the comparison and the predictions [fact 2060]
+- 2026-10-05 - round 3's IBM bundles, their predictions and the pre-registration, committed before any job [fact 2061]
+- 2026-10-05 - round 3's IBM runs: the shelf's Pauli law on three Heron r2 devices, as pre-registered [fact 2062]
 
-The results document records its protocol: “Nine jobs, each submitted once, in the pre-registered order. Each job's line was committed and pushed before any result was read. [fact 2062]” Its one-paragraph summary: “All three devices carry the law's two quantum signatures, well clear of the classical twin: 4.3% to 5.4% of their five-crystal shots on forbidden layouts against the twin's 31.1%, and coherences of +0.27 to +0.34 where a classical mixture gives 0. And all three fall short of what their own noise models predicted. [fact 2063]” And it states a limit: “One day. Each device's jobs ran on one day; day-to-day variation is not measured. Within the day, the sheets' runs measure run-to-run variation (above) [fact 2064]”.
+The results document records its protocol: “Nine jobs, each submitted once, in the pre-registered order. Each job's line was committed and pushed before any result was read. [fact 2063]” Its one-paragraph summary: “All three devices carry the law's two quantum signatures, well clear of the classical twin: 4.3% to 5.4% of their five-crystal shots on forbidden layouts against the twin's 31.1%, and coherences of +0.27 to +0.34 where a classical mixture gives 0. And all three fall short of what their own noise models predicted. [fact 2064]” And it states a limit: “One day. Each device's jobs ran on one day; day-to-day variation is not measured. Within the day, the sheets' runs measure run-to-run variation (above) [fact 2065]”.
 
 V. Kept failures
 
-- The claim, in the README, STOCKS.md, ROUND1.md, DETERMINISM.md and the not-yet-dispatched P3 brief: givens.py's Pauli tile ran on Atlas and matched the exact law [fact 2065]. At that entry's date the ledger said: “the shelf's Pauli law has never run on Atlas [fact 2066]” — 2026-09-25 - the P0 verifier: a run credited to the wrong law, gates that could not fail, and what now makes each one fail [fact 2067]. The law ran on Atlas later: see the second row under Verified. Fixed by commit b0e9ed1 [fact 2068].
-- 2026-09-26 - corrections to the P1 entry: two labels copied without their definitions [fact 2069]: The entry copied the label without its definition [fact 2070]. Fixed by commit 283330c [fact 2071].
-- The READMEs frozen into the three IBM bundles say: "To rehearse offline first, add --dry-run". For those bundles that is wrong [fact 2072]. The bundles stay as frozen, since their READMEs are in their manifests' hashes [fact 2073] — 2026-10-05 - the frozen bundles' README advised a dry run the runner refuses; the template is corrected for bundles frozen from now on; the Moth handoff [fact 2074]. The template was corrected by commit 66d17c0 [fact 2075].
+- The claim, in the README, STOCKS.md, ROUND1.md, DETERMINISM.md and the not-yet-dispatched P3 brief: givens.py's Pauli tile ran on Atlas and matched the exact law [fact 2066]. At that entry's date the ledger said: “the shelf's Pauli law has never run on Atlas [fact 2067]” — 2026-09-25 - the P0 verifier: a run credited to the wrong law, gates that could not fail, and what now makes each one fail [fact 2068]. The law ran on Atlas later: see the second row under Verified. Fixed by commit b0e9ed1 [fact 2069].
+- 2026-09-26 - corrections to the P1 entry: two labels copied without their definitions [fact 2070]: The entry copied the label without its definition [fact 2071]. Fixed by commit 283330c [fact 2072].
+- The READMEs frozen into the three IBM bundles say: "To rehearse offline first, add --dry-run". For those bundles that is wrong [fact 2073]. The bundles stay as frozen, since their READMEs are in their manifests' hashes [fact 2074] — 2026-10-05 - the frozen bundles' README advised a dry run the runner refuses; the template is corrected for bundles frozen from now on; the Moth handoff [fact 2075]. The template was corrected by commit 66d17c0 [fact 2076].
 
 VI. Test it
 
-- make verify-quick: ~2 min: lint, docs, vectors, golden, circuits, decode, client, fixer, hardware, pinned, develop, compare, the control and its twin [fact 2076].
-- make verify: every stage [fact 2077]; any stage that cannot run skips BY NAME [fact 2078].
+- make verify-quick: ~2 min: lint, docs, vectors, golden, circuits, decode, client, fixer, hardware, pinned, develop, compare, the control and its twin [fact 2077].
+- make verify: every stage [fact 2078]; any stage that cannot run skips BY NAME [fact 2079].
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page.
 
 - Look at the first prints yourself and compare the structure-factor claim against what the eye can actually see in the published images — free.
-- Re-make a table of docs/HARDWARE-RESULTS.md from the committed records, and read whether any cell differs. “Every table below is quantum_film/compare.py's own, made from the records committed under docs/records/2026-10-05/ibm/, and every number in the prose is computed from them [fact 2079]”: python -m quantum_film.compare table --prediction <a prediction> docs/records/2026-10-05/ibm/<device>/run [fact 2080].
-- make verify-quick on a clean clone, and read whether the README's “The negative control, and its twin [fact 2081]” still catch a moved crystal.
+- Re-make a table of docs/HARDWARE-RESULTS.md from the committed records, and read whether any cell differs. “Every table below is quantum_film/compare.py's own, made from the records committed under docs/records/2026-10-05/ibm/, and every number in the prose is computed from them [fact 2080]”: python -m quantum_film.compare table --prediction <a prediction> docs/records/2026-10-05/ibm/<device>/run [fact 2081].
+- make verify-quick on a clean clone, and read whether the README's “The negative control, and its twin [fact 2082]” still catch a moved crystal.
 - Feed the fixer a record with one crystal moved yourself, by hand, and confirm it is refused for its digest and for no other reason.
-- Repeat the same Atlas job and check whether the bytes really differ: “Identical requests to Atlas returned different bytes wherever sampling was involved [fact 2082],” which needs an Atlas account this dossier does not supply.
+- Repeat the same Atlas job and check whether the bytes really differ: “Identical requests to Atlas returned different bytes wherever sampling was involved [fact 2083],” which needs an Atlas account this dossier does not supply.
 
 VIII. Connections
 
-- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 2091]
-- atlas-film underlies Quantum-Film: path = vendor/atlas-film [fact 2092]
-- Quantum-Film underlies QRO-Crate: Its first data are Quantum-Film's runs, on IBM's processors and on Moth's Atlas emulator [fact 2093]
-- StoryDocs documents Quantum-Film: projects/quantum-film [fact 2108]
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 2092]
+- atlas-film underlies Quantum-Film: path = vendor/atlas-film [fact 2093]
+- Quantum-Film underlies QRO-Crate: Its first data are Quantum-Film's runs, on IBM's processors and on Moth's Atlas emulator [fact 2094]
+- StoryDocs documents Quantum-Film: projects/quantum-film [fact 2109]
 
 IX. Provenance
 
-Quantum-Film read at 3a73823 [fact 2109].
+Quantum-Film read at 3a73823 [fact 2110].
 
-- README.md [fact 2110]
-- CLAUDE.md [fact 2111]
-- docs/HARDWARE-RESULTS.md [fact 2112]
-- docs/VALIDATION.md [fact 2113]
-- verify/run.sh [fact 2114]
+- README.md [fact 2111]
+- CLAUDE.md [fact 2112]
+- docs/HARDWARE-RESULTS.md [fact 2113]
+- docs/VALIDATION.md [fact 2114]
+- verify/run.sh [fact 2115]

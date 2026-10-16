@@ -123,8 +123,10 @@ def oversight_block():
                                                            r"coding agents\s+at\s+once, without the pieces failing to "
                                                            r"meet)\.")),
          ". It exists because ",
-         q(P("ParcelRound", "README.md", r"(Give four agents four well-scoped parcels of one feature and you\s+can "
-                                          r"get four green gates and a feature that does not work)")),
+         q(P("ParcelRound", "README.md", r"It exists because (the obvious approach fails in a specific, repeatable\s+"
+                                          r"way)\.")),
+         ": ", q(P("ParcelRound", "README.md", r"(Give four agents four well-scoped parcels of one feature and you\s+"
+                                                r"can get four green gates and a feature that does not work)")),
          ". ", facts.count_paths("ParcelRound", r"CASE-STUDY(-\d+)?\.md", "CASE-STUDY*.md files at the pin"),
          " rounds are recorded as case studies, and the sixth put ",
          q(P("ParcelRound", "README.md", r"(planted faults on every parcel's verifier)")), "."],
