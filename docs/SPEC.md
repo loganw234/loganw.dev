@@ -341,12 +341,13 @@ word.
     - `resume.html` claims no navigation entry and asks search engines not
       to index it. The links stage refuses a link to it from any other
       page, so it is reached by its address alone. Unlisted is not private:
-      MANIFEST and facts.json name it like any other page.
+      the page is published, MANIFEST names it, and facts.json holds its
+      figures like any other page's.
     - Most of it quotes the projects at their pins, each quote with its file
       and line.
-    - His role, his summary and the Moth Hack result are drafted from his
-      draft resume, and carry the draft label until he approves them as
-      printed.
+    - His role, his summary, cft-fp256 as his experiment, and the Moth Hack
+      result are drafted from his draft resume, and carry the draft label
+      until he approves them as printed.
     - Its background is Home's biography and About's first approved
       sentence, as he approved them (decisions 14 and 26).
     - On his draft's "billion-scale binary256 stress testing", he said: "I

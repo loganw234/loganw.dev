@@ -1749,14 +1749,25 @@ class _Refs(html.parser.HTMLParser):
 SITE_HOSTS = {"loganw.dev": "/", "www.loganw.dev": "/", "loganw234.github.io": "/loganw.dev/"}
 
 
-def _own_page(u):
+def _own_page(u, files=()):
     """The published path a full address on one of the site's own hosts
-    names (index.html for a bare directory), or None for any other address."""
+    names, or None for any other address. It is read as a browser and GitHub
+    Pages read it: percent-encoding decoded, doubled slashes and dot segments
+    resolved, a bare directory as its index.html, and a path with no
+    extension as the page of that name, since GitHub Pages serves
+    resume.html at /resume (files: the published paths)."""
     s = urllib.parse.urlsplit("https:" + u if u.startswith("//") else u)
     base = SITE_HOSTS.get((s.hostname or "").lower())
-    if base is None or s.scheme.lower() not in ("http", "https") or not s.path.startswith(base):
+    if base is None or s.scheme.lower() not in ("http", "https"):
         return None
-    return urllib.parse.unquote(s.path[len(base):]) or "index.html"
+    path = posixpath.normpath(re.sub(r"/+", "/", "/" + urllib.parse.unquote(s.path)))
+    root = base.rstrip("/")
+    if path != root and not path.startswith(root + "/"):
+        return None
+    rel = path[len(root):].lstrip("/") or "index.html"
+    if not posixpath.splitext(rel)[1] and rel + ".html" in files:
+        rel += ".html"
+    return rel
 
 
 def _target(rel, u, files):
@@ -1796,7 +1807,7 @@ def check_links(root=PUBLIC):
         # a full address on one of the site's own hosts. So no page the
         # navigation links to can carry NOINDEX either.
         if SCHEME.match(u) or u.startswith("//"):
-            own = _own_page(u)
+            own = _own_page(u, files)
             if own in unlisted and own != rel:
                 problems.append("%s links to %s, the unlisted page %s, which no other page may link to"
                                 % (rel, u, own))
@@ -2579,7 +2590,10 @@ def controls():
             report("links", False, "could not plant a link to an unlisted page: no published page is unlisted")
         for h in hidden[:1]:
             for href in (h, "https://loganw.dev/" + h, "https://www.loganw.dev/" + h,
-                         "https://loganw234.github.io/loganw.dev/" + h, "//loganw.dev/" + h):
+                         "https://loganw234.github.io/loganw.dev/" + h, "//loganw.dev/" + h,
+                         "https://LOGANW.DEV:443/" + h, "https://loganw.dev/x/../" + h, "https://loganw.dev//" + h,
+                         "https://loganw.dev/" + posixpath.splitext(h)[0], "https://loganw.dev/%2e/" + h,
+                         "https://loganw234.github.io/loganw.dev/x/./../" + posixpath.splitext(h)[0]):
                 planted("links", "a link to the unlisted %s as %s" % (h, href),
                         t.replace("</footer>", '<a href="%s">x</a></footer>' % href, 1), check_links, "unlisted page")
         planted("links", "%s marked unlisted, though every page's navigation links to it" % MAP_PAGE,

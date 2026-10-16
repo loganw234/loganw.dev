@@ -173,8 +173,8 @@ One page, `resume.html` (Logan's resume, docs/SPEC.md decision 42), is
 unlisted. The navigation doesn't link to it, it asks search engines not to
 index it, and the links stage refuses a link to it from any other page, by a
 relative link or by a full address on the site's own hosts. Unlisted isn't
-private: MANIFEST and facts.json name it like any other page, and every rule
-above holds on it.
+private: the page is published, MANIFEST names it, facts.json holds its
+figures like any other page's, and every rule above holds on it.
 
 ## Does it still hold?
 

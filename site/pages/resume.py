@@ -1,16 +1,16 @@
 """Resume: Logan's resume, unlisted (docs/SPEC.md, decision 42). It is
 reached by its address alone: it claims no navigation entry, carries
 render.NOINDEX, and build.check_links refuses a link to it from any other
-page. Unlisted is not private: MANIFEST and facts.json name it like any
-other page.
+page. Unlisted is not private: the page is published, MANIFEST names it,
+and facts.json holds its figures like any other page's.
 
 It is held to the site's own rules, and at Logan's word ("Id also prefer
 more come from cited sources than my claims where able", 2026-10-15) most of
 it is the projects' own words, each quoted at its pin and labelled with the
 file and line. What only Logan can say is a statement:
-  - his role, his summary and the Moth Hack result are drafted from his
-    draft resume of 2026-10-15, and carry the draft label until he approves
-    them as printed;
+  - his role, his summary, cft-fp256 as his experiment, and the Moth Hack
+    result are drafted from his draft resume of 2026-10-15, and carry the
+    draft label until he approves them as printed;
   - the background is Home's biography and About's first approved sentence,
     printed as Logan approved them, so they carry no draft label.
 pages._settled holds every statement here to those two kinds, as it holds
@@ -36,6 +36,8 @@ SUMMARY = ("I direct AI agents through engineering and research work beyond my o
            "all of the code. What makes that workable is oversight that doesn't rest on the agents' word: checks "
            "that have been seen to fail, verifiers scored against planted faults, and dated records that keep the "
            "failed runs.")
+EXPERIMENT = ("Used cft-fp256 to test how far one person without formal computing training can take a serious "
+              "engineering effort with AI.")
 WIN = "Winner, Quantum Native Repo category, Moth Hack 2026"
 # The hackathon's results, for a reader, as Logan's draft links them. The
 # build doesn't read it, so the result beside it stays his statement.
@@ -106,9 +108,10 @@ def head_block():
             '<p class="contact"><a href="mailto:logan@loganw.dev">logan@loganw.dev</a> · '
             '<a href="index.html">loganw.dev</a> · <a href="https://github.com/loganw234">github.com/loganw234</a></p>'
             '<p>%s</p>'
-            '<p class="how">Each line below quotes its project at the commit this site pins, and names the file and '
-            'line it came from. What only Logan can say is marked as his statement, with its date; a statement he '
-            'has not yet approved as printed says so.</p></div>'
+            '<p class="how">Each quotation below is its project&#x27;s own words at the commit this site pins, '
+            'labelled with the file and line; every other figure names where it was read. What only Logan can say '
+            'is marked as his statement, with its date; a statement he has not yet approved as printed says so.</p>'
+            '</div>'
             % (render([D(ROLE)]), render([D(SUMMARY)])))
 
 
@@ -118,6 +121,9 @@ def oversight_block():
         ["ParcelRound: ", q(P("ParcelRound", "README.md", r"^(A method for splitting one body of work across several "
                                                            r"coding agents\s+at\s+once, without the pieces failing to "
                                                            r"meet)\.")),
+         ". It exists because ",
+         q(P("ParcelRound", "README.md", r"(Give four agents four well-scoped parcels of one feature and you\s+can "
+                                          r"get four green gates and a feature that does not work)")),
          ". ", facts.count_paths("ParcelRound", r"CASE-STUDY(-\d+)?\.md", "CASE-STUDY*.md files at the pin"),
          " rounds are recorded as case studies, and the sixth put ",
          q(P("ParcelRound", "README.md", r"(planted faults on every parcel's verifier)")), "."],
@@ -129,7 +135,10 @@ def oversight_block():
                                               r"implementation, a bit-identity\s+comparison, a hash, a gate that has "
                                               r"been watched to fail, an append-only\s+record with dates on it)\.")),
          "."],
-        ["HonestHarness's first round asked: ",
+        ["HonestHarness holds ",
+         q(P("HonestHarness", "README.md", r"(the requirements, H1 to H17, derived from the record of cft-fp256's "
+                                            r"rounds)")),
+         ". Its first round asked: ",
          q(CS(r"(can a cheaper model, reached over an API, do\s+the skills a ParcelRound round measures)\?")),
          "? Replaying the planted faults of ParcelRound's sixth round, DeepSeek's flash model caught ",
          CS(r"\*\*The plants: (\d+ of \d+), by pass", num=True), ", where that round's own verifiers, on Opus, "
@@ -160,6 +169,9 @@ def cft_block():
              r"the same inputs give the same bits whether\s+the work runs on a laptop CPU, in a browser tab, on a "
              r"microcontroller,\s+or on the FPGA card it was designed for)\.")),
          ", the ", q(P(r"built for the\s+(AMD/Xilinx Alveo U50 through the open Vitis RTL kernel flow)")), "."],
+        [D(EXPERIMENT), " Its rule: ",
+         q(P(r"(The rule is that a number in a document has a run behind it, and the\s+runs that failed stay in the "
+             r"record)\.")), "."],
         ["Checked by ",
          q(P(r"\| (\d+ simulation targets checking every result and every flag against the golden model, and \d+ "
              r"machine-checked proofs, plus a negative control that must be refuted or the gate has stopped being "
@@ -172,8 +184,6 @@ def cft_block():
          ". A binary256 soak on the card ran ",
          q(V_(r"(\d+ passes in \d+ minutes, each a\s+resident run of a million elements at fma, add and mul)")),
          ", with ", q(V_(r"reference orbit to its checkpoint - (0 failures)")), "."],
-        [q(P(r"(The rule is that a number in a document has a run behind it, and the\s+runs that failed stay in the "
-             r"record)\.")), "."],
         ["In cft-rebound, ",
          q(prose("cft-rebound", "README.md", r"^(REBOUND's IAS15 integrator with its arithmetic routed through "
                                              r"libcft)")),

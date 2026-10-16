@@ -33,8 +33,8 @@ CSP = ("default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self' da
 # An unlisted page (decision 42: the resume) is reached by its address
 # alone. It claims no navigation entry, asks search engines not to index it
 # with this tag, and no other published page may link to it
-# (build.check_links). Unlisted is not private: the page is published, and
-# MANIFEST and facts.json name it and its figures like any other.
+# (build.check_links). Unlisted is not private: the page is published,
+# MANIFEST names it, and facts.json holds its figures like any other page's.
 NOINDEX = '<meta name="robots" content="noindex">'
 
 
