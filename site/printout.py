@@ -88,13 +88,16 @@ OPEN, CLOSE = chr(0x201C), chr(0x201D)
 
 
 def blank(text):
-    """Whether text holds nothing to print: only whitespace (Python's, so a
-    tab or a no-break space too) and format characters, which draw as
-    nothing (a soft hyphen). The page's reader and the twin's both use it
-    (verifier-record2's N-3 and R-2). A character that WinAnsi can't print
-    is refused when the PDF is written, and the local-only stage refuses
-    any character that draws as nothing in a published file."""
-    return not "".join(ch for ch in "".join(text.split()) if unicodedata.category(ch) != "Cf")
+    """Whether a line holds nothing to print: only whitespace (Python's, so
+    a tab or a no-break space too), the bar a project line sets between its
+    name and its dates, and format characters (Cf, such as a soft hyphen),
+    which a line must not carry as its only text. The page's reader and the
+    twin's both use it, so each refuses what the other does
+    (verifier-record2's N-3, R-2 and W-7). A character that WinAnsi can't
+    print is refused when the PDF is written, and the local-only stage
+    refuses Unicode's default-ignorable characters, its reading of what
+    draws as nothing, in any published file."""
+    return not "".join(ch for ch in "".join(text.replace("|", " ").split()) if unicodedata.category(ch) != "Cf")
 
 
 class _Reader(html.parser.HTMLParser):
@@ -271,7 +274,7 @@ def blocks(twin_text):
         # would be dropped (verifier-print's T1 and T4): an edited twin is
         # refused by name, never printed short. No text is what the page's
         # reader means by it (blank)
-        if blank(MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).replace("|", " ")):
+        if blank(MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l))):
             raise Refused("a twin line with no text: %s" % ascii(l[:20]))
         if l.startswith("-- ") and any(b[0] == "note" for b in out):
             raise Refused("a twin with a second note")

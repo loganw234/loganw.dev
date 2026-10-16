@@ -189,9 +189,11 @@ Unlisted isn't private: the page is published, MANIFEST names it, facts.json
 holds its figures like any other page's, and every rule above holds on it.
 
 Its sources come on request (SPEC decision 45):
-- Each figure on the page is underlined and carries its own label as a
-  tooltip. The numbers stage holds a title on a figure, or on anything
-  inside it, to exactly that figure's label.
+- Each figure in the resume itself, the page's `div.cv`, is underlined and
+  carries its own label as a tooltip. The header's stamp keeps its labels
+  in view, and the footer prints its figures bare, as on every page. The
+  numbers stage holds a title on a figure, or on anything inside it, to
+  exactly that figure's label.
 - It also refuses a figure that carries no tooltip of its own when a
   `css_hides.json` entry lets the stylesheet hide its label, so no element
   around it can lend it another. Such an entry is one selector written
@@ -203,11 +205,12 @@ Its sources come on request (SPEC decision 45):
 - A rule the hiding check doesn't read, such as a near-zero size or a label
   placed off screen, can hide a label with no entry, here as on any other
   page. That is the stated limit under Styles, above.
-- The labels beside the figures are in the page, as on every other page.
-  Its stylesheet hides them until a reader opens "Show every source beside
-  its line"; `site/data/css_hides.json` names that one rule.
-- Only a reader who hovers, or opens the toggle, sees a source, and a
-  tooltip does not show on a phone; that is a stated limit.
+- The labels beside the resume's figures are in the page, as on every
+  other page. Its stylesheet hides them until a reader opens "Show every
+  source beside its line"; `site/data/css_hides.json` names that one rule.
+- In the resume itself, only a reader who hovers, or opens the toggle,
+  sees a source, and a tooltip does not show on a phone; that is a stated
+  limit.
 
 The page also prints, as `resume.pdf` (`site/printout.py`):
 - The build reads the page's resume into a text twin, `resume.txt`, a block

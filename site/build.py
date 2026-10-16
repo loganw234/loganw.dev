@@ -2894,6 +2894,9 @@ def controls():
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- \t" + chr(0xA0).encode("utf-8") + b"\n-- ", 1), check_numbers,
                     "numbers", "a twin line with no text",
                     "the printout's twin with a line of a tab and a no-break space (verifier-record2's N-3)")
+            swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- " + chr(0xAD).encode("utf-8") + b"\n-- ", 1), check_numbers,
+                    "numbers", "a twin line with no text",
+                    "the printout's twin with a line of a soft hyphen alone (verifier-record2's N-9)")
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- [x](https://loganw.dev/planted.html)\n-- ", 1),
                     check_links, "links", "not a published file", "the printout's twin linking no published file")
             other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"

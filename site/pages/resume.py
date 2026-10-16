@@ -357,8 +357,8 @@ def controls():
         # caught means the rule held: a wrong reader fails here by name
         out.append(("resume-printout-quotes", ok, "the rule holds: %s, reading %s" % (what, ascii(got))))
     # the page's reader refuses a block with nothing to print, as the twin
-    # does (printout.blank; verifier-record2's R-2)
-    for what, ch in (("a soft hyphen", chr(0xAD)), ("a no-break space", chr(0xA0))):
+    # does (printout.blank; verifier-record2's R-2 and W-7)
+    for what, ch in (("a soft hyphen", chr(0xAD)), ("a no-break space", chr(0xA0)), ("a bar", "|")):
         try:
             _printed("<p>%s</p>" % ch)
             out.append(("resume-printout-blank", False, "a paragraph holding only %s passed" % what))
