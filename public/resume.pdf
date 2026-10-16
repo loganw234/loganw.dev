@@ -15,11 +15,14 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 6 0 obj
-<< /Length 6544 >>
+<< /Length 6893 >>
 stream
 BT /F2 20 Tf 1 0 0 1 54.00 716.00 Tm (Logan W.) Tj ET
 BT /F2 11 Tf 1 0 0 1 54.00 701.00 Tm (Independent project lead) Tj ET
 BT /F1 9.5 Tf 1 0 0 1 54.00 688.00 Tm (logan@loganw.dev \267 loganw.dev \267 github.com/loganw234) Tj ET
+q 0.48 w 54 686.86 m 134.93 686.86 l S Q
+q 0.48 w 142.85 686.86 m 190.9 686.86 l S Q
+q 0.48 w 198.83 686.86 m 293.88 686.86 l S Q
 BT /F1 10 Tf 1 0 0 1 54.00 669.00 Tm (I direct AI agents through engineering and research work beyond my own implementation expertise. I set the) Tj ET
 BT /F1 10 Tf 1 0 0 1 54.00 656.00 Tm (direction, review the evidence and decide what the record supports; the agents write essentially all of the code.) Tj ET
 BT /F1 10 Tf 1 0 0 1 54.00 643.00 Tm (What makes that workable is oversight that doesn't rest on the agents' word: checks that have been seen to fail,) Tj ET
@@ -50,6 +53,8 @@ BT /F1 10 Tf 1 0 0 1 66.00 365.00 Tm (This site is built the same way. In its se
 BT /F1 10 Tf 1 0 0 1 66.00 352.00 Tm (holding planted faults: 8 of 8 caught, each on its first pass.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 365.00 Tm (\225) Tj ET
 BT /F1 9 Tf 1 0 0 1 66.00 337.00 Tm (Where to look first: ParcelRound's METHOD.md, the case study of HonestHarness's first round.) Tj ET
+q 0.46 w 143.53 335.92 m 258.27 335.92 l S Q
+q 0.46 w 263.27 335.92 m 444.57 335.92 l S Q
 BT /F2 10.5 Tf 1 0 0 1 54.00 315.00 Tm (cft-fp256) Tj ET
 BT /F1 9.5 Tf 1 0 0 1 492.52 315.00 Tm (since Aug 2026) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 302.00 Tm (A math coprocessor that gets the same answer everywhere: It does IEEE 754 arithmetic at four precisions - 32,) Tj ET
@@ -74,6 +79,9 @@ BT /F1 10 Tf 1 0 0 1 66.00 112.00 Tm (cft-rebound is REBOUND's IAS15 integrator 
 BT /F1 10 Tf 1 0 0 1 66.00 99.00 Tm (REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 112.00 Tm (\225) Tj ET
 BT /F1 9 Tf 1 0 0 1 66.00 84.00 Tm (Where to look first: the validation ledger, the conformance contract, and the browser replay, which replays the published) Tj ET
+q 0.46 w 143.53 82.92 m 224.07 82.92 l S Q
+q 0.46 w 229.07 82.92 m 330.62 82.92 l S Q
+q 0.46 w 353.14 82.92 m 427.16 82.92 l S Q
 BT /F1 9 Tf 1 0 0 1 66.00 72.00 Tm (conformance vectors in front of you.) Tj ET
 endstream
 endobj
@@ -105,7 +113,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R /Annots [7 0 R 8 0 R 9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R] >>
 endobj
 16 0 obj
-<< /Length 4097 >>
+<< /Length 4180 >>
 stream
 BT /F2 10.5 Tf 1 0 0 1 54.00 718.00 Tm (Quantum-Film) Tj ET
 BT /F1 9.5 Tf 1 0 0 1 492.52 718.00 Tm (since Sep 2026) Tj ET
@@ -120,6 +128,7 @@ BT /F1 10 Tf 1 0 0 1 66.00 625.00 Tm (devices carry the law's two quantum signat
 BT /F1 10 Tf 1 0 0 1 66.00 612.00 Tm (their own noise models predicted.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 664.00 Tm (\225) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 597.00 Tm (Winner, Quantum Native Repo category, Moth Hack 2026 \050the hackathon's results\051. Entered for the Expert) Tj ET
+q 0.5 w 327.77 595.8 m 429.73 595.8 l S Q
 BT /F1 10 Tf 1 0 0 1 66.00 584.00 Tm (challenge #9: a repository of a quantum application that runs a process on media through the Atlas API.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 597.00 Tm (\225) Tj ET
 BT /F2 10.5 Tf 1 0 0 1 54.00 562.00 Tm (QRO-Crate) Tj ET
@@ -144,6 +153,7 @@ BT /F1 10 Tf 1 0 0 1 54.00 363.00 Tm (have written essentially all of the code i
 BT /F1 10 Tf 1 0 0 1 54.00 350.00 Tm (they said.) Tj ET
 BT /F1 10 Tf 1 0 0 1 54.00 332.00 Tm (I have a GED, and one month of formal computer science.) Tj ET
 BT /F3 7 Tf 1 0 0 1 54.00 63.00 Tm (This PDF is built, not written: the site's build prints it from the page at https://loganw.dev/resume.html, where every) Tj ET
+q 0.38 w 373.2 62.16 m 499.2 62.16 l S Q
 BT /F3 7 Tf 1 0 0 1 54.00 54.00 Tm (passage read from a source names it, and Logan's own words are marked as his.) Tj ET
 endstream
 endobj
@@ -165,21 +175,21 @@ xref
 0000000220 00000 n 
 0000000322 00000 n 
 0000000417 00000 n 
-0000007013 00000 n 
-0000007158 00000 n 
-0000007302 00000 n 
-0000007456 00000 n 
-0000007679 00000 n 
-0000007932 00000 n 
-0000008160 00000 n 
-0000008384 00000 n 
-0000008547 00000 n 
-0000008757 00000 n 
-0000012907 00000 n 
-0000013403 00000 n 
-0000013556 00000 n 
+0000007362 00000 n 
+0000007507 00000 n 
+0000007651 00000 n 
+0000007805 00000 n 
+0000008028 00000 n 
+0000008281 00000 n 
+0000008509 00000 n 
+0000008733 00000 n 
+0000008896 00000 n 
+0000009106 00000 n 
+0000013339 00000 n 
+0000013835 00000 n 
+0000013988 00000 n 
 trailer
 << /Size 20 /Root 1 0 R >>
 startxref
-13728
+14160
 %%EOF

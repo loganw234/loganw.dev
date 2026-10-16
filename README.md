@@ -219,8 +219,8 @@ The page also prints, as `resume.pdf` (`site/printout.py`):
   while it is unlisted.
 - The PDF prints no source labels, and its note says where the sources
   are. It leaves out the quotation marks the page sets straight around a
-  quotation, and keeps every other mark. It keeps each project on one page
-  when it fits.
+  quotation, and keeps every other mark. It underlines its links, and keeps
+  each project on one page when it fits.
 
 ## Does it still hold?
 

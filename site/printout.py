@@ -381,7 +381,13 @@ class _Writer:
         self.pages[-1][0].append("BT /%s %s Tf 1 0 0 1 %.2f %.2f Tm %s Tj ET" % (font, _num(size), x, y, _string(s)))
 
     def link(self, x0, y, x1, size, href):
+        """A link: its annotation, and a thin rule under its words, so a
+        printed copy shows what links (Logan, 2026-10-16: "Underlined for
+        clarity")."""
         self.pages[-1][1].append((x0, y - 0.22 * size, x1, y + 0.82 * size, href))
+        under = y - 0.12 * size
+        self.pages[-1][0].append("q %s w %s %s m %s %s l S Q" % (_num(0.04 * size + 0.1), _num(x0), _num(under),
+                                                                _num(x1), _num(under)))
 
     def lines(self, rs, font, size, leading, x=MARGIN, avail=WIDTH, floor=MARGIN):
         """Runs set as wrapped lines. -> (page, baseline) of the first line,
