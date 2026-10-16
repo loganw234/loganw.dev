@@ -194,8 +194,11 @@ Its sources come on request (SPEC decision 45):
   inside it, to exactly that figure's label. It also refuses a figure whose
   label the stylesheet may hide if it carries no tooltip of its own, so no
   element around it can lend it another. `css_hides.json` may let a
-  stylesheet hide labels only by a selector written `.X .src`, whose scope
-  that rule reads; the numbers stage refuses an entry of any other shape.
+  stylesheet hide labels only by one selector written `.X .src`, whose
+  scope that rule reads. The numbers stage refuses any other entry that
+  names `src`, and any entry that is a list of selectors. A label carries
+  the class `src` and no other, and nothing inside it carries a class, so
+  no other entry can hide a label or its words.
 - The labels beside the figures are in the page, as on every other page.
   Its stylesheet hides them until a reader opens "Show every source beside
   its line"; `site/data/css_hides.json` names that one rule.

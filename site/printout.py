@@ -28,6 +28,7 @@ same twin always gives the same bytes.
 """
 import html.parser
 import re
+import unicodedata
 
 from facts import Refusal
 
@@ -258,9 +259,12 @@ def blocks(twin_text):
     for l in lines[3:]:
         # a line with no text would print as nothing, and a second note
         # would be dropped (verifier-print's T1 and T4): an edited twin is
-        # refused by name, never printed short
-        if not MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).strip(" |"):
-            raise Refused("a twin line with no text: %r" % l[:20])
+        # refused by name, never printed short. No text is what the page's
+        # reader means by it: a tab or a no-break space is none, and nor is
+        # a character that draws as nothing (verifier-record2's N-3)
+        rest = MARKER.sub("", re.sub(r"^(?:={2,3}|-{1,2}|>) ", "", l)).replace("|", " ")
+        if not "".join(ch for ch in "".join(rest.split()) if unicodedata.category(ch) != "Cf"):
+            raise Refused("a twin line with no text: %s" % ascii(l[:20]))
         if l.startswith("-- ") and any(b[0] == "note" for b in out):
             raise Refused("a twin with a second note")
         if l.startswith("=== "):

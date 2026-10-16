@@ -458,6 +458,14 @@ class _Marks(html.parser.HTMLParser):
                 self.tips.append((f, v or ""))
             elif k in ("alt", "title", "aria-label") and v:
                 self.attr_text.append("%s %s=%r" % (tag, k, v))
+        # Nothing inside a source label carries a class, and the label carries
+        # src alone (handle_starttag): so the one css_hides.json shape that
+        # names src, '.X .src', is the only rule that may hide a label or its
+        # words (label_scope_problems; verifier-record2's W-1).
+        cls = classes(dict(attrs).get("class"))
+        if inside is not None and "src" in inside["cls"] and cls:
+            self.problems.append("a <%s> of class %r inside fact %s's label; nothing inside a label carries a class"
+                                 % (tag, " ".join(cls), inside["f"]))
         a = dict(attrs)
         if tag == "meta" and a.get("name") == "description":
             self.attr_text.append("meta description %r" % a.get("content", ""))
@@ -474,6 +482,9 @@ class _Marks(html.parser.HTMLParser):
         cls, f = classes(a.get("class")), a.get("data-f")
         if f is None and tag == "span" and set(cls) & {"fig", "q", "stated", "src"}:
             self.problems.append("a span of class %r has no fact id" % " ".join(cls))
+        if f is not None and "src" in cls and cls != ["src"]:
+            self.problems.append("fact %s's label is of class %r; a label carries the class src and no other"
+                                 % (f, " ".join(cls)))
         if f is not None and self._mark() is not None:
             self.problems.append("a mark for fact %s sits inside the mark for fact %s" % (f, self._mark()["f"]))
         if tag == "a" and self._mark() is not None:
@@ -902,16 +913,23 @@ class _Holders(html.parser.HTMLParser):
 
 
 def label_scope_problems():
-    """css_hides.json may let a stylesheet hide source labels only by a
+    """css_hides.json may let a stylesheet hide source labels only by one
     selector written ".X .src", whose scope label_scopes() reads, so a figure
-    there must carry its own tooltip. A label-hiding entry of any other shape
-    ("div.cv span.src", a bare ".src") would hide labels the tooltip rule
-    never reads (verifier-print's W3-1), and is refused."""
+    there must carry its own tooltip. Any other entry that names the class
+    src ("div.cv span.src", a bare ".src", ".cv .src.x") would hide labels
+    the tooltip rule never reads (verifier-print's W3-1), and is refused. So
+    is any entry that is a list of selectors: ".cv .src, .x" hid the
+    resume's labels and was no scope (verifier-record2's W-1). A label
+    carries the class src and no other, and nothing inside it carries a
+    class (_Marks), so an entry that doesn't name src can't hide one."""
     allowed = json.loads(HIDES_FILE.read_text(encoding="utf-8"))["selectors"] if HIDES_FILE.is_file() else {}
     out = []
     for sel in sorted(allowed):
-        m = re.search(r"\.([\w-]+)$", sel.strip())
-        if m and m.group(1) == "src" and not re.fullmatch(r"\.[\w-]+ \.src", sel.strip()):
+        s = sel.strip()
+        if "," in s:
+            out.append("%s's entry %r is a list of selectors; an entry names one selector, so the tooltip rule "
+                       "reads every label it may hide" % (HIDES_FILE.name, sel))
+        elif re.search(r"\.src(?![\w-])", s) and not re.fullmatch(r"\.[\w-]+ \.src", s):
             out.append("%s lets %r hide source labels; an entry that may hide them is written '.X .src', the scope "
                        "the tooltip rule reads" % (HIDES_FILE.name, sel))
     return out
@@ -2865,6 +2883,9 @@ def controls():
                     "the printout's twin with an empty line (verifier-print's T1)")
             swapped(twin_p, twin_b + b"-- a second note\n", check_numbers, "numbers", "a twin with a second note",
                     "the printout's twin with a second note (verifier-print's N3-4)")
+            swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- \t" + chr(0xA0).encode("utf-8") + b"\n-- ", 1), check_numbers,
+                    "numbers", "a twin line with no text",
+                    "the printout's twin with a line of a tab and a no-break space (verifier-record2's N-3)")
             swapped(twin_p, twin_b.replace(b"\n-- ", b"\n- [x](https://loganw.dev/planted.html)\n-- ", 1),
                     check_links, "links", "not a published file", "the printout's twin linking no published file")
             other_pdf, other_twin = root / "planted.pdf", root / "planted.txt"
@@ -2899,6 +2920,21 @@ def controls():
                 bare = re.sub(rb' title="[^"]*"', b"", fig_tip.group(1), count=1)
                 swapped(res, page_b.replace(fig_tip.group(1), bare, 1), check_numbers, "numbers",
                         "carries no tooltip of its own", "a figure in the resume with its tooltip taken away")
+                # verifier-print's N3-1: a mark still open where the page ends
+                # is read like any other
+                swapped(res, page_b + fig_tip.group(1), check_numbers, "numbers", "reads '', and the fact is",
+                        "a figure's mark left open at the end of the resume")
+            # verifier-record2's W-1: a label carries the class src alone, and
+            # nothing inside it a class, so no css_hides.json entry but one
+            # written '.X .src' can hide it or its words
+            lab = re.search(rb'(<span class="src" data-f="\d+">) (<a href)', page_b)
+            if lab is None:
+                report("numbers", False, "could not plant into a label: no label on resume.html links its source")
+            else:
+                swapped(res, page_b.replace(lab.group(1), lab.group(1).replace(b'"src"', b'"src x"'), 1), check_numbers,
+                        "numbers", "a label carries the class src and no other", "a label in the resume with a second class")
+                swapped(res, page_b.replace(lab.group(0), lab.group(1) + b' <a class="x" href', 1), check_numbers,
+                        "numbers", "nothing inside a label carries a class", "a classed link inside a label in the resume")
         planted("local-only", "a robots meta other than an unlisted page's noindex",
                 t.replace("</head>", '<meta name="robots" content="nofollow"></head>', 1), check_local_only,
                 "not an unlisted page's noindex")
@@ -3343,12 +3379,14 @@ def controls():
         m.print_files = lambda ctx, bad=bad: {bad: b"%PDF-1.4"}
         refused("seam", "a printout named %s with no twin" % bad, lambda m=m: collect_prints(m, {}, {}, {}), want)
     # verifier-print's W3-1: css_hides.json may let a stylesheet hide source
-    # labels only by a selector written '.X .src', whose scope the tooltip
-    # rule reads; an entry of another shape is refused
+    # labels only by one selector written '.X .src', whose scope the tooltip
+    # rule reads; an entry of another shape is refused, and so is a list
+    # (verifier-record2's W-1 hid the resume's labels with '.cv .src, .x')
     global HIDES_FILE
     saved_hides = HIDES_FILE
     with tempfile.TemporaryDirectory() as d:
-        for sel in ("div.cv span.src", ".src"):
+        for sel in ("div.cv span.src", ".src", ".cv .src, .x", ".src, .x", ".cv .src,.x", ".cv .src.x",
+                    ":is(.cv .src)"):
             planted_hides = pathlib.Path(d) / "css_hides.json"
             data = json.loads(saved_hides.read_text(encoding="utf-8"))
             data["selectors"][sel] = {"allow": ["display:none"], "on": ["span"], "why": "planted"}
