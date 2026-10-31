@@ -17,58 +17,66 @@ The README states the promise directly: “That guarantee is the product [fact 1
 
 The contract is versioned. CONFORMANCE.md opens with its profile, “Profile 3.1, 2026-10-13 [fact 1956]” (profile 3 was 2026-10-05, profile 2 2026-10-02 and profile 1 2026-09-16 [fact 1957]), and says of the tree: “a minor step: cases added, none moved [fact 1958].” A minor step is “an addition that changes no recorded case and no accepted image [fact 1959].”
 
+What CONFORMANCE.md says of the tree, “a minor step: cases added, none moved [fact 1960],” is that document's own word as of its last change, 2026-10-15 [fact 1961]. The ledger's newest entry, of 2026-10-30 [fact 1962], reports a fix that changed published records: “The 8 that change are the rtz and rdn transcendental sets of each format, each by exactly one record, exp2m1(emax + 1): the same value, flags 20 to 16. The unfixed model's 72 rtz and rdn sets equal the committed record, so those 8 records are the published ones moving [fact 1963].” The same document calls a change to any recorded bit or flag a major step: “a change to any recorded bit or flag, or to an accepted image's result, flags, STATUS or acceptance [fact 1964].” The pin holds both.
+
 IV. Verified
 
-Last verified: 2026-10-30 [fact 1960].
+Last verified: 2026-10-30 [fact 1966].
 
-- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 1961]
-- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 1962]
-- 2026-10-06 - step 6's closing records, part one: revision 8's first hardware image, rev8a (the single with R21 at 4,096 scratch slots), closes 135 MHz with +0.330 ns and passes its card legs; segrun_check's card leg follows the tile (SC8), 695 of 695 on it; the sentences that held only while no revision-8 image existed, restated; the verifiers' notes for the close; the known limits [fact 1963]
-- 2026-10-06 - step 6's closing records, part two: revision 8's streaming quad, rev8q (four tiles without R21 at 4,096 scratch slots), closes 135 MHz with +0.048 ns and passes its card legs; the deep single, rev8d (one tile with R21 at 8,192 slots), closes 135 MHz with +0.036 ns and passes its card legs; the gate at the close's integration passes (e3fe2ca, 36 stages, 0 failed); step 6 closed [fact 1964]
+- 2026-09-08 - card day: first light, and the published sets match on silicon [fact 1967]
+- 2026-09-23 - the U50 single closes 145 MHz with the registered multiply, and the whole conformance set agrees on the card [fact 1968]
+- 2026-10-06 - step 6's closing records, part one: revision 8's first hardware image, rev8a (the single with R21 at 4,096 scratch slots), closes 135 MHz with +0.330 ns and passes its card legs; segrun_check's card leg follows the tile (SC8), 695 of 695 on it; the sentences that held only while no revision-8 image existed, restated; the verifiers' notes for the close; the known limits [fact 1969]
+- 2026-10-06 - step 6's closing records, part two: revision 8's streaming quad, rev8q (four tiles without R21 at 4,096 scratch slots), closes 135 MHz with +0.048 ns and passes its card legs; the deep single, rev8d (one tile with R21 at 8,192 slots), closes 135 MHz with +0.036 ns and passes its card legs; the gate at the close's integration passes (e3fe2ca, 36 stages, 0 failed); step 6 closed [fact 1970]
+- 2026-10-12 - step 6's leftovers, closed: ten of the eleven hard workloads that missed revision 7 run on revision 8's cards (rev8q nine of nine, rev8d one of one), and RETIMING=1 is shown never to have retimed (SYNTH_CLOCK off by Logan's word) [fact 1971]
+- 2026-10-19 - the card's long stress run, closed: 61 hours on the three revision-8 images, 4,086 legs and 0 failures, 3,287 sweep slices and 0 disagreements, the 14 exhaustive fp32 items complete; and which of the sweep's items reached the tile [fact 1972]
+- 2026-10-19 - M1's build, seventh wave, closed: the stages replay a marked lane (parcel MS, Sonnet) and the card's routine case (parcel MA, Sonnet), merged and gated; item 6's card leg passed on rev8q [fact 1973]
+- 2026-10-20 - three outside test sources against libcft: Berkeley TestFloat 3e with SoftFloat 3e, UCBTEST and IBM's FPgen vectors, with their drivers, the arbitration and the tests (parcel XG, Sonnet 5.5); none of it has touched the card or amd-arc-box [fact 1974]
+
+The card's nightly sweep. The README says its nightly page “shows how far the card's nightly stress run has come: the items fully covered, night by night, and the hours on the card [fact 1975].” At the pin its data file, site/nightly.json, holds 10 [fact 1976] nights, the first starting 2026-10-19 [fact 1977] and the newest, night 10 [fact 1978], starting 2026-10-29 [fact 1979]. In them: 6,135 [fact 1980] slices, 20,759,013,456,650 [fact 1981] cases and 0 [fact 1982] disagreements, and 8,645 [fact 1983] legs, of which 8,505 [fact 1984] passed, 0 [fact 1985] failed and 140 [fact 1986] were skipped. The file says what a night is: “A night is one run_start and the records after it up to the next one; the run resumes each night. Its date is the date it started, on the clock of the card's host. [fact 1987]”
+
+Reading those figures. The sweep has items no tile computes: the file counts “a host item per host tree and compiler, because no tile computes it [fact 1988],” and the record says “The sweep's case totals add items whose tools count different things [fact 1989].” These are the pin's figures, through night 10 [fact 1990]. The live page goes on past them: the entry of 2026-10-30 [fact 1991] records “the weekend window launched [fact 1992],” and says of that run “It waits for 18:00 and runs until Monday 2026-11-02 07:45 [fact 1993].” The entry that built the page is in the same ledger.
 
 V. Kept failures
 
-- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 1965]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 1966], commit f192bf0 [fact 1967].
-- a device predating a new capability flag ignored an unchecked reserved bit and read far past a one-element buffer [fact 1968] — measured as a host-side segfault in the entry 2026-09-12 - a stride-0 operand, the MODE guard it needed, and a contract I misread [fact 1969]. Fixed by commit 8b7dea1 [fact 1970].
-- exp2 at x = emin - p [fact 1971]: Its exact value 2^(emin - p) is half the smallest subnormal, the tie between +0 and it, which IEEE 754's roundTiesToAway (rmm) rounds to the subnormal. The model rounded it as a quarter of the subnormal and gave +0 [fact 1972]. Step 6's design study M1 found it (its question 5), verifier-VM1 confirmed it [fact 1973] — in the entry 2026-10-05 - the golden model's exp2 tie fixed, and the conformance profile's major step to 3 (parcel XT); M1's design study merged as a design record [fact 1974]. Fixed by commit ca43695 [fact 1975].
+- cocotb's inability to set an exit code — stated in its own makefile at Makefile.inc:88, which checks only that the file *exists* — meant three real RTL failures were reported as a pass [fact 1994]. Fixed by the entry 2026-09-12 - two gates that could not fail, and the path that has always been the critical one [fact 1995], commit f192bf0 [fact 1996].
+- exp2 at x = emin - p [fact 1997]: Its exact value 2^(emin - p) is half the smallest subnormal, the tie between +0 and it, which IEEE 754's roundTiesToAway (rmm) rounds to the subnormal. The model rounded it as a quarter of the subnormal and gave +0 [fact 1998]. Step 6's design study M1 found it (its question 5), verifier-VM1 confirmed it [fact 1999] — in the entry 2026-10-05 - the golden model's exp2 tie fixed, and the conformance profile's major step to 3 (parcel XT); M1's design study merged as a design record [fact 2000]. Fixed by commit ca43695 [fact 2001].
+- At x = emax + 1, under roundTowardZero and roundTowardNegative, exp2m1 returned the largest finite, which is right, with overflow | inexact (0x14), which is wrong [fact 2002]. Reported, in the entry's words, “from a clean-room audit of loganw234/muse-softfloat (binary16/32/64), cross-tested against this library and an exact arbiter [fact 2003]” — in the entry of 2026-10-30 [fact 2004]. No gate had caught it: “The MPFR oracle never asked [fact 2005].” Fixed by commit 48e2aa22 [fact 2006].
 
 VI. Test it
 
-- replays the published conformance vectors in front of you [fact 1977] — Try it without installing anything [fact 1978].
-- make golden: The golden model's self-tests (any Python 3.10+, mpmath optional but recommended) [fact 1979], after “pip install pytest mpmath [fact 1980]”.
-- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 1981], which needs the FPGA and its toolchain.
+- replays the published conformance vectors in front of you [fact 2008] — Try it without installing anything [fact 2009].
+- make golden: The golden model's self-tests (any Python 3.10+, mpmath optional but recommended) [fact 2010], after “pip install pytest mpmath [fact 2011]”. The record's newest timing of the golden stage is one run on one machine: the runner's stage, which runs “PY -m pytest "$ROOT/python/tests" -q -rs --color=no [fact 2012]” and names no worker option, took “golden ok 3,385 s, 5,951 passed and 3 skipped [fact 2013]” on amd-arc-box [fact 2014], in the entry of 2026-10-30 [fact 2015]. What make golden takes elsewhere depends on the machine and on whether pytest is given workers.
+- the card: compares a device against the software backend bit for bit across the elementwise operations [fact 2016], which needs the FPGA and its toolchain.
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page.
 
-- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 1982].” Anything less than a perfect score is a disproof.
-- make vectors locally, then compare the digests it writes with the ones the repository publishes in vectors/SHA256SUMS [fact 1983], by the recipe CONFORMANCE.md gives; a differing line is a disproof. The record says this is a check no gate makes: “no gate compares a set's digest with vectors/SHA256SUMS [fact 1984].”
-- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 1985] records; a differing hex value is a disproof.
-- Rebuild host/tools/mpfr_check.c and widen its sweep past the campaign's own cases: the independent oracle is only as good as the cases put to it. The record names one it lacks: “The MPFR campaign's pool (host/tools/mpfr_check.c, build_tpool) lacks the tie's argument, so the gate's mpfr stage does not test the fix; XT-1's probe does [fact 1986].”
+- Open the web page above and hand it your own vector file: “Drop a vector file on it and it scores itself [fact 2017].” Anything less than a perfect score is a disproof.
+- make vectors locally, then compare the digests it writes with the ones the repository publishes in vectors/SHA256SUMS [fact 2018], by the recipe CONFORMANCE.md gives; a differing line is a disproof. The record says this is a check no gate makes: “no gate compares a set's digest with vectors/SHA256SUMS [fact 2019].”
+- Replay the identity protocol yourself in another language and compare its checksum line against the ones docs/COMPATIBILITY.md [fact 2020] records; a differing hex value is a disproof.
+- Rebuild host/tools/mpfr_check.c and widen its sweep past the campaign's own cases: the independent oracle is only as good as the cases put to it. The record names one it lacks: “The MPFR campaign's pool (host/tools/mpfr_check.c, build_tpool) lacks the tie's argument, so the gate's mpfr stage does not test the fix; XT-1's probe does [fact 2021].” The record's newest entry adds a limit of the same kind, after a case the oracle had never been asked (the entry): “the oracle is only as wide as its pools: the ten now see both, and nothing but this case moved, but no sweep has asked which families any pool lacks [fact 2022].”
 
 VIII. Connections
 
-- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 1989]
-- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 1990]
-- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 1994]
-- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 1995]
-- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 1998]
-- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 2000]
-- cft-fp256 was distilled into HonestHarness: the requirements, H1 to H17, derived from the record of cft-fp256's rounds [fact 2003]
-- cft-fp256 underlies softfloat-bootstrap: The four sources, HonestFramework, ParcelRound, QRO-Crate and cft-fp256, are read from git objects at the commits build/sources.lock pins [fact 2007]
-- muse-softfloat verifies cft-fp256: from a clean-room audit of loganw234/muse-softfloat (binary16/32/64), cross-tested against this library and an exact arbiter [fact 2009]
-- StoryDocs documents cft-fp256: projects/cft-fp256 [fact 2015]
+- atlas-engine grew into cft-fp256: The workload this tile exists to serve is atlas-engine [fact 2025]
+- atlas-engine verifies cft-fp256: A GPU agrees, bit for bit, on a real workload [fact 2026]
+- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 2030]
+- cft-fp256 underlies Quantum-Film: path = vendor/cft-fp256 [fact 2031]
+- cft-fp256 hosts a port of atlas-film: P2 moves atlas-film [fact 2034]
+- cft-fp256 was distilled into HonestFramework: §1 bit-identity authority, §2 refusal, §3 the gates, §4 single-sourcing, §6 artifact manifests [fact 2036]
+- cft-fp256 was distilled into HonestHarness: the requirements, H1 to H17, derived from the record of cft-fp256's rounds [fact 2039]
+- cft-fp256 underlies softfloat-bootstrap: The four sources, HonestFramework, ParcelRound, QRO-Crate and cft-fp256, are read from git objects at the commits build/sources.lock pins [fact 2043]
+- muse-softfloat verifies cft-fp256: from a clean-room audit of loganw234/muse-softfloat (binary16/32/64), cross-tested against this library and an exact arbiter [fact 2045]
+- StoryDocs documents cft-fp256: projects/cft-fp256 [fact 2051]
 
 IX. Provenance
 
-cft-fp256 read at 19de866 [fact 2019].
+cft-fp256 read at 19de866 [fact 2055].
 
-- README.md [fact 2020]
-- CONFORMANCE.md [fact 2021]
-- CLAUDE.md [fact 2022]
-- docs/VALIDATION.md [fact 2023]
-
-HonestFramework read at 65447fd [fact 2024].
-
-- CASE-STUDY.md [fact 2025]
+- README.md [fact 2056]
+- CONFORMANCE.md [fact 2057]
+- CLAUDE.md [fact 2058]
+- docs/VALIDATION.md [fact 2059]
+- verify/run.sh [fact 2060]
+- site/nightly.json [fact 2061]
