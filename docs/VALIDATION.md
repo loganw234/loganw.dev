@@ -2766,3 +2766,49 @@ integration verifier comes after this entry, so it is not in the table.
   - CONFORMANCE.md's "none moved" against the entry's eight moved records.
 - Where the round's ledger is archived, and the plant branches, which are
   bundled and deleted at the round's end.
+
+## 2026-10-31 - round 3's integration verifier: one figure of the round's entry cited to lines that do not hold it, and two of its phrases restated; the rest it checked holds
+
+**verifier-I**, on Haiku, read the lead's own work on `round3` from
+`6eff67b` to `33dc465`:
+- **the three merges**, made again from their parents with `git merge-tree`.
+  At each, every path outside `public/` is as the merge of its parents gives
+  it, and `--check` passes;
+- **each merge's second parent**, the parcel's own commit. No plant's new
+  text is on `round3`, but for the one the round's entry quotes in telling
+  of it;
+- **each restate**, against its source at the pin;
+- **the round's entry**, sentence by sentence and figure by figure:
+  - its cost table, run again from the transcripts;
+  - its account of the push and the cleanup, against the resume work's
+    ledger;
+- **SPEC's decisions 47 to 56**, against the round's ledger's record of
+  Logan's words;
+- **the published pages**, read together for a sentence that two merges
+  made false. It found none;
+- **the full gate**, which it ran itself on `33dc465` after the lead's:
+  VERDICT: PASS, nothing skipped; `--control` caught 512 of 512.
+
+**What it found.** The round's entry says the box's full-budget gates "took
+181 to 198 minutes for 36 of 44 stages (VALIDATION.md:20886, :21353, :21762
+and :22643 at the pin)". Those lines hold the minutes and the 36 stages
+run. The 44 is at :21354, "36 and 8 make the budget's 44", which the entry
+does not cite. So the sentence's lines are :20886, :21353, :21354, :21762
+and :22643.
+
+**Two of the entry's phrases, restated:**
+- **"The golden step's cost is the runner's timing on the build box."** The
+  build box is amd-arc-box, as the pages name it, and as cft-fp256's record
+  does (VALIDATION.md:26110 at the pin).
+- **"Each of the three was its repository's GitHub main when the snapshot
+  was taken."** The snapshot records each pin's commit, not the branch it
+  was on. The lead read each repository's main with `gh api` from 05:01 to
+  05:02 that morning, and each was the commit pinned. The snapshot followed
+  at 05:30. The round's ledger records both.
+
+**Its notes, left as they are:**
+- P0 changed SPEC's list of its sections. Section 2 was "Logan's decisions,
+  that day, on 2026-09-30 and on 2026-10-08", and is now "from that day to
+  2026-10-31". Those are the lead's words, not Logan's.
+- verifier-I, like verifier-P2, read some of the round's ledger by search,
+  and not whole at each of the README's three moments.
