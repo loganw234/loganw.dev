@@ -2812,3 +2812,18 @@ and :22643.
   2026-10-31". Those are the lead's words, not Logan's.
 - verifier-I, like verifier-P2, read some of the round's ledger by search,
   and not whole at each of the README's three moments.
+
+## 2026-10-31 - round 3's integration verifier, its second pass: when the lead read the two new repositories' mains
+
+**verifier-I's second pass** read the entry before this one against its
+sources. One sentence of it is wrong: "The lead read each repository's main
+with `gh api` from 05:01 to 05:02 that morning, and each was the commit
+pinned". That run compared the pins already in pins.json with their default
+branches, and cft-fp256's was `19de866`. softfloat-bootstrap and
+muse-softfloat were not yet pins. The lead read their mains at 04:30, with
+`gh api repos/loganw234/<name>/commits/HEAD`, as `a23a0ff` and `a2241fc`.
+The round's ledger now records that read with its time; until this pass it
+gave the two mains without when or how they were read. GitHub's
+default-branch heads, which verifier-I read at its pass, are the three pins.
+The rest of that entry holds, and the round's entry, read with both, says
+nothing false.
