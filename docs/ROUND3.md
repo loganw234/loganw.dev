@@ -173,7 +173,9 @@ reading of each, where one is needed, follows it, marked as the lead's.
   passed with nothing skipped. The question's "perhaps in the 10-26
   toolchain reinstall" was the lead's guess, from cft-fp256's entry of
   2026-10-26 (afternoon), not a measurement.
-- On 9: the two are one item of the resume, of two printed lines, so that
+- On 9: the question's figures were the lead's reading of the record at the
+  pin, which the ledger's entry for the answer says. The two are one item of
+  the resume, of two printed lines, so that
   cft-fp256 still fits on the printout's first page: the run in the README's
   own sentence on it, the sweep in the ledger's newest totals, beside the
   ledger's sentence on what a case total adds. Commit `2cbb7e7`, after P0.
