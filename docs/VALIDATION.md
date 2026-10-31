@@ -2547,3 +2547,222 @@ are not added to them. The verifiers wrote 79.1% of the output.
 At 06:12, before the verifier had reported, Logan wrote: "You can push
 once the verifier and final gate finish". Its last pass ended NOT READY,
 so the push waits on his word.
+
+## 2026-10-31 - round 3: cft-fp256 at 19de866, with its nightly sweep and issue 1; softfloat-bootstrap and muse-softfloat on Map & Ledger and the map; Muse counted; parcels on Sonnet, verifiers on Haiku, 5 of 6 planted faults caught
+
+**First, what the entry of 2026-10-16 left waiting on Logan's word.** He
+answered at 08:42 that day, through the question tool: "Push now
+(Recommended)", for `797f588` with the lead's fixes for W-6 and W-7, and
+"Every link (Recommended)", so all ten of the PDF's links stay underlined.
+Main moved from `e56a7b4` to `797f588`, a fast-forward, and `48aff18`, those
+fixes, went live with no verifier having read it. The site's workflow, run
+38926087470, passed its gate, and its deploy failed: deploy-pages found no
+`github-pages` artifact 0.3 s after the upload. The failed job's re-run,
+attempt 2, uploaded a second artifact, and deploy-pages refused two of the
+same name. Deleting them was Logan's to do, and he wrote: "I'm at work so
+unable to run them, you have permission to execute the commands, I've
+reviewed them." The lead checked each artifact first (each was exactly
+`public/` at `797f588`), deleted both, and re-ran the job; attempt 3 passed
+its gate and deployed. Live, BUILD named `797f588`, and every other
+published file, 42 of 42, was byte-identical to the build. That work's
+ledger, `loganw-dev-resume-ledger/lead.md`, holds each step's time.
+
+**The cleanup of 2026-10-31,** at Logan's word: "Go ahead with the cleanup".
+Each branch, worktree and clone was checked first: no commit held only
+there, nothing untracked but ignored build and run output, and no process
+running in it. The branches' tips that main did not hold, plants included,
+were bundled first, and `git bundle verify` passed on the bundle
+(`leftover-branches-2026-10-31.bundle`, in the same ledger). Then nine
+branches were deleted, the worktrees pruned, and the two plant worktrees and
+six verifier clones moved to the Recycle Bin, not deleted. Emptying it is
+Logan's. loganw.dev then held main alone, at `797f588`.
+
+**What Logan asked for** (SPEC decisions 47 to 56): "Go ahead with the
+cleanup, then we will update the site with a couple new projects, a
+bootstrap kit and a muse-softfloat hackathon project, as well as updating
+the cft information (it has a new nightly page which shows quite a bit
+about a nightly case sweep, as well as a separate project which found an
+issue in the golden model that can go to the corrections page)". The plan
+is [ROUND3.md](ROUND3.md). Its verifier, on Haiku, made three passes before
+Logan approved draft 4: on four defects, then one, then one stamp the
+record lacked. The lead checked each defect against the records and fixed
+it.
+
+**What moved.** cft-fp256's pin went from `ab51655` to `19de866`. Two new
+pins: softfloat-bootstrap at `a23a0ff` and muse-softfloat at `a2241fc`. Each
+of the three was its repository's GitHub main when the snapshot was taken,
+and the two new ones are read
+from the site's own clones (CLAUDE.md trap 9). The snapshot is
+`sources/github-2026-10-31-0530.json`. The gate's Python is 3.12.15
+(decision 54), after the full gate passed under it on main's tree. QRO-Crate
+and the three Preservation repositories stay at their pins (decision 51).
+
+**What changed:**
+
+- **P0**, the lead's (`0e87fc2`, `2f52525` and `f57c22e`; `2cbb7e7` for the
+  resume; `c5e5e79` and `52983e0` for its verifier; and the seam, `90e36ef`
+  and `6eff67b`):
+  - the pins and the snapshot;
+  - a Map & Ledger row each for the two new projects, and two nodes and six
+    edges in the map's Determinism lane, each edge quoting its own file;
+  - the agent-credit rule counts Muse (decision 50), with its own controls,
+    and its limits are in SPEC section 4;
+  - About names Muse (decision 53);
+  - the resume cites the card's 61-hour stress run and the nightly sweep's
+    totals, dated to the newest night (decision 55);
+  - every quote the pin's move broke, read again at it;
+  - the map's layout, widened for the lane's new nodes.
+- **P1**, cft-fp256's dossier:
+  - Verified gains eight rows after 2026-10-06. The last four are the
+    lead's, after verifier-P1, and they run to 2026-10-30's, in which sin,
+    cos and tan are built at all four formats.
+  - The nightly sweep follows, through night 10. Its figures are read from
+    `site/nightly.json` at the pin, through a new fact that refuses a key
+    the file lacks.
+  - Issue 1 is a kept failure, fixed by the merge `48e2aa22`.
+  - The contract sets two lines side by side, CONFORMANCE.md's "none moved"
+    and the entry's eight moved published records, and settles neither.
+  - The golden step's cost is the runner's timing on the build box.
+- **P2**, Verify and the Determinism thread:
+  - Verify keeps its order and drops "cheapest first" (decision 56). Each
+    check's cost says where and when it was measured, where its source says.
+  - `make golden`'s cost is the runner's timing, given as the runner's.
+    After verifier-P2, the lead put make golden's own Makefile line beside
+    it, and the Makefile is now a listed source path.
+  - The browser replay's module is said to have been stale from 2026-10-22
+    until its rebuild.
+  - Among what the gates did not reach is a later shared defect, issue 1.
+  - The thread gains the lane's two new projects, in their READMEs' words,
+    and cft-fp256's record of the audit.
+- **P3**, Corrections and Method:
+  - Corrections gains issue 1's row (decision 49). Each quote and figure in
+    it is read from its one entry of cft-fp256's ledger, and its fix is
+    checked against cft-fp256's history; the signature row stays pending.
+  - Method's count sentence says "Claude, Gemini or Muse", and a sentence
+    gives muse-softfloat's trailers.
+
+**A correction to what the site had published:** cft-fp256's dossier's
+Provenance has left out two files the page reads, `docs/COMPATIBILITY.md`
+and `vectors/SHA256SUMS`, since before this round (verifier-P1). Everything
+else the round changed follows the new pin or Logan's decisions.
+
+**Verified.** Every parcel ran on claude-sonnet-5-5 and every verifier on
+claude-haiku-5-5, each read from the agent's own transcript. Each parcel's
+verifier worked on a copy of its work holding two planted faults, in a clone
+that held no other branch: 5 of 6 were caught, all on first passes. The one
+passed was Verify's "rebuilt with every change to the library", set beside
+the quote that the module was stale from 2026-10-22. verifier-P2 took the
+README's standing rule, "as every change to its sources requires", for the
+module's history. Every plant was of one kind, the words around a quote,
+which no stage reads. The keys are in the round's ledger.
+
+A planted-copy verifier's report stayed out of the round's ledger until the
+last of them had reported, so that no report could show another verifier
+where its plants were. That rule is the lead's addition to round 2's.
+
+The lead merged each parcel's own commit by its SHA, rebuilt `public/` at
+each merge, ran the full gate after each merge, and restated what the
+verifiers found. Each verifier's later passes were scoped to the lead's
+restates, and verifier-P3, verifier-P2 and verifier-P1 were each READY on
+its third. `bash verify/run.sh --require-all` on `4bcc3d0`, the round's last
+commit before this entry: VERDICT: PASS, nothing skipped; 11 passed;
+`--control` caught 512 of 512.
+
+**Known limits:**
+
+- Whether the words around a quote say only what the quote says is read by
+  a verifier. No stage holds it.
+- Corrections' issue-1 row reads its date from the same heading as its
+  other cells, and nothing else ties them. `check_row_words` is lexical.
+- Method's Muse reader refuses a name with an ASCII "@". An address spelled
+  out in words passes the local-only stage, which CLAUDE.md states as a limit
+  (trap 14).
+- The dossier's nightly figures are the pin's, through night 10, and the
+  live page goes on. Its reader would cite a same-named key with the same
+  value, written earlier in a sibling object, in place of the right one. At
+  the pin, each figure is cited at its own key's line.
+- `_dossier.kept_failure` checks that a commit exists and that the pin
+  descends from it, not that it is the fix.
+- An entry of another repository's ledger, cited by its line, is re-pointed
+  silently if a pin's move puts another heading on that line.
+
+**The lead's slips,** each written in the round's ledger when it was caught:
+- **Times typed instead of read,** four of them: two in one entry, one in
+  SPEC caught before its commit, and one in a message to a verifier.
+- **Two claims too wide for their sources:** the plan's first draft calling
+  two private repositories new, and the claim that no file at the pin says
+  cft-fp256's profile stepped. That second claim reached two parcels'
+  comments through the round's ledger and a message.
+- **Records taken unchecked or misread:**
+  - two parcels' claims recorded unchecked: that one parcel's quotes had
+    the same words at both pins, and that another's rows were those its
+    brief named;
+  - `git log -S` read as the date of a line's last change;
+  - "one worker" in a question to Logan, which no source says;
+  - a ledger description of a verifier's entry that the word diff did not
+    bear out.
+- **Mistakes in its own process:**
+  - a tracked file edited while a gate ran;
+  - a commit message's figure, amended before it went anywhere;
+  - a side note misattributed to its verifier;
+  - a gate started outside the runtime's tracking;
+  - a verifier's pass scoped to a range that took in a merge;
+  - a copy instruction that carried the lead's own note into a verifier's
+    file.
+
+**Cost**, from the session's transcripts, from Logan's request at 04:22:42
+to 10:24:41, 362 minutes of wall clock, by round 2's script with this
+round's prefix, "R3 ", in a window that ends before the run that measured
+it:
+
+| agent | model | runs | minutes | tool uses | output | fresh | cache reads |
+|---|---|---:|---:|---:|---:|---:|---:|
+| verifier-plan | claude-haiku-5-5 | 3 | 48 | 127 | 542 k | 1.8 M | 35.6 M |
+| verifier-P0 | claude-haiku-5-5 | 3 | 54 | 172 | 552 k | 2.5 M | 51.7 M |
+| P1 | claude-sonnet-5-5 | 2 | 80 | 239 | 331 k | 1.7 M | 107.9 M |
+| P2 | claude-sonnet-5-5 | 2 | 97 | 262 | 399 k | 1.9 M | 125.2 M |
+| P3 | claude-sonnet-5-5 | 2 | 57 | 182 | 312 k | 1.3 M | 54.2 M |
+| verifier-P1 | claude-haiku-5-5 | 3 | 41 | 98 | 483 k | 1.5 M | 32.1 M |
+| verifier-P2 | claude-haiku-5-5 | 3 | 37 | 89 | 406 k | 1.4 M | 19.5 M |
+| verifier-P3 | claude-haiku-5-5 | 3 | 45 | 105 | 413 k | 1.9 M | 36.8 M |
+| the lead | claude-opus-5-5 | - | 362 (wall) | 757 | 736 k | 2.1 M | 276.1 M |
+| all | | 21 | 460 | 2031 | 4.2 M | 16.2 M | 739.1 M |
+
+Fresh tokens are input, cache writes and output. The "all" row's minutes
+are the parcels' and the verifiers'; the lead's are wall clock, and are not
+added to them. The verifiers wrote 57.4% of the output, the parcels 25.0%
+and the lead 17.6%. A parcel's two runs are its design and its build. The
+integration verifier comes after this entry, so it is not in the table.
+
+**Left with Logan:**
+- The push: main to round3's tip, at his word.
+- For cft-fp256's own session, findings about cft-fp256 that the site quotes
+  and does not settle:
+  - CONFORMANCE.md says "The tree is at profile 3.1 (2026-10-13), a minor
+    step: cases added, none moved". Issue 1's entry says eight published
+    records moved, which by the same document's rule is a major step.
+  - CLAUDE.md's budget lines keep time figures written on 2026-09-12, when
+    the quick budget chose 24 of 37 stages; at the pin it chooses 31 of 53.
+    The box's full-budget gates took 181 to 198 minutes for 36 of 44 stages
+    (VALIDATION.md:20886, :21353, :21762 and :22643 at the pin).
+  - VERIFICATION.md's golden row still gives September's cells.
+  - README.md (lines 436 to 439) still calls sin, cos and tan "the next
+    build", where the record has them built at all four formats on
+    2026-10-30 (verifier-P1).
+- His call, from the verifiers' side notes:
+  - the dossiers' "Cheapest first;" over their attack lists, the spec's
+    wording (SPEC section 1), after decision 56 dropped it from Verify;
+  - issue 1's first known limit, "the gate ran on the desktop, not on the
+    box", which neither Corrections nor the dossier quotes;
+  - the Determinism thread's budget figures, which name no machine or date;
+  - Verify's `cardstress` stage, listed just above the sentence that the
+    card's nightly run is none of the checks.
+- Gaps that cft-fp256's record names and Corrections' "Where I'd attack
+  first" does not, which P3 listed and did not add, since the gap list is
+  his (decision 36):
+  - DETERMINISM.md's one row where the contract departs from RISC-V, fma(inf,
+    0, quiet NaN), "planned for the next RTL revision";
+  - issue 1's known limits;
+  - CONFORMANCE.md's "none moved" against the entry's eight moved records.
+- Where the round's ledger is archived, and the plant branches, which are
+  bundled and deleted at the round's end.
