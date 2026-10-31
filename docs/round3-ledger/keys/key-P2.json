@@ -1,0 +1,21 @@
+{
+ "parcel": "P2",
+ "commit": "2cbcc82",
+ "branch": "r3-P2-1",
+ "plants": [
+  {
+   "file": "site/pages/thread_determinism.py",
+   "old": "\"cft-fp256's ledger records a report that came, in its words, from “\",",
+   "new": "\"muse-softfloat's record, docs/RECORD.md, records a report that came, in its words, from “\",",
+   "kind": "a sentence that names the wrong source",
+   "why": "The thread says muse-softfloat's record holds the report on the audit; the quote beside it is read from cft-fp256's docs/VALIDATION.md at 19de866, and muse-softfloat's docs/RECORD.md at a2241fc never names cft-fp256. No gate reads the words around a figure."
+  },
+  {
+   "file": "site/pages/verify.py",
+   "old": "\".” Its module is a committed build product, and cft-fp256's record says of it, in the entry of \",",
+   "new": "\".” Its module is a committed build product, rebuilt with every change to the library, and cft-fp256's record says of it, in the entry of \",",
+   "kind": "a sentence that claims more than its source at the pin",
+   "why": "Verify says the browser module is rebuilt with every change to the library; issue 1's entry, which the same sentence quotes, says the committed module was stale from 2026-10-22, since the host batch of that day merged without a rebuild. No gate reads the words around a figure."
+  }
+ ]
+}

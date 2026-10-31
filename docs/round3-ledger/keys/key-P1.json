@@ -1,0 +1,21 @@
+{
+ "parcel": "P1",
+ "commit": "7e576fd",
+ "branch": "r3-P1-1",
+ "plants": [
+  {
+   "file": "site/pages/work_cft_fp256.py",
+   "old": "\", reports a fix that changed published records: “\",",
+   "new": "\", reports a fix that left every published record as it was: “\",",
+   "kind": "a sentence that claims other than its source at the pin",
+   "why": "The contract paragraph says issue 1's fix left every published record as it was; the quote beside it, VALIDATION.md:26179 at 19de866, says 8 sets changed by one record each, 'so those 8 records are the published ones moving'. No gate reads the words around a figure."
+  },
+  {
+   "file": "site/pages/work_cft_fp256.py",
+   "old": "\".” These are the pin's figures, through night \", N(\"newest\", \"night\"), \". The \",",
+   "new": "\".” These are the campaign's final figures, through night \", N(\"newest\", \"night\"), \". The \",",
+   "kind": "a sentence that presents as final what the record says goes on",
+   "why": "The nightly paragraph calls night 10's totals the campaign's final figures; the same paragraph quotes the record's 'the weekend window launched' and 'It waits for 18:00 and runs until Monday 2026-11-02 07:45' (the entry of 2026-10-30), so the sweep goes on past the pin. No gate reads the words around a figure."
+  }
+ ]
+}

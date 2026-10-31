@@ -1,0 +1,21 @@
+{
+ "parcel": "P3",
+ "commit": "9d26d4f",
+ "branch": "r3-P3-1",
+ "plants": [
+  {
+   "file": "site/pages/corrections.py",
+   "old": "\"of its cells is read from one entry of cft-fp256's own ledger at its pin, and its fix commit is \"",
+   "new": "\"of its cells is read from cft-fp256's CONFORMANCE.md at its pin, and its fix commit is \"",
+   "kind": "a caption that names the wrong source",
+   "why": "The ledger's caption says issue 1's row is read from cft-fp256's CONFORMANCE.md; every cell is read from one entry of docs/VALIDATION.md (lines 26149 to 26225 at 19de866). No gate reads a caption's words."
+  },
+  {
+   "file": "site/pages/method.py",
+   "old": "\" of muse-softfloat's commits, always as “\",",
+   "new": "\" of muse-softfloat's commits, each written by Muse alone, always as “\",",
+   "kind": "a sentence that claims more than its source at the pin",
+   "why": "A Co-Authored-By trailer says a commit was co-authored; every one of muse-softfloat's 185 commits at a2241fc is authored by Logan and co-credits Muse, so 'each written by Muse alone' claims more than the trailers and the commits' authors show. No gate reads the words around a figure."
+  }
+ ]
+}

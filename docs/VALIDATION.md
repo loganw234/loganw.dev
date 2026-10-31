@@ -2827,3 +2827,43 @@ gave the two mains without when or how they were read. GitHub's
 default-branch heads, which verifier-I read at its pass, are the three pins.
 The rest of that entry holds, and the round's entry, read with both, says
 nothing false.
+
+## 2026-10-31 - round 3 pushed at Logan's word and live byte for byte; its integration verifier READY on its third pass; its ledger archived as docs/round3-ledger/; two slips after the round's entry
+
+**The integration verifier's third pass**, its last, read the entry before
+this one sentence by sentence against its sources: READY. The entries of
+the second and third pass, read with the round's entry, say nothing false.
+Its one note is on wording: "cft-fp256's was `19de866`" means cft-fp256's
+default branch, which "its default branch" would say with no doubt.
+
+**The gate before the push.** `bash verify/run.sh --require-all` on
+`38a91a9`, round3's tip: VERDICT: PASS, nothing skipped; 11 passed;
+`--control` caught 512 of 512.
+
+**The push.** Logan answered at 13:24, through the question tool: "Push
+now (Recommended)". GitHub's main was still `797f588`. main fast-forwarded
+to `38a91a9`, and main alone was pushed, at 13:25. The site's workflow, run
+41238802159, passed its gate and deployed on its first attempt, its deploy
+ending at 13:32. Live at https://loganw.dev/:
+- BUILD names `38a91a9`;
+- every other published file, 42 of 42, is byte-identical to the build;
+- /resume serves the same bytes as resume.html;
+- resume.pdf is served as application/pdf.
+
+**The round's end.** The three plant branches are kept in a bundle with the
+round's ledger, outside the repository, since their plants never reach
+main. `git bundle verify` passed on it, and the round's ledger gives its
+SHA-256. Then the plant branches and the parcels' three branches, each
+merged, were deleted. The round's ten worktrees and the four verifiers'
+clones went to the Recycle Bin, not deleted, and emptying it is Logan's.
+
+**The archive.** Logan's second answer: "Archive it (Recommended)". The
+round's ledger is copied into this repository as
+[round3-ledger/](round3-ledger/), as round 2's was, as it stood at 13:35:
+every file but the bundle. The ledger goes on outside the repository after
+the copy; its entries on this archive's own push are not in it.
+
+**Two slips after the round's entry,** each corrected in the round's ledger
+when it was caught: two more times typed instead of read, for six in the
+round. One was a heading of the lead's file, and one the time of the
+integration verifier's third report.
