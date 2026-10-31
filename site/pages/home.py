@@ -190,7 +190,9 @@ def rows():
                    [P("muse-softfloat", "README.md",
                       r"^\*\*(Tier 1 and Tier 2 complete: 849 of 849 instantiations,\s+three workloads "
                       r"bit-identical on silicon)\.\*\*")],
-                   [C("bash " + facts.exists("muse-softfloat", "tools/run.sh").text + " smoke")]))
+                   [C("bash " + facts.exists("muse-softfloat", "tools/run.sh").text + " smoke"),
+                    "; its record, which the Record does not merge, is ",
+                    L(facts.pin("muse-softfloat").href("docs/RECORD.md"), facts.exists("muse-softfloat", "docs/RECORD.md"))]))
     T = "Film & photography"
     for name in ("CanonBracketTool", "Microscope-Stacker"):
         out.append(row(T, name, [facts.api_description(name)], [S("a beginning project, from before the method")],
