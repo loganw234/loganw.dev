@@ -208,7 +208,8 @@ def cft_block():
          ", with ", q(V_(r"reference orbit to its checkpoint - (0 failures)")), "."],
         # Decision 55 (2026-10-31): the record's longer runs, beside the soak,
         # in one item of two printed lines, so that this project still fits on
-        # the printout's first page (it had 29 pt to spare). The run is the
+        # the printout's first page (it had 29 pt to spare before this item,
+        # and has 1 with it: any growth here moves it to page 2). The run is the
         # README's own sentence on it. The totals are the campaign's, summed to
         # its newest night: the last of the ledger's "Totals:" lines, dated by
         # the newest night that site/nightly.json gives (Logan, the same day:

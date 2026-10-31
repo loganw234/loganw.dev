@@ -417,7 +417,9 @@ golden model that can go to the corrections page)". The plan is
 [ROUND3.md](ROUND3.md), which gives each question whole. His answers came
 through the question tool: the first four by 04:40:32, the next two by
 04:55:59, the seventh by 05:06:21, the eighth by 05:11:18 and the ninth by
-05:57:33, each stamp from `date` right after the answer. Each answer is the option he chose, in the
+05:57:33, each stamp from `date` right after the answer; decision 55's
+three further answers, below, by 06:44:54 and 06:48:36, the stamps of the
+ledger entries that record them. Each answer is the option he chose, in the
 words the lead wrote for that option; his choice is his word.
 
 47. **softfloat-bootstrap's visibility.** Its README says the repository
@@ -472,6 +474,9 @@ words the lead wrote for that option; his choice is his word.
     "Leave it out (Recommended)"; and the nightly totals, which grow after
     the pin, "Date them (Recommended)": they read "nightly sweeps to
     2026-10-29", the newest night that `site/nightly.json` gives at the pin.
+    The printout keeps its two pages by one point: any growth of
+    cft-fp256's block, or of the text above it on page 1, moves the block
+    to page 2 and the printout to three.
 
 ---
 
@@ -532,8 +537,9 @@ measured them are in `docs/VALIDATION.md`.
 - **Agent-credited.** The number of commits whose message has a
   Co-Authored-By line naming Claude, Gemini or Muse (Muse since decision
   50), out of all commits at the pin. The rule reads names, in any case,
-  as whole words, which is a stated limit: a person named Muse on such a
-  line would be counted, and a name written `Muse_Code` would not.
+  as whole words, on a line that starts with the key, which is a stated
+  limit: a person named Muse on such a line would be counted, and a name
+  written `Muse_Code`, or a key after a space or a tab, would not.
   It counts commits, not trailer lines and not lines of code. It is a
   **lower bound** on the agents' part in the work, not a measure of it: in
   Logan's words, the trailer "simply wasn't always there" (decision 23). A

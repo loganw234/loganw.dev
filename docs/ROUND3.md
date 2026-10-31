@@ -320,11 +320,14 @@ does:
   restoring its quote, goes to Logan, since its statements are his (decision
   46). Its replay line said the published set "is" 1,068,915 cases "and
   that exact set was replayed"; at the pin the set is 1,072,415 and the card
-  replayed the earlier one, so the line now cites "That 1,068,915-case set
-  was replayed", which keeps its claim. Whether the resume should also cite
-  what the record states after the soak it quotes, the card's long stress
-  run and the nightly sweep, would change what it claims, so it went to
-  Logan, whose word is to cite both (decision 55, in `2cbb7e7`).
+  replayed the earlier one, so the line now reads "the 1,068,915-case set
+  was replayed", which keeps its claim about the replay and drops the
+  published set's size; Logan's word is to leave the size out (decision
+  55). Whether the resume should also cite what the record states after the
+  soak it quotes, the card's long stress run and the nightly sweep, would
+  change what it claims, so it went to Logan, whose word is to cite both,
+  dated (decision 55, in `2cbb7e7` and `c5e5e79`). The printout keeps its
+  two pages by one point.
 - **`build.SOURCE_PATHS`:** P0's labels name no path it does not list
   (verifier-P0's C). Its follow-up adds `site/nightly.json`, for the
   resume's dated line, a path P1's brief expects to need too.
