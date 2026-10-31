@@ -5,8 +5,10 @@ was measured where a source says, and what a pass does and does not prove.
 The page ranks them by no cost (decision 56): no current figure ranks them on
 one machine, since the replay has no time, make golden's newest timing is the
 runner's golden stage on the build box, of 2026-10-30, and CLAUDE.md's two
-budget lines name no machine and no date (they were last written on
-2026-09-12). docs/VERIFICATION.md dates its own figure for the gate, quiet on
+budget lines name no machine and no date. Their time figures were written on
+2026-09-12 and have not changed since; their stage counts have, last on
+2026-10-22 (git log -L at the pin; verifier-P2's second pass, round 3).
+docs/VERIFICATION.md dates its own figure for the gate, quiet on
 the Windows desktop in the census of 2026-09-04 and loaded on 2026-09-07
 (item 3 quotes where and when). The first three checks
 are sourced at cft-fp256's pin (its README, CLAUDE.md, docs/VERIFICATION.md,
