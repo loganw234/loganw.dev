@@ -477,6 +477,15 @@ words the lead wrote for that option; his choice is his word.
     The printout keeps its two pages by one point: any growth of
     cft-fp256's block, or of the text above it on page 1, moves the block
     to page 2 and the printout to three.
+56. **Verify's ranking.** The spec's Verify lists its checks "cheapest
+    first"; at cft-fp256's new pin, make golden's newest timing, 3,385 s on
+    the build box, is no longer below verify-quick's documented ~20 min, and
+    both documented budgets date from September: "Keep order, drop the
+    ranking (Recommended)": "The checks stay in their order, each with its
+    cost and where and when it was measured; the lede no longer says
+    "cheapest first", since no current figure ranks them on one machine."
+    (2026-10-31, by 07:39:53, the stamp of the ledger entry that records
+    it.)
 
 ---
 
