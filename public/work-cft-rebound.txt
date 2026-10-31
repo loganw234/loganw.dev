@@ -3,56 +3,56 @@ cft-rebound — dossier
 
 I. What it is
 
-REBOUND's IAS15 integrator with its arithmetic routed through libcft, the IEEE 754-2019 binary32/64/128/256 library of the cft-fp256 project, so that the same integrator runs at binary64, binary128 and binary256 - and, given an artifact, on the FP256 tile - with the same bits everywhere [fact 2066].
+REBOUND's IAS15 integrator with its arithmetic routed through libcft, the IEEE 754-2019 binary32/64/128/256 library of the cft-fp256 project, so that the same integrator runs at binary64, binary128 and binary256 - and, given an artifact, on the FP256 tile - with the same bits everywhere [fact 2098].
 
 II. What it is not
 
-The README carries no “what it is not” heading. Its nearest equivalent is “Scope: what it integrates, and what it refuses [fact 2067]”, a refusal list rather than a limits statement. In the README's own words: “Everything below is refused, by name, with a message - never silently ignored, never approximated [fact 2068]. The list is one table in code (cft_support_rows, src/cft_supported.c) that both entry points walk, and the gate walks it too and fails on any row no case exercises [fact 2069]”
+The README carries no “what it is not” heading. Its nearest equivalent is “Scope: what it integrates, and what it refuses [fact 2099]”, a refusal list rather than a limits statement. In the README's own words: “Everything below is refused, by name, with a message - never silently ignored, never approximated [fact 2100]. The list is one table in code (cft_support_rows, src/cft_supported.c) that both entry points walk, and the gate walks it too and fails on any row no case exercises [fact 2101]”
 
-- this is direct summation. REB_GRAVITY_COMPENSATED is refused too: a different summation from the one ported [fact 2070]
-- WHFast is ranked first to follow (docs/INTEGRATORS.md) and has not been done [fact 2071]
-- a heap overread in REBOUND's own gravity loop. There is no bit-identity to claim against undefined behaviour [fact 2072]
+- this is direct summation. REB_GRAVITY_COMPENSATED is refused too: a different summation from the one ported [fact 2102]
+- WHFast is ranked first to follow (docs/INTEGRATORS.md) and has not been done [fact 2103]
+- a heap overread in REBOUND's own gravity loop. There is no bit-identity to claim against undefined behaviour [fact 2104]
 
 III. The contract
 
-At binary64 it is REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build [fact 2073].
+At binary64 it is REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build [fact 2105].
 
 IV. Verified
 
-Last verified: 2026-09-14 [fact 2074].
+Last verified: 2026-09-14 [fact 2106].
 
-- 2026-09-09 - Phase 3 gate: the port at binary64 is REBOUND's IAS15, bit for bit [fact 2075]
-- 2026-09-14 [fact 2076] — 37. Five benchmarks on a real integration: where the hardware pays, and where a step's time actually goes [fact 2077]
+- 2026-09-09 - Phase 3 gate: the port at binary64 is REBOUND's IAS15, bit for bit [fact 2107]
+- 2026-09-14 [fact 2108] — 37. Five benchmarks on a real integration: where the hardware pays, and where a step's time actually goes [fact 2109]
 
 V. Kept failures
 
-- REBOUND's IAS15 was thought to leave a *stale polynomial* behind when a particle is removed [fact 2078]. So the polynomial is not stale. It is aliased, and the survivors do not inherit each other's coefficients - they inherit fragments of the level above [fact 2079] — 2026-09-11 [fact 2080], 30. Collisions, and a defect that was not the one we wrote down [fact 2081]. Fixed by commit 1561d35 [fact 2082].
-- A banner is the only place in this suite that states a step count without executing it, so under --light it was the only place that could overstate the work done [fact 2083] — 2026-09-11 [fact 2084], 33. --light, and the banner that overstated it [fact 2085]. Fixed by commit e12aed9 [fact 2086].
+- REBOUND's IAS15 was thought to leave a *stale polynomial* behind when a particle is removed [fact 2110]. So the polynomial is not stale. It is aliased, and the survivors do not inherit each other's coefficients - they inherit fragments of the level above [fact 2111] — 2026-09-11 [fact 2112], 30. Collisions, and a defect that was not the one we wrote down [fact 2113]. Fixed by commit 1561d35 [fact 2114].
+- A banner is the only place in this suite that states a step count without executing it, so under --light it was the only place that could overstate the work done [fact 2115] — 2026-09-11 [fact 2116], 33. --light, and the banner that overstated it [fact 2117]. Fixed by commit e12aed9 [fact 2118].
 
 VI. Test it
 
-- make check-quick: cheaper arguments + the gate cache [fact 2087], 5 s warm [fact 2088].
-- make check-light: cheaper arguments, the cache, and step counts scaled down [fact 2089], ~9 min [fact 2090].
-- make check: every gate at every format, never skipping one [fact 2091], ~55–70 min [fact 2092].
+- make check-quick: cheaper arguments + the gate cache [fact 2119], 5 s warm [fact 2120].
+- make check-light: cheaper arguments, the cache, and step counts scaled down [fact 2121], ~9 min [fact 2122].
+- make check: every gate at every format, never skipping one [fact 2123], ~55–70 min [fact 2124].
 
 VII. Prove it wrong
 
 Cheapest first; the site-wide rules of engagement are stated once, on the Corrections page.
 
-- make check-quick on a clean clone, and see whether the cache lets anything silently pass: Every skip prints itself by name [fact 2093].
+- make check-quick on a clean clone, and see whether the cache lets anything silently pass: Every skip prints itself by name [fact 2125].
 - make check-light end to end, and compare it against make check on the same commit: a scaled leg that disagrees with the full one is a disproof.
 - Point CFT_REBOUND_ARTIFACT at the software backend and at a card image on the same problem and diff every coordinate: the contract is bit identity at binary64, not agreement within a tolerance.
-- Run make check itself, which executes [fact 2094], and read the log rather than the exit code.
+- Run make check itself, which executes [fact 2126], and read the log rather than the exit code.
 
 VIII. Connections
 
-- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 2102]
-- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 2107]
+- cft-fp256 underlies cft-rebound: REBOUND's IAS15 integrator with its arithmetic routed through libcft [fact 2134]
+- cft-rebound was distilled into ParcelRound: lifted into a standalone repository [fact 2139]
 
 IX. Provenance
 
-cft-rebound read at 039e3c3 [fact 2127].
+cft-rebound read at 039e3c3 [fact 2159].
 
-- README.md [fact 2128]
-- CLAUDE.md [fact 2129]
-- docs/VALIDATION.md [fact 2130]
+- README.md [fact 2160]
+- CLAUDE.md [fact 2161]
+- docs/VALIDATION.md [fact 2162]
