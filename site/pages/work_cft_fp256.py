@@ -204,15 +204,24 @@ def _sections(built):
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18248))],
             [L(facts.pin(NAME).href("docs/VALIDATION.md", 18547),
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18547))],
-            # Round 3: four of the verification events the record holds after 2026-10-06, newest last, the ones
-            # P1's brief named. The selection is editorial (P1's design): the record holds later ones, of
-            # 2026-10-26, 10-27 and 10-29, which no row here gives (verifier-P1's first pass, round 3). Each row is
-            # its entry's heading whole, so the row says what the entry says: the last of them says in its own
-            # heading that none of it has touched the card or amd-arc-box.
+            # Round 3: eight of the record's entries after 2026-10-06, newest last, each one that verifies:
+            # revision 8's hard workloads, the card's long stress run, M1's seventh wave, the three outside test
+            # sources, the wide division and square-root soak and the wide class modes against MPFR, program.c's
+            # parity for sin, cos and tan, and the entry in which sin, cos and tan are built at all four formats,
+            # the milestone P1's brief names. The record holds other entries in that span, on tools, studies and
+            # nights; the nightly sweep follows this list, and issue 1 is under Kept failures. The selection is
+            # editorial, and its newest row is of 2026-10-30, the date "Last verified" prints above it at the pin
+            # (verifier-P1's first and second passes, round 3). Each row is its entry's heading whole, so the row
+            # says what the entry says: the
+            # fourth says in its own heading that none of it has touched the card or amd-arc-box.
             row(18943),
             row(21042),
             row(21275),
             row(22253),
+            row(24164),
+            row(25104),
+            row(25753),
+            row(26082),
         ], ordered=False),
         # The nightly sweep, as the data file at the pin gives it. Every figure is the file's `totals` (the
         # campaign summed to its newest night), never one night's own; the stop night is printed twice; and the
