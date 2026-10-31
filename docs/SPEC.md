@@ -466,7 +466,12 @@ words the lead wrote for that option; his choice is his word.
     the printout's first page. The run is quoted from the README's sentence
     on it, "a 61-hour stress run of the card with no failure"; the sweep from
     the ledger's newest totals, beside its own sentence on what a case
-    total adds.
+    total adds. Asked whether that one item may stand for his "two short
+    lines": "Keep one item (Recommended)". And on verifier-P0's two findings
+    on the resume: the published set's size, which the moved quote dropped,
+    "Leave it out (Recommended)"; and the nightly totals, which grow after
+    the pin, "Date them (Recommended)": they read "nightly sweeps to
+    2026-10-29", the newest night that `site/nightly.json` gives at the pin.
 
 ---
 
@@ -526,7 +531,9 @@ measured them are in `docs/VALIDATION.md`.
   that too, as an absence.
 - **Agent-credited.** The number of commits whose message has a
   Co-Authored-By line naming Claude, Gemini or Muse (Muse since decision
-  50), out of all commits at the pin.
+  50), out of all commits at the pin. The rule reads names, in any case,
+  as whole words, which is a stated limit: a person named Muse on such a
+  line would be counted, and a name written `Muse_Code` would not.
   It counts commits, not trailer lines and not lines of code. It is a
   **lower bound** on the agents' part in the work, not a measure of it: in
   Logan's words, the trailer "simply wasn't always there" (decision 23). A

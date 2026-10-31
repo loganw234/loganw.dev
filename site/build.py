@@ -89,7 +89,7 @@ SOURCE_PATHS = {
     "docs/PREREGISTRATION.md", "docs/README.md", "docs/TRANSCENDENTALS.md", "docs/VALIDATION.md",
     "docs/VERIFICATION.md", "docs/prints/ibm-kingston-pauli-4x4-print.png", "docs/prints/ibm-kingston-pauli-4x4.json",
     "docs/prints/pauli-print.png", "docs/prints/poisson-print.png", "docs/prints/trix-print.png",
-    "host/include/cft.h", "projects/method/README.md", "tools/check_method.py", "verify/run.sh"}
+    "host/include/cft.h", "projects/method/README.md", "site/nightly.json", "tools/check_method.py", "verify/run.sh"}
 
 
 def sha256(b):
@@ -3361,6 +3361,8 @@ def controls():
             ("a Muse trailer", ["x\n\nCo-Authored-By: Muse Code (muse-wonder-full-1.0)\n"], 1),
             ("Claude's and Muse's trailers on one commit",
              ["x\n\nCo-Authored-By: Claude Opus 5.5\nCo-Authored-By: Muse Code (muse-wonder-full-1.0)\n"], 1),
+            ("an upper-case trailer, which a case-sensitive rule would miss",
+             ["x\n\nCO-AUTHORED-BY: MUSE CODE\n"], 1),
             ("a word that only contains muse", ["x\n\nCo-Authored-By: Amused Reviewer\n"], 0),
             ("Muse named outside a trailer", ["Built with Muse.\n\nSigned-off-by: a person\n"], 0)):
         got = sum(1 for msg in msgs if facts.agent_credited(msg))

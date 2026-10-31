@@ -209,12 +209,16 @@ def cft_block():
         # Decision 55 (2026-10-31): the record's longer runs, beside the soak,
         # in one item of two printed lines, so that this project still fits on
         # the printout's first page (it had 29 pt to spare). The run is the
-        # README's own sentence on it. The totals are the newest night's, so
-        # the last of the ledger's "Totals:" lines; and its units are the
-        # tools' own, as its entry on the long run says, so that sentence goes
-        # beside them.
+        # README's own sentence on it. The totals are the campaign's, summed to
+        # its newest night: the last of the ledger's "Totals:" lines, dated by
+        # the newest night that site/nightly.json gives (Logan, the same day:
+        # "Date them"); and their units are the tools' own, as the ledger's
+        # entry on the long run says, so that sentence goes beside them.
         ["A ", q(P(r"a (\d+-hour stress run of the card with\s+no failure)")),
-         "; then nightly sweeps: ",
+         "; nightly sweeps to ",
+         q(prose("cft-fp256", "site/nightly.json", r'^ "newest": \{"night": \d+, "date": "(\d{4}-\d{2}-\d{2})"',
+                 num=True)),
+         ": ",
          q(V_(r"Totals: (\d+ nights, [\d,]+ cases, \d+ disagreements)", last=True)),
          ", where the ",
          q(V_(r"\*\*The units differ by item\.\*\* The (sweep's case totals add items whose tools count different "

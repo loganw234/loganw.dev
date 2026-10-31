@@ -15,7 +15,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 6 0 obj
-<< /Length 7153 >>
+<< /Length 7162 >>
 stream
 BT /F2 20 Tf 1 0 0 1 54.00 716.00 Tm (Logan W.) Tj ET
 BT /F2 11 Tf 1 0 0 1 54.00 701.00 Tm (Independent project lead) Tj ET
@@ -74,8 +74,8 @@ BT /F1 10 Tf 1 0 0 1 66.00 166.00 Tm (The card replayed the conformance sets on 
 BT /F1 10 Tf 1 0 0 1 66.00 153.00 Tm (at each point of the 2026-09-23/24 clock sweep from 145 to 170 MHz. A binary256 soak on the card ran 541) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 140.00 Tm (passes in 70 minutes, each a resident run of a million elements at fma, add and mul, with 0 failures.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 166.00 Tm (\225) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 125.00 Tm (A 61-hour stress run of the card with no failure; then nightly sweeps: 10 nights, 20,759,013,456,650 cases, 0) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 112.00 Tm (disagreements, where the sweep's case totals add items whose tools count different things.) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 125.00 Tm (A 61-hour stress run of the card with no failure; nightly sweeps to 2026-10-29: 10 nights, 20,759,013,456,650) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 112.00 Tm (cases, 0 disagreements, where the sweep's case totals add items whose tools count different things.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 125.00 Tm (\225) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 97.00 Tm (cft-rebound is REBOUND's IAS15 integrator with its arithmetic routed through libcft. At binary64 it is) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 84.00 Tm (REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build.) Tj ET
@@ -177,21 +177,21 @@ xref
 0000000220 00000 n 
 0000000322 00000 n 
 0000000417 00000 n 
-0000007622 00000 n 
-0000007767 00000 n 
-0000007911 00000 n 
-0000008065 00000 n 
-0000008288 00000 n 
-0000008541 00000 n 
-0000008769 00000 n 
-0000008993 00000 n 
-0000009156 00000 n 
-0000009366 00000 n 
-0000013599 00000 n 
-0000014095 00000 n 
-0000014248 00000 n 
+0000007631 00000 n 
+0000007776 00000 n 
+0000007920 00000 n 
+0000008074 00000 n 
+0000008297 00000 n 
+0000008550 00000 n 
+0000008778 00000 n 
+0000009002 00000 n 
+0000009165 00000 n 
+0000009375 00000 n 
+0000013608 00000 n 
+0000014104 00000 n 
+0000014257 00000 n 
 trailer
 << /Size 20 /Root 1 0 R >>
 startxref
-14420
+14429
 %%EOF

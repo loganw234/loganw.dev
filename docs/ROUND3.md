@@ -306,7 +306,10 @@ does:
   their neighbours and past the wide map's edge, so `site/mapgen.py`
   re-lays them: the wide map is wider, three labels sit left of their
   markers, and on a phone a label is kept inside the viewBox and off the
-  month ticks. No gate reads where text lands; that is a stated limit.
+  month ticks. No gate reads where text lands; that is a stated limit. On a
+  phone a label still sits under its own marker and may cover a marker born
+  days later in its column: seven labels do on the live map, and
+  softfloat-bootstrap's now covers muse-softfloat's (verifier-P0's A).
 - **Work** lists the two among the projects with no dossier.
 - **The Record** reads every pinned repository's docs/VALIDATION.md, as it
   always has. So softfloat-bootstrap's ledger joins it, and the trial parsed
@@ -322,7 +325,9 @@ does:
   what the record states after the soak it quotes, the card's long stress
   run and the nightly sweep, would change what it claims, so it went to
   Logan, whose word is to cite both (decision 55, in `2cbb7e7`).
-- **`build.SOURCE_PATHS`:** the paths P0's new labels name.
+- **`build.SOURCE_PATHS`:** P0's labels name no path it does not list
+  (verifier-P0's C). Its follow-up adds `site/nightly.json`, for the
+  resume's dated line, a path P1's brief expects to need too.
 - **SPEC.md:** decisions 47 to 54, and section 4's definition.
 
 **verifier-P0** reads P0 against this plan and the tree, and picks its own
