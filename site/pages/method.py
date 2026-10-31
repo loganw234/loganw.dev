@@ -261,7 +261,9 @@ def muse_commits(name):
 
 # Every Co-Authored-By line naming Muse in muse-softfloat also carries an
 # email address. No page prints one (CLAUDE.md, trap 14): the name is read up to
-# the address, and a name that holds an "@" is refused.
+# the address, and a name that holds an ASCII "@" is refused here. An address
+# spelled another way, with a fullwidth at sign say, is the local-only stage's
+# to refuse on a published page (verifier-P3's first pass, round 3).
 _NAME_BEFORE_ADDRESS = re.compile(r"^Co-Authored-By:[ \t]*(.*?)[ \t\r]*(?:<[^<>\n]*>)?[ \t\r]*$", re.I)
 
 
@@ -284,7 +286,7 @@ def muse_trailer_names(messages):
 def one_muse_name(names, where):
     """The one (name, commits) of a muse_trailer_names() result. The sentence
     says every Muse trailer is that name, so two names, or none, refuse; and
-    a name with an address in it is refused without being printed."""
+    a name with an ASCII "@" in it is refused without being printed."""
     if any("@" in nm for nm in names):
         raise Refusal("%s: a Co-Authored-By line naming Muse holds an address inside its name; no page prints "
                       "one" % where)
@@ -343,8 +345,12 @@ def coauthor_block():
         "Gemini's name sits in a Co-Authored-By trailer on ", gcount, " of Mercenaries2's commits: ", gcommit,
         ", which also credits Claude — a commit counted once, never once per trailer line. ", acount,
         " of its commits credit %s this way. " % COUNT_WORDS,
+        "Logan's word is that ", S(home.AI_USE), ". ",
+        # After Logan's word, so that his line on trailers left off is read as
+        # about the projects it names, not about muse-softfloat, whose every
+        # commit carries one (verifier-P3's first pass, round 3).
         "Muse's name sits in a Co-Authored-By trailer on ", mcount, " of muse-softfloat's commits, always as “",
-        mname, "”. Logan's word is that ", S(home.AI_USE), "."
+        mname, "”."
     ])
     return ('<div class="measure">'
            '<p>%s This is the one place the site states it.</p>'

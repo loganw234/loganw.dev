@@ -8,7 +8,8 @@ quoted at its pin. The corrections ledger is seeded from this site's own
 record, docs/VALIDATION.md, read through facts.own_prose()/own_entry() and
 facts.own_commit() - never typed from memory. Its newest row is the first read
 from another repository's ledger: cft-fp256's issue 1 (docs/SPEC.md, decision
-49), every cell read from that one entry at the pin (III, below).
+49), every quote and figure in it read from that one entry at the pin, and a
+few typed words joining them (III, below).
 """
 import copy
 import re
@@ -95,7 +96,8 @@ def attack_first():
 
 # ---------------------------------------------------------------------------
 # III. The corrections ledger: date | claim | found by | disposition | fix.
-# Every cell is read, never typed. Three rows are this site's own corrections,
+# Every figure and quote in a cell is read, never typed; a few typed words, such
+# as "fixed", join them. Three rows are this site's own corrections,
 # read from its own ledger; the fourth is cft-fp256's issue 1, read from
 # cft-fp256's ledger at its pin (below). The signature row is Logan's words,
 # appended last.
@@ -134,11 +136,13 @@ def _row(claim_pattern, found_pattern, fix_sha, fix_what):
 
 # The fourth row (docs/SPEC.md, decision 49) is the first read from another
 # repository's ledger: cft-fp256's issue 1, found by "a clean-room audit of
-# loganw234/muse-softfloat". Every cell is read from the one entry that
-# records it, found by its heading's whole text and never by line, and
-# entry_prose looks only between that entry's heading and the next, so a cell
+# loganw234/muse-softfloat". Every quote and figure is read from the one entry
+# that records it, found by its heading's whole text and never by line, and
+# entry_prose looks only between that entry's heading and the next, so a quote
 # cannot come from a second entry: a pattern that matches only elsewhere is
-# refused, saying where.
+# refused, saying where. The date is the entry's own, read from the same
+# heading, ISSUE1, as every other cell; nothing else ties it to them
+# (verifier-P3's first pass, round 3).
 #
 # The row says what the entry says and no more.
 #   - "found by" is the entry's own words. The row never calls the report an
@@ -149,10 +153,11 @@ def _row(claim_pattern, found_pattern, fix_sha, fix_what):
 #     "merged as" line and shown to be a merge the pin descends from. Beside it
 #     are the entry's own line on what the fix moved (8 published records) and
 #     two of its known limits. cft-fp256's CONFORMANCE.md calls the tree "a
-#     minor step: cases added, none moved", and no file at the pin says the
-#     profile stepped; so the row never says the published record stood
-#     unchanged, and never says the profile moved (P1's finding, lead.md
-#     2026-10-31 07:05). check_row_words holds the words, and only the words.
+#     minor step: cases added, none moved", and no file at the pin records a
+#     profile step for issue 1's fix (the step to 3.1 it records was on
+#     2026-10-13); so the row never says the published record stood
+#     unchanged, and never says the profile moved (P1's finding, in round 3's
+#     ledger). check_row_words holds the words, and only the words.
 
 CFT = "cft-fp256"
 CFT_LEDGER = "docs/VALIDATION.md"
@@ -262,11 +267,12 @@ def entry_fix(name, path, heading, pattern, what):
 
 
 def check_row_words(texts):
-    """Refuse the row if any cell prints a word in ROW_REFUSES. The first two
-    are the trap docs/ROUND3.md names for this row: a "found by" that reads as
-    an outside finder's, and a "fixed" that says the profile moved or implies
-    the published record stood. The third is CONFORMANCE.md's own quote, which
-    belongs to the dossier. Lexical, so a stated limit."""
+    """Refuse the row if a cell's text holds one of ROW_REFUSES as written, in
+    any case. They keep to the trap docs/ROUND3.md names for this row: a "found
+    by" that reads as an outside finder's, and a "fixed" that claims more than
+    the entry does, such as a profile step. The third is CONFORMANCE.md's own
+    quote, which belongs to the dossier. Lexical, so a stated limit: the same
+    words with another space between them, or other words, pass."""
     text = " ".join(texts).lower()
     for w in ROW_REFUSES:
         if w in text:
@@ -330,9 +336,9 @@ LEDGER_CAP = ("A selection, not every finding. The older rows are this site's ow
               "early in the site's first round, where a single fix commit answers a single finding, each read "
               "from docs/VALIDATION.md's own entry and checked against this site's own history; the rest of "
               "that entry, and everything since, is in that ledger itself. The newest row is cft-fp256's: each "
-              "of its cells is read from one entry of cft-fp256's own ledger at its pin, and its fix commit is "
-              "checked against cft-fp256's history at that pin. The rest of that record is in cft-fp256's "
-              "ledger.")
+              "quote and figure in it is read from one entry of cft-fp256's own ledger at its pin, joined by a "
+              "few typed words, and its fix commit is checked against cft-fp256's history at that pin. The rest "
+              "of that record is in cft-fp256's ledger.")
 
 
 def render_page(ctx):
@@ -431,6 +437,11 @@ def _issue1_controls():
                 lambda: _fix_commit(CFT, sha, ISSUE1_FIX_WHAT), "is not part of the history the pin")
     finally:
         facts._PIN[CFT] = real
+    # ...and a commit the pin descends from that is no merge: 25d5b8d2, the fix
+    # branch's own first commit, which the entry names (verifier-P3: no control
+    # had exercised the merge check).
+    refused("issue1-fix-not-a-merge", "the fix branch's own commit 25d5b8d2, which is no merge",
+            lambda: _fix_commit(CFT, "25d5b8d2", ISSUE1_FIX_WHAT), "is not a merge commit")
 
     # 5: a cell whose words are in another entry (the one before, on verifier VM2F1's note).
     refused("issue1-two-entries", "a pattern whose words are in the entry before",
