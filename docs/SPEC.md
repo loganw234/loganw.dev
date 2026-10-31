@@ -3,7 +3,7 @@
 This file holds four things in order:
 
 1. **The spec**, word for word as Logan gave it on 2026-09-29.
-2. **Logan's decisions**, that day, on 2026-09-30 and on 2026-10-08.
+2. **Logan's decisions**, from that day to 2026-10-31.
 3. **Where the repositories corrected the spec**, measured.
 4. **The definitions the build uses.**
 
@@ -78,7 +78,7 @@ spec itself is left untouched, so the original stays readable.
 
 ---
 
-## 2. Decisions (Logan, 2026-09-29, 2026-09-30 and 2026-10-08)
+## 2. Decisions (Logan, 2026-09-29 to 2026-10-31)
 
 Each decision is given in Logan's words where they were brief, and summarised
 where they were longer.
@@ -408,6 +408,55 @@ word.
     Moth Hack result are stated by Logan, approved as printed, and carry no
     draft label.
 
+**Round 3 (2026-10-31).** Logan asked for it in these words: "Go ahead with
+the cleanup, then we will update the site with a couple new projects, a
+bootstrap kit and a muse-softfloat hackathon project, as well as updating the
+cft information (it has a new nightly page which shows quite a bit about a
+nightly case sweep, as well as a separate project which found an issue in the
+golden model that can go to the corrections page)". The plan is
+[ROUND3.md](ROUND3.md), which gives each question whole. His answers came
+through the question tool: the first four by 04:40:32, the next two by
+04:55:59, the seventh by 05:06:21 and the eighth by 05:11:18, each stamp from
+`date` right after the answer. Each answer is the option he chose, in the
+words the lead wrote for that option; his choice is his word.
+
+47. **softfloat-bootstrap's visibility.** Its README says the repository
+    "stays private", and GitHub has shown it public since it was made: "Public
+    is right": "Keep it public. The site carries it like any public pin and
+    never quotes the README's 'stays private' line, which is now stale."
+48. **The two new projects:** "Rows and nodes now (Recommended)": "Pin both at
+    GitHub's main. Each gets a Map & Ledger row and a map node in the
+    Determinism lane, with edges quoting their own files. Dossiers wait until
+    the hackathon closes on 2026-11-04."
+49. **Issue 1 on Corrections**, which cft-fp256's ledger calls "the first
+    outside report", filed from Logan's own account: "Own row; signature
+    stays (Recommended)": "A new row read from cft-fp256's ledger at the new
+    pin: found by 'a clean-room audit of loganw234/muse-softfloat', fixed in
+    48e2aa22. The signature row stays pending until a stranger files one."
+50. **Muse's trailers.** Every one of muse-softfloat's commits credits "Muse
+    Code (muse-wonder-full-1.0)": "Count Muse, name it on Method
+    (Recommended)": "The rule counts Claude, Gemini or Muse (185 of 185).
+    SPEC's definition says so, and Method's co-authorship section adds a
+    sentence read from muse-softfloat's trailers. Your statement there is
+    unchanged."
+51. **Which pins move:** "cft-fp256 and the new two (Recommended)":
+    "QRO-Crate, mid-round, and the three Preservation repositories stay at
+    their pins for a later update. Their pages are unchanged."
+52. **The round's shape:** "Sonnet parcels, Haiku verifiers (Recommended)":
+    "As in round 2. The lead does P0: pins, snapshot, rows, nodes and the Muse
+    rule. Then Sonnet parcels take the cft-fp256 pages, Corrections and
+    Method. Each parcel is verified on a planted copy on Haiku, and the lead's
+    own work on Haiku too."
+53. **About's list of the AI collaborators:** "Name Muse too (Recommended)":
+    ""The AI collaborators are named here: Claude, Gemini and Muse." Only that
+    list changes; the rest of About stays as you approved it."
+54. **The gate's Python.** The desktop no longer has 3.12.9: "Move the gate to
+    3.12.15": "Change .python-version to 3.12.15, so the desktop and CI both
+    run 3.12.15, recorded in the ledger. Python's HTML parser reads edge
+    cases differently between releases, so the gate itself would need
+    checking first." Before the change, the full gate passed on main's tree
+    under 3.12.15 with nothing skipped.
+
 ---
 
 ## 3. Where the repositories corrected the spec (measured 2026-09-29)
@@ -465,7 +514,8 @@ measured them are in `docs/VALIDATION.md`.
   failures began. When every newest verdict is a pass, the site records
   that too, as an absence.
 - **Agent-credited.** The number of commits whose message has a
-  Co-Authored-By line naming Claude or Gemini, out of all commits at the pin.
+  Co-Authored-By line naming Claude, Gemini or Muse (Muse since decision
+  50), out of all commits at the pin.
   It counts commits, not trailer lines and not lines of code. It is a
   **lower bound** on the agents' part in the work, not a measure of it: in
   Logan's words, the trailer "simply wasn't always there" (decision 23). A

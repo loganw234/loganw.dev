@@ -24,7 +24,7 @@ LEDGER_CAP = ("Each figure names where it was read: a repository at the commit i
               "<i>Last verified</i>: the newest recorded pass of the repository's own gate at or before its pin, on "
               "its author's calendar &mdash; a run of a workflow pins.json classes as verifying, on the pinned commit "
               "or an ancestor of it, or a ledger line in a form pins.json declares as a pass; a dash means neither "
-              "records one. <i>Agent-credited</i>: commits with a Co-Authored-By line naming Claude or Gemini, of all "
+              "records one. <i>Agent-credited</i>: commits with a Co-Authored-By line naming Claude, Gemini or Muse, of all "
               "its commits &mdash; a trailer, not a line count, and a lower bound: ")
 
 # Logan, 2026-09-29, correcting the lead's reading of that column: the counts
@@ -83,16 +83,21 @@ def newest_date(name, path):
 
 @fact
 def newest_subject(name, path):
-    """The newest entry's heading, from after its date to its first colon. A
-    stated limit: the cut is at the first colon even inside brackets, which
-    no heading at the pin has (verifier-P0)."""
+    """The newest entry's heading, from after its date to its first colon; or,
+    in a heading written `YYYY-MM-DD: subject` with no colon after it, as
+    softfloat-bootstrap's are, everything after its date. A stated limit: the
+    cut is at the first colon even inside brackets, which no heading at the
+    pin has (verifier-P0)."""
     e = _newest(name, path)
     m = re.match(r"\d{4}-\d{2}-\d{2} - ([^:]+):", e["title"])
+    how = "the newest entry's heading, to its first colon"
+    if not m:
+        m = re.match(r"\d{4}-\d{2}-\d{2}: ([^:]+)$", e["title"])
+        how = "the newest entry's heading, after its date"
     if not m:
         raise facts.Refusal("%s %s:%d: the newest heading has no subject before a colon: %r"
                             % (name, path, e["line"], e["title"][:70]))
-    return V(m.group(1), facts.pin(name).src("file", "%s:%d" % (path, e["line"]),
-                                             "the newest entry's heading, to its first colon", path, e["line"]),
+    return V(m.group(1), facts.pin(name).src("file", "%s:%d" % (path, e["line"]), how, path, e["line"]),
              raw=m.group(1))
 
 
@@ -167,6 +172,25 @@ def rows():
                    [P("HonestHarness", "README.md", r"^\*\*Status: (research, with its first code)\.\*\*"), "; ",
                     P("HonestHarness", "README.md", r"HonestHarness's\s+(round 1, closed \d{4}-\d{2}-\d{2})\.", num=True)],
                    [C("python " + facts.exists("HonestHarness", "tools/check.py").text)]))
+    # The hackathon's two (docs/SPEC.md, decisions 47 and 48): rows and map
+    # nodes now, dossiers once the hackathon closes on 2026-11-04. The kit's
+    # README also says the repository "stays private"; it has been public from
+    # its creation, Logan's word is that public is right, and the line is not
+    # quoted.
+    out.append(row(T, "softfloat-bootstrap",
+                   [P("softfloat-bootstrap", "README.md",
+                      r"^(The builder of the bootstrap kit for Logan's Meta AI hackathon, 2026-10-26 to 2026-11-04):")],
+                   ["its newest ledger entry, of ", newest_date("softfloat-bootstrap", "docs/VALIDATION.md"),
+                    ", is “", newest_subject("softfloat-bootstrap", "docs/VALIDATION.md"), "”"],
+                   [C("bash " + facts.exists("softfloat-bootstrap", "verify/run.sh").text + " --budget quick")]))
+    out.append(row(T, "muse-softfloat",
+                   [P("muse-softfloat", "README.md",
+                      r"^(An IEEE 754 softfloat library for the RP2040 — binary16, binary32 and binary64 —\s+"
+                      r"built with Meta's Muse models)")],
+                   [P("muse-softfloat", "README.md",
+                      r"^\*\*(Tier 1 and Tier 2 complete: 849 of 849 instantiations,\s+three workloads "
+                      r"bit-identical on silicon)\.\*\*")],
+                   [C("bash " + facts.exists("muse-softfloat", "tools/run.sh").text + " smoke")]))
     T = "Film & photography"
     for name in ("CanonBracketTool", "Microscope-Stacker"):
         out.append(row(T, name, [facts.api_description(name)], [S("a beginning project, from before the method")],

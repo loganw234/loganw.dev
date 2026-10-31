@@ -3351,7 +3351,20 @@ def controls():
 
     # C. Rules that need no source: the page seam, workflow classes, pins
     #    GitHub must have, paraphrases, statements tied to a pin, fenced
-    #    headings, a figure copied with its text changed, and names.
+    #    headings, a figure copied with its text changed, names, and the
+    #    agent-credit rule.
+    # The agent-credit rule (docs/SPEC.md, decision 50): a Co-Authored-By line
+    # naming Claude, Gemini or Muse credits its commit, once however many such
+    # lines it has; a word that only contains one of the names, or a name
+    # outside a trailer, credits nothing.
+    for what, msgs, want in (
+            ("a Muse trailer", ["x\n\nCo-Authored-By: Muse Code (muse-wonder-full-1.0)\n"], 1),
+            ("Claude's and Muse's trailers on one commit",
+             ["x\n\nCo-Authored-By: Claude Opus 5.5\nCo-Authored-By: Muse Code (muse-wonder-full-1.0)\n"], 1),
+            ("a word that only contains muse", ["x\n\nCo-Authored-By: Amused Reviewer\n"], 0),
+            ("Muse named outside a trailer", ["Built with Muse.\n\nSigned-off-by: a person\n"], 0)):
+        got = sum(1 for msg in msgs if facts.agent_credited(msg))
+        report("agent-rule", got == want, "%s: %d commit(s) credited, %d expected" % (what, got, want))
     import types
     fake = lambda f, nav, idx=None: types.SimpleNamespace(
         __name__="planted." + f, render_page=lambda ctx: "",

@@ -15,7 +15,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 6 0 obj
-<< /Length 6893 >>
+<< /Length 6815 >>
 stream
 BT /F2 20 Tf 1 0 0 1 54.00 716.00 Tm (Logan W.) Tj ET
 BT /F2 11 Tf 1 0 0 1 54.00 701.00 Tm (Independent project lead) Tj ET
@@ -70,19 +70,18 @@ BT /F1 10 Tf 1 0 0 1 66.00 207.00 Tm (Checked by 29 simulation targets checking 
 BT /F1 10 Tf 1 0 0 1 66.00 194.00 Tm (machine-checked proofs, plus a negative control that must be refuted or the gate has stopped being able to) Tj ET
 BT /F1 10 Tf 1 0 0 1 66.00 181.00 Tm (catch a bug; and MPFR arbitrates all four formats.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 207.00 Tm (\225) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 166.00 Tm (The card replayed the conformance sets on silicon. The published set is 1,068,915 cases, and that exact set) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 153.00 Tm (was replayed on the card, one tile, at each point of the 2026-09-23/24 clock sweep from 145 to 170 MHz. A) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 140.00 Tm (binary256 soak on the card ran 541 passes in 70 minutes, each a resident run of a million elements at fma, add) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 127.00 Tm (and mul, with 0 failures.) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 166.00 Tm (The card replayed the conformance sets on silicon: the 1,068,915-case set was replayed on the card, one tile,) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 153.00 Tm (at each point of the 2026-09-23/24 clock sweep from 145 to 170 MHz. A binary256 soak on the card ran 541) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 140.00 Tm (passes in 70 minutes, each a resident run of a million elements at fma, add and mul, with 0 failures.) Tj ET
 BT /F1 10 Tf 1 0 0 1 56.00 166.00 Tm (\225) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 112.00 Tm (cft-rebound is REBOUND's IAS15 integrator with its arithmetic routed through libcft. At binary64 it is) Tj ET
-BT /F1 10 Tf 1 0 0 1 66.00 99.00 Tm (REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build.) Tj ET
-BT /F1 10 Tf 1 0 0 1 56.00 112.00 Tm (\225) Tj ET
-BT /F1 9 Tf 1 0 0 1 66.00 84.00 Tm (Where to look first: the validation ledger, the conformance contract, and the browser replay, which replays the published) Tj ET
-q 0.46 w 143.53 82.92 m 224.07 82.92 l S Q
-q 0.46 w 229.07 82.92 m 330.62 82.92 l S Q
-q 0.46 w 353.14 82.92 m 427.16 82.92 l S Q
-BT /F1 9 Tf 1 0 0 1 66.00 72.00 Tm (conformance vectors in front of you.) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 125.00 Tm (cft-rebound is REBOUND's IAS15 integrator with its arithmetic routed through libcft. At binary64 it is) Tj ET
+BT /F1 10 Tf 1 0 0 1 66.00 112.00 Tm (REBOUND's own IAS15 bit for bit, which is a gate the port passes on every build.) Tj ET
+BT /F1 10 Tf 1 0 0 1 56.00 125.00 Tm (\225) Tj ET
+BT /F1 9 Tf 1 0 0 1 66.00 97.00 Tm (Where to look first: the validation ledger, the conformance contract, and the browser replay, which replays the published) Tj ET
+q 0.46 w 143.53 95.92 m 224.07 95.92 l S Q
+q 0.46 w 229.07 95.92 m 330.62 95.92 l S Q
+q 0.46 w 353.14 95.92 m 427.16 95.92 l S Q
+BT /F1 9 Tf 1 0 0 1 66.00 85.00 Tm (conformance vectors in front of you.) Tj ET
 endstream
 endobj
 7 0 obj
@@ -101,13 +100,13 @@ endobj
 << /Type /Annot /Subtype /Link /Rect [263.27 335.02 444.57 344.38] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234/HonestHarness/blob/b69ed7613bdb655fb4b42acd1517b0b30631af7a/Rounds/HonestHarness-R1/CASE-STUDY.md) >> >>
 endobj
 12 0 obj
-<< /Type /Annot /Subtype /Link /Rect [143.53 82.02 224.07 91.38] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234/cft-fp256/blob/ab51655bad2db9ac2daad44ee9387412dcd775d0/docs/VALIDATION.md) >> >>
+<< /Type /Annot /Subtype /Link /Rect [143.53 95.02 224.07 104.38] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234/cft-fp256/blob/19de866c3bf9519672fe847771f4784571835c30/docs/VALIDATION.md) >> >>
 endobj
 13 0 obj
-<< /Type /Annot /Subtype /Link /Rect [229.07 82.02 330.62 91.38] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234/cft-fp256/blob/ab51655bad2db9ac2daad44ee9387412dcd775d0/CONFORMANCE.md) >> >>
+<< /Type /Annot /Subtype /Link /Rect [229.07 95.02 330.62 104.38] /Border [0 0 0] /A << /S /URI /URI (https://github.com/loganw234/cft-fp256/blob/19de866c3bf9519672fe847771f4784571835c30/CONFORMANCE.md) >> >>
 endobj
 14 0 obj
-<< /Type /Annot /Subtype /Link /Rect [353.14 82.02 427.16 91.38] /Border [0 0 0] /A << /S /URI /URI (https://loganw234.github.io/cft-fp256/) >> >>
+<< /Type /Annot /Subtype /Link /Rect [353.14 95.02 427.16 104.38] /Border [0 0 0] /A << /S /URI /URI (https://loganw234.github.io/cft-fp256/) >> >>
 endobj
 15 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R /Annots [7 0 R 8 0 R 9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R] >>
@@ -175,21 +174,21 @@ xref
 0000000220 00000 n 
 0000000322 00000 n 
 0000000417 00000 n 
-0000007362 00000 n 
-0000007507 00000 n 
-0000007651 00000 n 
-0000007805 00000 n 
-0000008028 00000 n 
-0000008281 00000 n 
-0000008509 00000 n 
-0000008733 00000 n 
-0000008896 00000 n 
-0000009106 00000 n 
-0000013339 00000 n 
-0000013835 00000 n 
-0000013988 00000 n 
+0000007284 00000 n 
+0000007429 00000 n 
+0000007573 00000 n 
+0000007727 00000 n 
+0000007950 00000 n 
+0000008203 00000 n 
+0000008432 00000 n 
+0000008657 00000 n 
+0000008821 00000 n 
+0000009031 00000 n 
+0000013264 00000 n 
+0000013760 00000 n 
+0000013913 00000 n 
 trailer
 << /Size 20 /Root 1 0 R >>
 startxref
-14160
+14085
 %%EOF

@@ -486,13 +486,15 @@ def born(name):
              raw=min(dates), num=True)
 
 
-AGENT = re.compile(r"^Co-Authored-By:.*\b(?:claude|gemini)\b", re.I | re.M)
+AGENT = re.compile(r"^Co-Authored-By:.*\b(?:claude|gemini|muse)\b", re.I | re.M)
 
 
 def agent_credited(message):
     """The one rule for an agent-credited commit, here and in
-    snapshot_github.py: its message has a Co-Authored-By line naming Claude or
-    Gemini. It counts commits, so a commit crediting both counts once."""
+    snapshot_github.py: its message has a Co-Authored-By line naming Claude,
+    Gemini or Muse (Muse since 2026-10-31: muse-softfloat's commits credit
+    Meta's Muse, and Logan's word is to count it, docs/SPEC.md decision 50).
+    It counts commits, so a commit crediting two of them counts once."""
     return AGENT.search(message) is not None
 
 
@@ -504,7 +506,7 @@ def agents(name):
     recs = p.git("log", p.full, "--format=%x1e%B").split("\x1e")[1:]
     ai = sum(1 for r in recs if agent_credited(r))
     return V("%d/%d" % (ai, len(recs)),
-             p.src("git", "git log", "commits with a Co-Authored-By line naming Claude or Gemini, of all commits"),
+             p.src("git", "git log", "commits with a Co-Authored-By line naming Claude, Gemini or Muse, of all commits"),
              raw="%d/%d" % (ai, len(recs)), num=True)
 
 
@@ -519,7 +521,7 @@ def api_born(name):
 def api_agents(name):
     c = snap()["github_only"][name]
     t = "%d/%d" % (c["agent_coauthored"], c["total"])
-    return V(t, api_src(name, "commits with a Co-Authored-By line naming Claude or Gemini, of all commits"),
+    return V(t, api_src(name, "commits with a Co-Authored-By line naming Claude, Gemini or Muse, of all commits"),
              raw=t, num=True)
 
 

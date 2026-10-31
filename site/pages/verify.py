@@ -89,10 +89,16 @@ def checks():
                                "C++ replay, lint, formal, the C auditor's gate (`audit`, about four minutes since "
                                "2026-09-29), two cases of the estimates study (`estimates`, under a minute since "
                                "2026-09-30), the compiler's routines (`lang-routines`, about two and a half "
-                               "minutes run directly on a quiet desktop since 2026-10-02), the language's "
-                               "variational equations (`tangent`, three to six minutes since 2026-10-01, far "
-                               "longer on a busy desktop) and the acceptance set (`acceptance`, about six "
-                               "minutes since 2026-10-02)") + ")"),
+                               "minutes run directly on a quiet desktop since 2026-10-02, and about two fifths "
+                               "more on the desktop with M1's build, item 5's legs for the six - 42 and 46 per "
+                               "cent of the old legs' time in two runs - and two thirds more on amd-arc-box, 252 s "
+                               "against 150 s, 245 s in its gate), the language's variational equations "
+                               "(`tangent`, three to six minutes since 2026-10-01, far longer on a busy desktop, "
+                               "and 9 to 19 per cent more with item 5's leg N on the desktop, a tenth more on "
+                               "amd-arc-box, 382 s against 346 s, 371 s in its gate) and the acceptance set "
+                               "(`acceptance`, about six minutes since 2026-10-02) and the stress driver's own "
+                               "suite (`cardstress`, about ten minutes in WSL since 2026-10-22; skipped by name "
+                               "while another process uses the card)") + ")"),
         ". The gate: ",
         P("cft-fp256", "CLAUDE.md", r"^make verify-gate\s+# (~\d+ h quiet, \d+ of \d+ - what a change should pass)",
           num=True), "; the document's own figure is “",
@@ -121,7 +127,7 @@ LIMIT = ("Every quotation above is read from cft-fp256's own documents, at the c
 def limits():
     """What cft-fp256's own documents say their checks do not reach, in their words and at the pin."""
     P = facts.prose
-    entry = 18203      # the ledger entry of the exp2 tie and the profile's major step (a heading line, read below)
+    entry = 18206      # the ledger entry of the exp2 tie and the profile's major step (a heading line, read below)
     shared = [
         "“", P("cft-fp256", "docs/VERIFICATION.md",
                "(" + ws("One stage in this layer holds the library to something this project did not compute "

@@ -30,9 +30,11 @@ is a figure, marked with its fact; the month ticks are the only text the
 numbers stage lets through unmarked, and only in the shape of a month.
 """
 import datetime
+import html
 import json
 import math
 import pathlib
+import re
 
 import facts
 from facts import Refusal
@@ -42,6 +44,9 @@ DATA = json.loads((pathlib.Path(__file__).resolve().parent / "data" / "relations
 
 MAIN0 = datetime.date(2026, 6, 20)
 MAIN_X0, MAIN_X1 = 230.0, 985.0
+# The wide map's width: 1080 until round 3, whose two nodes born days before
+# the snapshot carry labels that run to x 1092 (softfloat-bootstrap's).
+WIDE_W = 1100
 STUB0, STUB1 = datetime.date(2025, 11, 1), datetime.date(2025, 11, 9)
 STUB_X0 = 140.0
 MARGIN = datetime.timedelta(days=2)
@@ -63,6 +68,11 @@ NARROW_Y0, NARROW_Y1 = 232.0, 900.0
 NARROW_AXIS_X = 24.0
 COL_X = [75.0, 190.0, 305.0]
 ROW_DX = 14.0
+# Widths, to keep the phone map's text inside its viewBox and off its month
+# ticks: JetBrains Mono advances every character 0.6 em, and
+# site/styles/map.css sets the phone map's names at 11px and its notes and
+# ticks at 9.5px. An estimate from the font, not a measurement of a browser.
+NARROW_NAME_W, NARROW_SMALL_W = 6.6, 5.7
 
 
 class Axis:
@@ -212,8 +222,11 @@ def build():
         if "note" in n:
             before, _, after = n["note"]["format"].partition("%s")
             note = (before, facts.prose(name, n["note"]["path"], n["note"]["pattern"]), after)
+        label = n.get("label", "right")
+        if label not in ("right", "left"):
+            raise Refusal("the map's node %s has label %r; a wide-map label sits right or left of its marker" % (name, label))
         nodes[name] = dict(name=name, lane=n["lane"], row=n["row"], born=b,
-                           vis=facts.api_visibility([name]), trunk=n.get("trunk", False), note=note)
+                           vis=facts.api_visibility([name]), trunk=n.get("trunk", False), note=note, label=label)
     edges = all_edges()
     for e in edges:
         for end in (e["tail"], e["head"]):
@@ -290,22 +303,29 @@ def _select(M, omit):
 
 
 def svg_wide(M, omit=None, dim_lane=None):
-    """The wide map, 1080x440, time left to right. -> (svg, {node names
+    """The wide map, WIDE_W x 440, time left to right. -> (svg, {node names
     drawn}, {(tail, head, kind) drawn}): the same two kinds of set
     svg_narrow returns, so block() can hold them equal. dim_lane (a thread
     page's slice): every node outside that lane, and every edge that neither
     leaves nor enters it, is drawn with the extra class "dim" - the same
-    node and edge set, so the check still holds, only styled back."""
+    node and edge set, so the check still holds, only styled back.
+
+    A label sits right of its marker, or left where relations.json's node
+    says "label": "left": layout only, for a node whose right is crowded and
+    whose left is not. Round 3's snapshot ran the axis to 2026-11-02, and at
+    that scale three labels ran into a neighbour (cft-rebound into
+    nextpnr-xilinx, HonestFramework over HonestHarness's marker, atlas-optical
+    into StoryDocs). No gate reads where text lands; that is a stated limit."""
     nodes, edges = _select(M, omit)
     ax = Axis([n["born"].text for n in nodes.values()] + [M["now"].text] + [f["last"] for f in M["families"]])
     pos = {name: (ax.x(n["born"].text, name), ROWY[n["lane"]][n["row"]]) for name, n in nodes.items()}
-    o = ['<svg viewBox="0 0 1080 440" role="img" aria-labelledby="map-t-wide" xmlns="http://www.w3.org/2000/svg">',
+    o = ['<svg viewBox="0 0 %d 440" role="img" aria-labelledby="map-t-wide" xmlns="http://www.w3.org/2000/svg">' % WIDE_W,
          '<title id="map-t-wide">Where each project came from: born dates across, threads down, typed relations '
          'between them</title>', _defs()]
     for label, top in zip(DATA["lanes"], LANE_TOP):
         o.append('<text class="lane" x="14" y="%d">%s</text>' % (top + 16, esc(label)))
     for top in LANE_TOP[1:]:
-        o.append('<line class="sep" x1="14" x2="1066" y1="%d" y2="%d"/>' % (top - 4, top - 4))
+        o.append('<line class="sep" x1="14" x2="%d" y1="%d" y2="%d"/>' % (WIDE_W - 14, top - 4, top - 4))
     now = M["now"]
     xn = ax.x(now.text, "the snapshot")
     o.append('<line class="now" x1="%.1f" x2="%.1f" y1="28" y2="%d"/>' % (xn, xn, AXIS_Y))
@@ -331,8 +351,9 @@ def svg_wide(M, omit=None, dim_lane=None):
         if dim_lane is not None and n["lane"] != dim_lane:
             cls += " dim"
         tail = "".join('<tspan class="note"> %s</tspan>' % ln for ln in lines)
-        o.append('<g class="%s"><rect x="%.1f" y="%.1f" width="7" height="7"/><text x="%.1f" y="%.1f">%s%s</text></g>'
-                 % (cls, x - 3.5, y - 3.5, x + 9, y + 4.5, esc(name), tail))
+        tx, anchor = (x - 9, ' text-anchor="end"') if n["label"] == "left" else (x + 9, "")
+        o.append('<g class="%s"><rect x="%.1f" y="%.1f" width="7" height="7"/><text x="%.1f" y="%.1f"%s>%s%s</text></g>'
+                 % (cls, x - 3.5, y - 3.5, tx, y + 4.5, anchor, esc(name), tail))
     o.append("</svg>")
     return "\n".join(o), set(nodes), {(e["tail"], e["head"], e["kind"]) for e in edges}
 
@@ -341,8 +362,9 @@ def svg_narrow(M, omit=None, dim_lane=None):
     """The phone map: time down a vertical axis, the three lanes as columns.
     Every label sits centred under its marker, so a long name spreads to
     either side rather than running past the viewBox - the one thing that
-    would force a sideways scroll on a phone. -> the same (svg, node names,
-    edge triples) shape as svg_wide."""
+    would force a sideways scroll on a phone - and where a side has too
+    little room, the label moves sideways just far enough to fit. -> the
+    same (svg, node names, edge triples) shape as svg_wide."""
     nodes, edges = _select(M, omit)
     ax = Axis([n["born"].text for n in nodes.values()] + [M["now"].text] + [f["last"] for f in M["families"]],
              x0=NARROW_Y0, x1=NARROW_Y1, stub_x0=NARROW_STUB_Y0)
@@ -373,15 +395,22 @@ def svg_narrow(M, omit=None, dim_lane=None):
     now = M["now"]
     yn = ax.x(now.text, "the snapshot")
     o.append('<line class="now" x1="8" x2="%d" y1="%.1f" y2="%.1f"/>' % (NARROW_VB_W - 8, yn, yn))
-    o.append('<text class="tick" x="%.1f" y="%.1f">snapshot %s</text>' % (NARROW_AXIS_X + 4, yn - 4, mark(now)))
+    # At the line's right end: its left end sits in the Determinism column,
+    # where a node born days before the snapshot labels itself (round 3's
+    # muse-softfloat printed over it there).
+    o.append('<text class="tick" x="%d" y="%.1f" text-anchor="end">snapshot %s</text>'
+             % (NARROW_VB_W - 8, yn - 4, mark(now)))
     ys1 = ax.x(STUB1.isoformat(), "axis")
     o.append('<path class="axis" d="M%.1f %.1fV%.1f M%.1f %.1fV%.1f"/>'
              % (NARROW_AXIS_X, NARROW_STUB_Y0 - 4, ys1 + 3, NARROW_AXIS_X, NARROW_Y0 - 8, height - 12))
     o.append('<path class="axis" d="M%.1f %.1f l9 6 M%.1f %.1f l9 6"/>' % (NARROW_AXIS_X - 4, ys1 + 6, NARROW_AXIS_X - 4, ys1 + 13))
+    ticks = []      # each tick label's box: (x0, x1, top, bottom)
     for d, label in ax.ticks():
         y = ax.x(d.isoformat(), "a tick")
         o.append('<path class="axis" d="M%.1f %.1fh5"/><text class="tick" x="%.1f" y="%.1f">%s</text>'
                  % (NARROW_AXIS_X, y, NARROW_AXIS_X + 8, y + 3.5, label))
+        # its box as a browser draws 9.5px of the font: 9.2 above the baseline, 3.3 below
+        ticks.append((NARROW_AXIS_X + 8, NARROW_AXIS_X + 8 + len(label) * NARROW_SMALL_W, y + 3.5 - 9.2, y + 3.5 + 3.3))
     for f in M["families"]:
         y0, y1 = ax.x(f["first"], f["label"]), ax.x(f["last"], f["label"])
         cx = COL_X[f["lane"]]
@@ -408,6 +437,15 @@ def svg_narrow(M, omit=None, dim_lane=None):
     LINE_H = 12.0
     MIN_LABEL_GAP = 15.0
     lines_of = {name: _node_svg(n)[1] for name, n in nodes.items()}
+    # A centred label wider than the room on one side of its marker is moved
+    # sideways until it fits the viewBox (round 3's softfloat-bootstrap, at the
+    # Determinism column's left, ran past its edge), and never further.
+    half_of, label_x = {}, {}
+    for name in nodes:
+        widths = [len(name) * NARROW_NAME_W] + [len(html.unescape(re.sub(r"<[^>]+>", "", ln))) * NARROW_SMALL_W
+                                                for ln in lines_of[name]]
+        half_of[name] = max(widths) / 2
+        label_x[name] = min(max(pos[name][0], half_of[name] + 4), NARROW_VB_W - half_of[name] - 4)
     by_lane = {}
     for name, n in nodes.items():
         by_lane.setdefault(n["lane"], []).append((pos[name][1], name))
@@ -418,6 +456,17 @@ def svg_narrow(M, omit=None, dim_lane=None):
             ly = my + 16
             if bottom is not None and ly < bottom + MIN_LABEL_GAP:
                 ly = bottom + MIN_LABEL_GAP
+            # Nor on a month tick: pushed down past any tick label its own
+            # lines would cover (round 3's muse-softfloat, born days before
+            # November's), with 2 of room. A name's box, as a browser draws
+            # 11px of the font, is 10.6 above its baseline and 3.8 below.
+            x0, x1 = label_x[name] - half_of[name], label_x[name] + half_of[name]
+            moved = True
+            while moved:
+                moved = False
+                for tx0, tx1, top, bot in ticks:
+                    if x0 < tx1 and tx0 < x1 and ly - 10.6 < bot + 2 and top - 2 < ly + len(lines_of[name]) * LINE_H + 3.8:
+                        ly, moved = bot + 2 + 10.6, True
             label_y[name] = ly
             bottom = ly + len(lines_of[name]) * LINE_H
     for name, n in nodes.items():
@@ -425,10 +474,10 @@ def svg_narrow(M, omit=None, dim_lane=None):
         cls, lines = _node_svg(n)
         if dim_lane is not None and n["lane"] != dim_lane:
             cls += " dim"
-        ly = label_y[name]
-        texts = ['<text x="%.1f" y="%.1f" text-anchor="middle">%s</text>' % (x, ly, esc(name))]
+        ly, lx = label_y[name], label_x[name]
+        texts = ['<text x="%.1f" y="%.1f" text-anchor="middle">%s</text>' % (lx, ly, esc(name))]
         for i, line in enumerate(lines, 1):
-            texts.append('<text class="note" x="%.1f" y="%.1f" text-anchor="middle">%s</text>' % (x, ly + i * LINE_H, line))
+            texts.append('<text class="note" x="%.1f" y="%.1f" text-anchor="middle">%s</text>' % (lx, ly + i * LINE_H, line))
         o.append('<g class="%s"><rect x="%.1f" y="%.1f" width="7" height="7"/>%s</g>'
                  % (cls, x - 3.5, y - 3.5, "".join(texts)))
     o.append("</svg>")

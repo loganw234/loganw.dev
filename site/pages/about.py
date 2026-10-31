@@ -70,7 +70,7 @@ def coauthors_block(ctx):
     else:
         method_link = "Method, not yet built"
     body = render([
-        "The AI collaborators are named here: Claude and Gemini. What that credit means is stated once, on ",
+        "The AI collaborators are named here: Claude, Gemini and Muse. What that credit means is stated once, on ",
         method_link, ", so it stays in one place."
     ])
     return '<p>%s</p>' % body

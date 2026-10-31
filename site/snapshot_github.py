@@ -7,9 +7,10 @@ read here and nowhere else. What it records, all through `gh`:
   * every repository on the account: name, visibility, creation date,
     description, URL, and whether it is a fork;
   * for each repository pins.json lists under "github_only" (not cloned on
-    the build machine): every commit's date and whether it carries a Claude
-    or Gemini Co-Authored-By trailer, and whether the ledger and agent-notes
-    files exist on its default branch;
+    the build machine): every commit's date and whether it carries a Claude,
+    Gemini or Muse Co-Authored-By trailer (facts.agent_credited, the one
+    rule), and whether the ledger and agent-notes files exist on its default
+    branch;
   * for every pinned repository, the full SHA GitHub gives for its pin, or
     null where GitHub does not have that commit (the build refuses such a
     pin, and a pin this snapshot did not look up);

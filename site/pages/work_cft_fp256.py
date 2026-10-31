@@ -56,29 +56,30 @@ def _sections(built):
                        prose(NAME, "README.md", r"(That guarantee is the product)\."), ".” ",
                        prose(NAME, "README.md", r"(The hardware only makes it faster)\."), "."]),
         _dossier.para(["The contract is versioned. CONFORMANCE.md opens with its profile, “",
-                       prose(NAME, "CONFORMANCE.md", r"^\*\*(Profile 3, 2026-10-05)\*\*", num=True), "” (",
+                       prose(NAME, "CONFORMANCE.md", r"^\*\*(Profile 3\.1, 2026-10-13)\*\*", num=True), "” (",
                        prose(NAME, "CONFORMANCE.md",
-                             r"\((profile 2 was 2026-10-02 and profile 1\s+2026-09-16); \"Versioning\" says why each "
-                             r"stepped\)", num=True),
+                             r"\((profile 3 was 2026-10-05, profile 2\s+2026-10-02 and profile 1 2026-09-16); "
+                             r"\"Versioning\" says why each\s+stepped\)", num=True),
                        "), and says of the tree: “",
                        prose(NAME, "CONFORMANCE.md",
-                             r"\*\*The tree is at profile 3\*\* \(2026-10-05\), (a major step: recorded\s+bits moved)\."),
-                       ".” A major step is “",
+                             r"\*\*The tree is at profile 3\.1\*\* \(2026-10-13\), (a minor step: cases\s+added, none "
+                             r"moved)\."),
+                       ".” A minor step is “",
                        prose(NAME, "CONFORMANCE.md",
-                             r"\*\*A major step\*\* is (a change to any recorded bit or flag, or to an\s+accepted "
-                             r"image's result, flags, STATUS or acceptance):"), ".”"])])
+                             r"\*\*A minor step\*\* is (an addition that changes no recorded case and no\s+accepted "
+                             r"image):"), ".”"])])
 
     verified = S("Verified", [
         _dossier.para(["Last verified: ", facts.last_verified(NAME), "."]),
         _dossier.list_([
-            [L(facts.pin(NAME).href("docs/VALIDATION.md", 7161),
-               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 7161))],
-            [L(facts.pin(NAME).href("docs/VALIDATION.md", 13913),
-               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 13913))],
-            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18245),
-               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18245))],
-            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18544),
-               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18544))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 7164),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 7164))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 13916),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 13916))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18248),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18248))],
+            [L(facts.pin(NAME).href("docs/VALIDATION.md", 18547),
+               _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18547))],
         ], ordered=False)])
 
     kept_failures = S("Kept failures", [_dossier.list_([
@@ -87,7 +88,7 @@ def _sections(built):
                r"`Makefile\.inc:88`, which checks only that the file \*exists\* —\s+meant three real RTL "
                r"failures were reported as a pass)\."),
          ". Fixed by the entry ",
-         L(facts.pin(NAME).href("docs/VALIDATION.md", 10952), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 10952)),
+         L(facts.pin(NAME).href("docs/VALIDATION.md", 10955), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 10955)),
          ", commit ",
          _dossier.kept_failure(NAME, "f192bf0", "make sim reads its results instead of trusting cocotb's exit code"),
          "."],
@@ -97,7 +98,7 @@ def _sections(built):
                display="a device predating a new capability flag ignored an unchecked reserved bit and read far "
                        "past a one-element buffer"),
          " — measured as a host-side segfault in the entry ",
-         L(facts.pin(NAME).href("docs/VALIDATION.md", 10803), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 10803)),
+         L(facts.pin(NAME).href("docs/VALIDATION.md", 10806), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 10806)),
          ". Fixed by commit ",
          _dossier.kept_failure(NAME, "8b7dea1", "run_ok refuses any reserved MODE bit a build does not carry"), "."],
         [prose(NAME, "CONFORMANCE.md", r"\*\*(exp2 at x = emin - p)\.\*\*"), ": ",
@@ -108,7 +109,7 @@ def _sections(built):
          ". ", prose(NAME, "CONFORMANCE.md",
                      "(" + ws("Step 6's design study M1 found it (its question 5), verifier-VM1 confirmed it") + ")"),
          " — in the entry ",
-         L(facts.pin(NAME).href("docs/VALIDATION.md", 18203), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18203)),
+         L(facts.pin(NAME).href("docs/VALIDATION.md", 18206), _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18206)),
          ". Fixed by commit ",
          _dossier.kept_failure(NAME, "ca43695", "exp2's tie goes to round_pack, as pow's and pown's exact branches "
                                                 "always did; the profile's major step to 3"), "."],

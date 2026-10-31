@@ -200,10 +200,9 @@ def cft_block():
              r"machine-checked proofs, plus a negative control that must be refuted or the gate has stopped being "
              r"able to catch a bug)\. \|")),
          "; and ", q(P(r"\*\*(MPFR arbitrates all four formats)\*\*")), "."],
-        [q(P(r"\*\*(The card replayed the conformance sets on silicon)\*\*")), ". ",
-         q(P(r"(The published set is\s+\*\*[\d,]+\*\* cases)")), ", and that ",
-         q(P(r"(exact set was replayed on the card, one tile, at each point of the\s+\d{4}-\d{2}-\d{2}/\d{2} clock "
-             r"sweep from \d+ to \d+ MHz)\.")),
+        [q(P(r"\*\*(The card replayed the conformance sets on silicon)\*\*")), ": the ",
+         q(P(r"That ([\d,]+-case set was replayed on the card,\s+one tile, at each point of the "
+             r"\d{4}-\d{2}-\d{2}/\d{2} clock sweep from \d+ to\s+\d+ MHz)\.")),
          ". A binary256 soak on the card ran ",
          q(V_(r"(\d+ passes in \d+ minutes, each a\s+resident run of a million elements at fma, add and mul)")),
          ", with ", q(V_(r"reference orbit to its checkpoint - (0 failures)")), "."],
