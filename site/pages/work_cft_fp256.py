@@ -24,10 +24,13 @@ def ws(text):
 
 # ---------------------------------------------------------------------------
 # The nightly sweep (round 3): figures read from site/nightly.json at the pin.
-# The file is cft-fp256's reduction of the card's long run, one night added to
-# it each morning, and the live page it feeds goes on past any commit this
-# site reads. So a figure here is the pin's, through the file's newest night:
-# a reader is told which night, and the page never says "now".
+# The file is cft-fp256's reduction of one run of the card's, resumed each
+# night (its source names card-stress-1019; the long stress run that Verified's
+# row of 2026-10-19 closes is another), one night added to it each morning, and
+# the live page it feeds goes on past any commit this site reads. So a figure
+# here is the pin's, through the file's newest night: a reader is told which
+# night, and the page never says "now" in its own voice, though a quote of the
+# record's does (verifier-P1's first pass, round 3).
 # ---------------------------------------------------------------------------
 
 @fact
@@ -37,7 +40,10 @@ def nightly(name, keys, first=None, part=None):
     A key the file does not have is refused by name, with the path walked and the keys the file does have. The
     value is cited at the line where its last key is written, found by searching the text for each key after the
     line of the key before it; that line must hold `"key": value` as the file writes it, or the fact is refused,
-    so a layout change in the reducer is loud and a figure is never cited at a neighbour's line. An integer is
+    so a layout change in the reducer is loud. The search takes the first key of that name after its parent's, so
+    a same-named key with the same value written earlier, inside a sibling object, would be cited in its place:
+    a stated limit, and at the pin each figure the page prints is cited at its own key's line (verifier-P1's
+    first pass, round 3). An integer is
     printed with thousands separators and a string as it is. `first` keeps the first characters of a string (a
     date from 'YYYY-MM-DD hh:mm:ss'); `part` is a pattern with one group that must match the string once (a
     sentence of one of the file's rules). Only integers and strings are figures here: a float, a boolean, a
@@ -153,8 +159,10 @@ def _sections(built):
                              r"\*\*A minor step\*\* is (an addition that changes no recorded case and no\s+accepted "
                              r"image):"), ".”"]),
         # Round 3, decision D2: the pin's own record disagrees with itself here, and the site quotes both lines
-        # without settling it. It says neither that the profile stepped nor that it should have: no file at the
-        # pin says so (profile.py still reads (3, 1)), and a site that said it would be the one deciding.
+        # without settling it. It says neither that the profile stepped for issue 1's fix nor that it should have:
+        # no file at the pin records a step for that fix (profile.py still reads (3, 1); the step to 3.1 that
+        # docs/COMPATIBILITY.md:1002 and docs/ROADMAP.md:6446 record is of 2026-10-13), and a site that said it
+        # would be the one deciding (verifier-P1's first pass, round 3).
         _dossier.para(["What CONFORMANCE.md says of the tree, “",
                        prose(NAME, "CONFORMANCE.md",
                              r"\*\*The tree is at profile 3\.1\*\* \(2026-10-13\), (a minor step: cases\s+added, none "
@@ -196,8 +204,10 @@ def _sections(built):
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18248))],
             [L(facts.pin(NAME).href("docs/VALIDATION.md", 18547),
                _dossier.ledger_title(NAME, "docs/VALIDATION.md", 18547))],
-            # Round 3: the verification events the record holds after 2026-10-06, newest last. Each row is its
-            # entry's heading whole, so the row says what the entry says: the last of them says in its own
+            # Round 3: four of the verification events the record holds after 2026-10-06, newest last, the ones
+            # P1's brief named. The selection is editorial (P1's design): the record holds later ones, of
+            # 2026-10-26, 10-27 and 10-29, which no row here gives (verifier-P1's first pass, round 3). Each row is
+            # its entry's heading whole, so the row says what the entry says: the last of them says in its own
             # heading that none of it has touched the card or amd-arc-box.
             row(18943),
             row(21042),
@@ -258,12 +268,14 @@ def _sections(built):
                                                 "always did; the profile's major step to 3"), "."],
         # Round 3, decision D1: issue 1 is the third, in the place of the reserved-MODE-bit bullet, since the spec
         # gives this section "2-3". The words are the entry's own (docs/VALIDATION.md:26149 on); the fix is the
-        # merge the entry names ("merged as 48e2aa22") and Corrections prints. The entry's known limits are
-        # quoted in "Prove it wrong", not hidden. Nothing here says who opened the issue: that is GitHub's record.
-        # The entry is cited by its date, whose label links its heading, and not by its heading: the heading calls
-        # the report "the first outside report", and the lead's ruling of 07:39:53 on the Determinism thread keeps
-        # that word off a page other than Map & Ledger's row, while Corrections' signature row says no outside
-        # correction has come.
+        # merge the entry names ("merged as 48e2aa22") and Corrections prints. One of the entry's four known
+        # limits, the oracle's pools, is quoted in "Prove it wrong"; the other three are in the entry, which the
+        # date's label links (verifier-P1's first pass, round 3). Nothing here says who opened the issue: that is
+        # GitHub's record. The entry is cited by its date, whose label links its heading, and not by its heading:
+        # the heading calls the report "the first outside report", and the lead's ruling of 07:39:53 on the
+        # Determinism thread keeps that word, in that sense, off a page other than Map & Ledger's row, while
+        # Corrections' signature row says no outside correction has come. The word is printed on this page in
+        # another sense, in 2026-10-20's heading ("three outside test sources").
         [prose(NAME, LEDGER,
                r"- (At x = emax \+ 1, under roundTowardZero and roundTowardNegative, exp2m1 returned the largest "
                r"finite, which is right, with overflow \| inexact \(0x14\), which is wrong)\."),
@@ -332,7 +344,10 @@ def _sections(built):
     connections = S("Connections", [_dossier.connections_block(NAME)])
 
     provenance = S("Provenance", _dossier.provenance_block([
-        (NAME, ["README.md", "CONFORMANCE.md", "CLAUDE.md", "docs/VALIDATION.md", "verify/run.sh", NIGHTLY]),
+        # Every file of cft-fp256's that this page reads, quoted or only shown to exist (verifier-P1's first
+        # pass, round 3).
+        (NAME, ["README.md", "CONFORMANCE.md", "CLAUDE.md", "docs/COMPATIBILITY.md", "docs/VALIDATION.md",
+                "vectors/SHA256SUMS", "verify/run.sh", NIGHTLY]),
     ]))
 
     return [what_it_is, what_it_is_not, contract, verified, kept_failures, test_it, prove_it_wrong,
