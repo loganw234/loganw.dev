@@ -208,12 +208,14 @@ def _sections(built):
             # revision 8's hard workloads, the card's long stress run, M1's seventh wave, the three outside test
             # sources, the wide division and square-root soak and the wide class modes against MPFR, program.c's
             # parity for sin, cos and tan, and the entry in which sin, cos and tan are built at all four formats,
-            # the milestone P1's brief names. The record holds other entries in that span, on tools, studies and
-            # nights; the nightly sweep follows this list, and issue 1 is under Kept failures. The selection is
-            # editorial, and its newest row is of 2026-10-30, the date "Last verified" prints above it at the pin
-            # (verifier-P1's first and second passes, round 3). Each row is its entry's heading whole, so the row
-            # says what the entry says: the
-            # fourth says in its own heading that none of it has touched the card or amd-arc-box.
+            # the milestone P1's brief names. The record holds 82 other entries in that span (90 dated headings
+            # after 2026-10-06 at the pin), of many kinds and verifying ones among them, such as other gate runs
+            # and the math library's other routines; the nightly sweep follows this list, and issue 1 is under
+            # Kept failures. The selection is editorial,
+            # and its newest row is of 2026-10-30, the date "Last verified" prints above it at the pin
+            # (verifier-P1's three passes, round 3). Each row is its entry's heading whole, so the row says what
+            # the entry says: the fourth says in its own heading that none of it has touched the card or
+            # amd-arc-box.
             row(18943),
             row(21042),
             row(21275),
