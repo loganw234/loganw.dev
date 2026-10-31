@@ -17,6 +17,10 @@ round 2. Verification follows
 [HonestFramework](https://github.com/loganw234/HonestFramework). Round 2's
 plan is [ROUND2.md](ROUND2.md), and this one keeps its shape and its rules.
 
+Draft 1 went past verifier-plan, which found four defects; this draft
+answers them, and the side notes the lead took. The round's ledger records
+each finding and how the lead checked it.
+
 ## What moved
 
 Measured on 2026-10-31 by `gh api .../compare/<pin>...<default branch>` for
@@ -43,9 +47,10 @@ snapshot's list:
   commits, every one with the trailer `Co-Authored-By: Muse Code
   (muse-wonder-full-1.0)`. Its workflows are "Library CI (Linux gate)",
   which runs its own gate, and "Deploy demo site to GitHub Pages".
-- Two private repositories the site does not read are new too. The snapshot
-  leaves them out, as it leaves out every private repository the site does
-  not read, and nothing in this round names them.
+- The account also holds two private repositories the site does not read.
+  Neither is new: they were created on 2025-10-11 and 2026-04-18. The
+  snapshot leaves them out, as it leaves out every private repository the
+  site does not read, and nothing in this round names them.
 
 **What cft-fp256's record holds now.** `git diff ab51655 19de866 --
 docs/VALIDATION.md` adds 90 headings, dated 2026-10-12 to 2026-10-30. The
@@ -84,7 +89,7 @@ the pages describe cft-fp256 as it stood on 2026-10-08.
 
 Through the question tool, verbatim, question and then answer. Each answer
 is the option Logan chose, in the words the lead wrote for that option; his
-choice is his word. SPEC.md keeps them as decisions 47 to 54. The lead's
+choice is his word. SPEC.md records them, from P0 on, as decisions 47 to 54. The lead's
 reading of each, where one is needed, follows it, marked as the lead's.
 
 1. "softfloat-bootstrap's README says the repository "stays private" (only
@@ -141,11 +146,15 @@ reading of each, where one is needed, follows it, marked as the lead's.
 
 *The lead's readings:*
 - On 3: "found by" quotes cft-fp256's record of the report, since no
-  repository of the audit was found to pin. The row says the report came
-  from the owner's own account, so it doesn't read as a stranger's.
+  repository of the audit was found to pin. Those words name
+  loganw234/muse-softfloat, Logan's own project, so the row doesn't read as
+  a stranger's. That the issue was opened from his account is GitHub's
+  record, which no pin holds, so the row doesn't print it.
 - On 5: QRO-Crate's "round of its own running today" rests on its push to
   main that morning and on its directories' times under `<repos>`. Neither
-  was read for content.
+  was read for content. The question said "three more pins" and went on to
+  list four, QRO-Crate and the organisation's three; his answer keeps all
+  four at their pins.
 - On 8: the gate's Python is a venv of Miniconda's 3.12.15 at
   `<repos>/loganw-dev-venv`, holding `verify/requirements.txt` installed by
   hash, so Miniconda's own packages are left as they are. Every gate this
@@ -172,7 +181,8 @@ Each is a standing rule, with where it was given.
   as a recorded known limit, and a sentence that claims more than is true is
   restated at the merge (METHOD.md section 6).
 - **Logan's words.** About and the front page are his approved words
-  (decisions 26 and 29), every `stated()` figure is his statement (trap 12),
+  (decisions 26 and 29), every `stated()` figure is his statement
+  (`build.SPEAKERS` names Logan alone),
   and the spec's choices are his. They change only at his word, except that
   a stated line a pin has overtaken may be replaced by a figure read from
   its source, recorded in the ledger (decision 36). Anything that needs new
@@ -203,14 +213,15 @@ Each is a standing rule, with where it was given.
 4. **Each parcel's verifier** works on a copy of the parcel's work that may
    hold planted faults (below).
 5. **Merges onto `round3`**, one at a time. Before each, the lead reads every
-   author's file in the ledger; after each, the full gate, whose links,
-   numbers and connections stages read every page together and are the
-   round's seam test; then the lead's restates.
+   author's file in the ledger; after each, the full gate, whose numbers and
+   links stages read every page together (links also holds each dossier's
+   Connections to the map's edges) and are the round's seam test; then the
+   lead's restates.
 6. **The verifiers' side notes** get a step of their own after the last
    merge. The lead then appends the round's entry to the site's own ledger,
-   `docs/VALIDATION.md`. That entry also records what the entry of
-   2026-10-16 left open: the push of `797f588` at Logan's word and its
-   deploy, and the cleanup of 2026-10-31.
+   `docs/VALIDATION.md`. That entry also records the push of `797f588`,
+   which the entry of 2026-10-16 left waiting on Logan's word, and its
+   deploy; and the cleanup of 2026-10-31.
 7. **The integration verifier** on the lead's own work: its merges, made
    again from their parents with `git merge-tree`, its restates, its
    records.
@@ -220,9 +231,11 @@ Each is a standing rule, with where it was given.
 
 ## P0: the lead's
 
-On `round3`, from `797f588`. What it does:
+On `round3`, from `797f588`, in three commits: `0e87fc2`, the gate's Python;
+`2f52525`, the rest, whose full gate passed with nothing skipped; and a third,
+the record link this section promised muse-softfloat's row. What it does:
 
-- **`.python-version`:** 3.12.15 (decision 54), once the full gate has passed
+- **`.python-version`:** 3.12.15 (decision 54), once the full gate had passed
   under it on main's tree, as its own commit, so its effect on the gate is
   seen apart from the round's.
 - **pins.json:** cft-fp256 to `19de866`. softfloat-bootstrap is pinned at
@@ -236,13 +249,16 @@ On `round3`, from `797f588`. What it does:
 - **The refusals**, fixed only as far as the build needs, each requoted to
   what cft-fp256 now writes: the resume's published set, Verify's `gate`
   budget, and the dossier's profile. P1 and P2 own what their pages should
-  say.
+  say. cft-fp256's ledger header grew by three lines at the new pin, so
+  every entry the dossier and Verify cite by line moved down by three; P0
+  moves each citation, checked against its heading.
 - **The Muse rule** (decision 50). `facts.AGENT` counts a commit whose
   message has a Co-Authored-By line naming Claude, Gemini or Muse.
   `snapshot_github.py` shares that rule, so the snapshot uses it too. The
   label every count prints, Map & Ledger's caption, and SPEC.md section 4's
-  definition say so. A control holds it: a Muse trailer counts its commit
-  once, and a word that only contains "muse" counts none.
+  definition say so. `build.py`'s agent-rule control holds it: a Muse
+  trailer counts its commit once, and a word that only contains "muse"
+  counts none.
 - **About's list** (decision 53): "Claude, Gemini and Muse". Only that list
   changes.
 - **Map & Ledger** (`site/pages/home.py`):
@@ -251,15 +267,22 @@ On `round3`, from `797f588`. What it does:
     - what it is, quoted from its README at its pin;
     - its state;
     - last verified, as SPEC.md section 4 defines it. muse-softfloat's comes
-      from its classed CI runs. softfloat-bootstrap's comes from its ledger,
-      if that records a pass of its own gate in a form pins.json can
-      declare; otherwise the row shows a dash with its reason;
+      from its classed CI runs. softfloat-bootstrap's is a dash with its
+      reason, as QRO-Crate's is. Its ledger records its runner's passes in
+      one entry, headed "2026-10-23 to 2026-10-24", which the parser dates
+      at its start, while both runs were made on 2026-10-24: a declared pass
+      form would print the newest pass a day early;
     - its agent-credited count;
     - its own front door as its check.
   - **cft-fp256's row** is re-read at the new pin.
 - **The map** (`site/data/relations.json`): the two nodes in the Determinism
   lane, born on their first commits at their pins, and their edges. Each
-  edge names the words at its pin that make it, as every edge does.
+  edge names the words at its pin that make it, as every edge does. The new
+  snapshot runs the axis to 2026-11-02, and at that scale labels ran into
+  their neighbours and past the wide map's edge, so `site/mapgen.py`
+  re-lays them: the wide map is wider, three labels sit left of their
+  markers, and on a phone a label is kept inside the viewBox and off the
+  month ticks. No gate reads where text lands; that is a stated limit.
 - **Work** lists the two among the projects with no dossier.
 - **The Record** reads every pinned repository's docs/VALIDATION.md, as it
   always has. So softfloat-bootstrap's ledger joins it, and the trial parsed
@@ -268,7 +291,13 @@ On `round3`, from `797f588`. What it does:
 - **The resume**, which is the lead's, is re-read at the new pin for its
   cft-fp256 quotes. A requote that changes what the resume claims, beyond
   restoring its quote, goes to Logan, since its statements are his (decision
-  46).
+  46). Its replay line said the published set "is" 1,068,915 cases "and
+  that exact set was replayed"; at the pin the set is 1,072,415 and the card
+  replayed the earlier one, so the line now cites "That 1,068,915-case set
+  was replayed", which keeps its claim. Whether the resume should also cite
+  what the record states after the soak it quotes, the card's long stress
+  run and the nightly sweep, would change what it claims, and goes to Logan
+  with this plan.
 - **`build.SOURCE_PATHS`:** the paths P0's new labels name.
 - **SPEC.md:** decisions 47 to 54, and section 4's definition.
 
@@ -344,9 +373,11 @@ property is held.
 - **Owns:** `site/pages/verify.py` and `site/pages/thread_determinism.py`.
 - **What moved:**
   - docs/VERIFICATION.md's budgets;
-  - the WebAssembly conformance page, rebuilt for profile 3.1 on
-    2026-10-16 and again for issue 1. Issue 1's entry says the module was
-    "stale since 2026-10-22";
+  - `CLAUDE.md`'s two budget lines, which the thread quotes, read new counts
+    at the pin;
+  - cft-fp256's own conformance replay, in the browser, as Verify calls it:
+    its WebAssembly module was rebuilt for profile 3.1 on 2026-10-16 and
+    again for issue 1, whose entry says it was "stale since 2026-10-22";
   - the nightly page, a record a reader can look at rather than a check to
     run;
   - the two new projects in the thread's lane. The map slice draws them
@@ -354,10 +385,10 @@ property is held.
 - **Logan's, and staying:** the Determinism door, including its
   "workloads" and "bit-identical everywhere" (decision 27).
 - **The trap:** a check whose cost or reach changed at the new pin, and a
-  check that names the WebAssembly page as current when the record says it
-  was stale for a week.
-- **Its own control, besides the three:** the WebAssembly check's sentence
-  given the old pin's words is refused by name.
+  check that names the browser replay as current for a week in which its
+  record says it was stale.
+- **Its own control, besides the three:** the browser replay's sentence,
+  given the old pin's words, is refused by name.
 - **The regression it is most likely to cause:** a quote cut short so that
   the sentence around it claims more than its source, as round 2's Verify
   `gate` budget did.
@@ -367,9 +398,11 @@ property is held.
 - **Owns:** `site/pages/corrections.py` and `site/pages/method.py`.
 - **Corrections:**
   - Issue 1's row (decision 49), every cell read from cft-fp256's ledger at
-    the pin: the entry's date; the claim; "found by", from the entry's own
-    words, saying the report came from the owner's account; "fixed"; and
-    `48e2aa22`, a commit the pin descends from.
+    the pin: the entry's date; the claim; "found by", in the entry's own
+    words, which name loganw234/muse-softfloat, Logan's own project; "fixed";
+    and `48e2aa22`, a commit the pin descends from. That the issue was
+    opened from his account is GitHub's record, which no pin holds, so the
+    row does not print it.
   - The caption, restated: the ledger's other rows are the site's own
     corrections, and this one is cft-fp256's.
   - The signature row stays.
@@ -381,7 +414,7 @@ property is held.
   and so is its ONLY_HERE. The count sentence that says "Claude or Gemini"
   is restated to the rule as it now reads.
 - **Logan's, and staying:** the rules of engagement, the gaps' names, the
-  signature row, decision 9's statement and the ratio.
+  signature row, decision 9's statement, and the ratio (decision 8).
 - **The trap:** a "found by" that reads as an outside finder's, and a
   "fixed" that claims more than the entry does. The entry records known
   limits beside the fix.
@@ -400,26 +433,31 @@ The seams and the shared pages are the lead's: `site/facts.py`,
 `site/pages/_settled.py`, `site/pages/_p5.py`, `site/pages/front.py`,
 `site/pages/about.py`, and every document (README, CLAUDE.md, `docs/`). A
 stylesheet a parcel needs is a new file of its own under `site/styles/`.
-`public/` is generated: parcels rebuild it on their branches, and at each
-merge the lead rebuilds it rather than merging its text.
+Every page module on no parcel's list stays as it is this round, and is the
+lead's if it must change. `public/` is generated: parcels rebuild it on their
+branches, and at each merge the lead rebuilds it rather than merging its
+text.
 
 ## Planted faults
 
 Planted faults stay light (decision 20), and are kept from being found by
 anything but reading, as in round 2:
 
-- **The copy.** One commit on `round3`'s tip, whose tree is the parcel's
-  plus two plants, with `public/` rebuilt from it. The lead runs the full
+- **The copy.** One commit, whose parent is the parcel's own commit's
+  parent and whose tree is the parcel's plus two plants, with `public/`
+  rebuilt from it. It carries the parcel's own message, author and dates,
+  and sits on a branch of its own, named as a parcel's branch is, never on
+  `round3` (`tools/make_plant.py` in the ledger). The lead runs the full
   gate on it before dispatch, and every stage must pass, so no stage points
   at a plant.
 - **The plants** are faults of the kind the gates cannot read: a sentence
   that claims more than its source at the pin, a quote that is true at the
   pin but overtaken by a newer entry, a caption that names the wrong source.
 - **The clone.** The verifier works in a clone of its own, under its scratch
-  directory, made with `git clone --no-local --single-branch` from a branch
-  that holds only `round3`'s history and the planted commit. The parcel's
-  own commit is not in it, and its brief puts every other branch and
-  worktree of loganw.dev out of bounds until it has reported.
+  directory, made with `git clone --no-local --single-branch` from that
+  branch, which holds only `round3`'s history and the planted commit. The
+  parcel's own commit is not in it, and its brief puts every other branch
+  and worktree of loganw.dev out of bounds until it has reported.
 - **The design.** A planted-copy verifier reads the parcel's ledger file
   only after it reports, since a design there names what the parcel meant
   to write (round 2's case study, proposal 2).
@@ -437,7 +475,21 @@ the runtime's own figures, its "tokens" recorded as the context at the run's
 end. `tools/round_metrics.py` in the ledger, round 2's script with this
 round's prefix, reads the transcripts at the round's end, the lead's own
 session from the request at 04:22:42. Its table goes in the round's entry in
-`docs/VALIDATION.md`, beside the wall clock and the planted-fault yield.
+`docs/VALIDATION.md`, beside the wall clock and the planted-fault yield. Two
+limits of the script: it counts the agents described "R3 " in the lead's own
+subagent folder, so a parcel's own subagents are not counted (each brief
+asks a parcel to say in its file when it spawns one); and it labels times at
+a fixed -0700, which is wrong after 2026-11-01 02:00, when the desktop's
+clock goes to -0800.
+
+## Time and cost (an estimate, not a measurement)
+
+- The plan's verification and P0's, about an hour. Wave 1's designs, about
+  half an hour; the builds, about an hour; their verifiers, about half an
+  hour. The merges, the integration verifier and the push, about an hour.
+  Several hours of wall clock in all.
+- The cost is read from the transcripts afterwards, never estimated in the
+  record.
 
 ## What READY means
 
