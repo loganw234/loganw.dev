@@ -63,9 +63,10 @@ def account():
     # audit cft-fp256's ledger records of one of them. The kit's README also says the repository "stays private":
     # no pattern here reaches those lines (decision 47). The ledger entry's subject is quoted from the words that
     # follow its heading's own subject, which the pattern skips without naming (decision 49 and Corrections'
-    # signature row: no word of the heading's subject is printed on this page).
+    # signature row: the subject is not quoted, and its word "outside" is printed nowhere on this page, though its
+    # word "report" is, below; verifier-P2's first pass, round 3). Both READMEs name the models Meta's.
     paras.append(render([
-        "Newer in this lane, and carrying HonestFramework and ParcelRound to other models: softfloat-bootstrap is “",
+        "Newer in this lane, and carrying HonestFramework and ParcelRound to Meta's models: softfloat-bootstrap is “",
         P("softfloat-bootstrap", "README.md",
           r"^(The builder of the bootstrap kit for Logan's Meta AI hackathon, 2026-10-26 to 2026-11-04):"),
         ".” Its README says of the agents the kit is for: “",

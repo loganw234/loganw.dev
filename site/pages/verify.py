@@ -4,11 +4,14 @@ Four checks, in the spec's order, each with what it costs, where and when that
 was measured where a source says, and what a pass does and does not prove.
 The page ranks them by no cost (decision 56): no current figure ranks them on
 one machine, since the replay has no time, make golden's newest timing is the
-build box's of 2026-10-30, and the two budgets are the Windows desktop's
-figures from September, as docs/VERIFICATION.md dates them (item 3 quotes
-where and when). The first three checks
+runner's golden stage on the build box, of 2026-10-30, and CLAUDE.md's two
+budget lines name no machine and no date (they were last written on
+2026-09-12). docs/VERIFICATION.md dates its own figure for the gate, quiet on
+the Windows desktop in the census of 2026-09-04 and loaded on 2026-09-07
+(item 3 quotes where and when). The first three checks
 are sourced at cft-fp256's pin (its README, CLAUDE.md, docs/VERIFICATION.md,
-CONFORMANCE.md, bindings/wasm/README.md and its ledger); the fourth is this
+CONFORMANCE.md, bindings/wasm/README.md, verify/run.sh, the Makefile and its
+ledger); the fourth is this
 site's own, described the way its own documents already describe it -
 loganw.dev is not itself a pin, so there is no file to quote through
 facts.prose() for a claim about this site's own build.
@@ -18,8 +21,9 @@ that this page quotes cft-fp256 faithfully at its pin. It does not show that
 cft-fp256's claims are true - cft-fp256's own gates decide that, and running
 one of the four checks is how a reader checks it directly. Beside it, in
 cft-fp256's own words and not ours, what its documents say those gates do not
-reach (limits()): the defects its record shows the gates passing, the digests
-limit, and the card's nightly run, which is a record to look at.
+reach (limits()): the defects its record shows the gates passing and the
+digests limit. After that list, in this site's words, the card's nightly run,
+which is none of the checks.
 
 A long quotation (the lede, the two budgets, the limits) is written with ws(),
 so that a rewrap of the document it quotes does not break it. A ledger entry
@@ -77,7 +81,9 @@ def checks():
     items = []
 
     # The replay is a committed build product, and its record says so (decision 56 asks no cost of it: it has a
-    # browser tab and no time). What it holds is the page's own README's sample; the module it runs lapsed once.
+    # browser tab and no time). What it holds is the page's own README's sample. The module it runs was stale from
+    # 2026-10-22 until b9d60ebc, as the entry quoted below says; the record tells of an earlier stale module too, in
+    # its section on ABI 0.12, so this gives no count (verifier-P2's first pass, round 3).
     items.append([
         L(url.raw, "cft-fp256's own conformance replay"), ", in the browser. Cost: a browser tab, nothing "
         "installed. It ",
@@ -105,9 +111,9 @@ def checks():
     # Decision 56 and the lead's ruling: the record's newest timing of the golden stage, with its entry's date and
     # host, and no old cell. docs/VERIFICATION.md's table (its golden row, line 354 at the pin) gives other figures
     # for it, which this line overtakes; P1's dossier quotes the same line. The runner's own line for the stage is
-    # quoted beside it, so that the timing's basis is on the page: it names no worker option (`make golden` adds
-    # four where pytest-xdist imports, Makefile:20, :26, :112; the Makefile is not a listed source path, so the page
-    # says nothing of it, as P1's dossier does not).
+    # quoted beside it, and the Makefile's for `make golden`, so that the timing's basis is on the page: the runner's
+    # names no worker option, and `make golden` adds pytest-xdist's workers where it imports (Makefile:20, :22, :26
+    # and :112 at the pin). The timing is the runner's, not make golden's (verifier-P2's first pass, round 3).
     items.append([
         C("make golden"), " in a clone of cft-fp256. Cost: the record's newest timing of the golden stage, in the "
         "entry of ", _dossier.ledger_date("cft-fp256", VALIDATION, GOLDEN_RUN), ", on ",
@@ -115,7 +121,13 @@ def checks():
         P("cft-fp256", VALIDATION, r"  - (golden ok 3,385 s, 5,951 passed and 3 skipped)\. Against M2F1's gate"),
         ".” The stage the runner runs for it is “",
         P("cft-fp256", "verify/run.sh", r'^  (PY -m pytest "\$ROOT/python/tests" -q -rs --color=no)$'),
-        ",” which names no worker option. ",
+        ",” which names no worker option. ", C("make golden"), " itself runs “",
+        P("cft-fp256", "Makefile",
+          r"^\s+(\$\(PYTHON\) -m pytest python/tests -q \$\(if \$\(XDIST_N\),-n \$\(XDIST_N\),\))$"),
+        ",” which adds pytest-xdist's workers “",
+        P("cft-fp256", "Makefile", r"^# pytest-xdist (only if this interpreter has it):"),
+        ".” So what ", C("make golden"), " takes depends on the machine and on whether pytest-xdist is "
+        "installed. ",
         P("cft-fp256", "README.md", r"^(The golden model's self-tests)"), ": ",
         P("cft-fp256", "docs/VERIFICATION.md",
           r"(Its pytest suite\s+checks the model against its own invariants and against mpmath and\s+"
@@ -189,8 +201,9 @@ LIMIT = ("Every quotation above is read from cft-fp256's own documents, at the c
 
 def limits():
     """What cft-fp256's own documents say their checks do not reach, in their words and at the pin: the defects the
-    record shows its gates passing (the exp2 tie, and a later one), the digests limit, and the card's nightly run,
-    which is a record to look at and no check to run."""
+    record shows its gates passing (the exp2 tie, and a later one) and the digests limit. The card's nightly run
+    follows the list, in this site's words, since no document of cft-fp256's says of it what the list's heading
+    does (verifier-P2's first pass, round 3)."""
     P = facts.prose
     entry = EXP2_TIE   # the ledger entry of the exp2 tie and the profile's major step (a heading line, checked below)
     shared = [
@@ -261,10 +274,10 @@ def limits():
           r"record)\."),
         ".”",
     ]
-    # The card's nightly run is a record to look at, not a check to run: its page is cft-fp256's own, it goes on past
-    # the pin, and its figures at the pin are P1's, on the dossier, so none is printed here.
+    # The card's nightly run is none of the checks above: its page is cft-fp256's own, it goes on past the pin, and
+    # its figures at the pin are P1's, on the dossier, so none is printed here.
     nightly = [
-        "The card's nightly stress run is a record to look at, not a check to run: the README says its ",
+        "The card's nightly stress run is none of the checks above. The README says its ",
         L(P("cft-fp256", "README.md",
             r"\[nightly\.html\]\((https://loganw234\.github\.io/cft-fp256/nightly\.html)\)").raw, "nightly page"),
         " “",
@@ -273,7 +286,8 @@ def limits():
           r"hours on the card)\."),
         ".” That page goes on past the commit this site reads.",
     ]
-    return "<ul class=\"plain\">%s</ul>" % "".join("<li>%s</li>" % render(i) for i in (shared, digests, nightly))
+    return ("<ul class=\"plain\">%s</ul><p class=\"cap\">%s</p>"
+            % ("".join("<li>%s</li>" % render(i) for i in (shared, digests)), render(nightly)))
 
 
 def render_page(ctx):
