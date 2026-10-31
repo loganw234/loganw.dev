@@ -418,8 +418,8 @@ golden model that can go to the corrections page)". The plan is
 through the question tool: the first four by 04:40:32, the next two by
 04:55:59, the seventh by 05:06:21, the eighth by 05:11:18 and the ninth by
 05:57:33, each stamp from `date` right after the answer; decision 55's
-three further answers, below, by 06:44:54 and 06:48:36, the stamps of the
-ledger entries that record them. Each answer is the option he chose, in the
+three further answers, below, by 06:44:54 and 06:48:36, and the tenth,
+decision 56, by 07:39:53, the stamps of the ledger entries that record them. Each answer is the option he chose, in the
 words the lead wrote for that option; his choice is his word.
 
 47. **softfloat-bootstrap's visibility.** Its README says the repository
