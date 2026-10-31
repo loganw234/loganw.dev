@@ -5,12 +5,17 @@ about a project is sourced or stated, as the common rules require.
 import facts
 from facts import V, fact
 import mapgen
+from pages import _dossier
 from render import C, L, esc, render
 
 PAGE = {"file": "thread-determinism.html", "nav": "Threads",
         "title": "Determinism — loganw.dev",
         "description": "Bit-identical arithmetic, from a point cloud to an integrator: the thread's account, "
                        "its part of the map, and its door."}
+
+# The heading's line, at cft-fp256's pin, of the ledger entry that records the audit of muse-softfloat
+# (_dossier.ledger_date refuses a line that is no heading, so a pin that moves it refuses the build).
+ISSUE_1 = 26149
 
 
 def account():
@@ -54,6 +59,52 @@ def account():
         P("HonestFramework", "README.md",
           r"^(A way to lay out a project so that an AI can write nearly all of it\s+and\s+"
           r"\*\*no claim about it ever rests on the AI's judgement\*\*)"), "."]))
+    # The lane's newer nodes (docs/SPEC.md decision 48), each said in its own README's words at its pin, and the
+    # audit cft-fp256's ledger records of one of them. The kit's README also says the repository "stays private":
+    # no pattern here reaches those lines (decision 47). The ledger entry's subject is quoted from the words that
+    # follow its heading's own subject, which the pattern skips without naming (decision 49 and Corrections'
+    # signature row: no word of the heading's subject is printed on this page).
+    paras.append(render([
+        "Newer in this lane, and carrying HonestFramework and ParcelRound to other models: softfloat-bootstrap is “",
+        P("softfloat-bootstrap", "README.md",
+          r"^(The builder of the bootstrap kit for Logan's Meta AI hackathon, 2026-10-26 to 2026-11-04):"),
+        ".” Its README says of the agents the kit is for: “",
+        P("softfloat-bootstrap", "README.md",
+          r"(The agents work in a clean room: they may not read cft-fp256, which already implements this "
+          r"arithmetic)\."),
+        ".” muse-softfloat is “",
+        P("muse-softfloat", "README.md",
+          r"^(An IEEE 754 softfloat library for the RP2040 — binary16, binary32 and binary64 —\s+built with Meta's "
+          r"Muse models under two working methods,\s+\[HonestFramework\]\([^)]*\) and ParcelRound)"),
+        ",” and its README adds “",
+        P("muse-softfloat", "README.md",
+          r"\((the owner's methods, carried in the hackathon bootstrap kit, not in this\s+repository)\)"),
+        ".” Its README names the workload that proves it in public: “",
+        P("muse-softfloat", "README.md",
+          r"The workload that proves it in public: \*\*(REBOUND's IAS15 integrator running on a\s+Raspberry Pi Pico "
+          r"through this library, bit-identical to the unmodified desktop\s+run)\*\*"),
+        ".”"]))
+    paras.append(render([
+        "cft-fp256's ledger records a report that came, in its words, from “",
+        P("cft-fp256", "docs/VALIDATION.md",
+          r"from (a clean-room audit of loganw234/muse-softfloat \(binary16/32/64\), cross-tested against this "
+          r"library and an exact arbiter)\."),
+        ".” Of what the audit found, the entry of ", _dossier.ledger_date("cft-fp256", "docs/VALIDATION.md", ISSUE_1),
+        " says “",
+        P("cft-fp256", "docs/VALIDATION.md",
+          r"(The four cases it found at binary32 and binary64 were the one disagreement between the two libraries "
+          r"that was a defect)\."),
+        ",” and names it: “",
+        P("cft-fp256", "docs/VALIDATION.md",
+          r"^## 2026-10-30 - [^:]+: (exp2m1\(emax \+ 1\) toward zero raised overflow, in the golden model, the C, the "
+          r"vectors and the WebAssembly module); "),
+        ".”"]))
+    paras.append(render([
+        "HonestFramework and ParcelRound also run on open-weight models: HonestHarness is “",
+        P("HonestHarness", "README.md",
+          r"^(A harness for running \[ParcelRound\]\([^)]*\)\s+and \[HonestFramework\]\([^)]*\) on\s+"
+          r"open-weight models)\."),
+        ".”"]))
     paras.append(render([
         "binary-sites is ", facts.api_visibility(["binary-sites"]), " for now: ",
         P("binary-sites", "README.md", r"^(Four sites, one per IEEE 754 binary interchange format)"), ", ",
