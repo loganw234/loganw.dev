@@ -262,8 +262,10 @@ def muse_commits(name):
 # Every Co-Authored-By line naming Muse in muse-softfloat also carries an
 # email address. No page prints one (CLAUDE.md, trap 14): the name is read up to
 # the address, and a name that holds an ASCII "@" is refused here. An address
-# spelled another way, with a fullwidth at sign say, is the local-only stage's
-# to refuse on a published page (verifier-P3's first pass, round 3).
+# in a spelling the local-only stage's readings decode, a fullwidth at sign
+# say, is that stage's to refuse on a published page. One spelled out in words,
+# for a person to reassemble, passes it, a limit CLAUDE.md states (trap 14;
+# verifier-P3's first and second passes, round 3).
 _NAME_BEFORE_ADDRESS = re.compile(r"^Co-Authored-By:[ \t]*(.*?)[ \t\r]*(?:<[^<>\n]*>)?[ \t\r]*$", re.I)
 
 
