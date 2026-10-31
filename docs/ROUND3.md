@@ -17,9 +17,9 @@ round 2. Verification follows
 [HonestFramework](https://github.com/loganw234/HonestFramework). Round 2's
 plan is [ROUND2.md](ROUND2.md), and this one keeps its shape and its rules.
 
-Draft 1 went past verifier-plan, which found four defects; this draft
-answers them, and the side notes the lead took. The round's ledger records
-each finding and how the lead checked it.
+Draft 1 went past verifier-plan, which found four defects, and draft 2 one
+more; this draft answers them, and the side notes the lead took. The round's
+ledger records each finding and how the lead checked it.
 
 ## What moved
 
@@ -89,7 +89,8 @@ the pages describe cft-fp256 as it stood on 2026-10-08.
 
 Through the question tool, verbatim, question and then answer. Each answer
 is the option Logan chose, in the words the lead wrote for that option; his
-choice is his word. SPEC.md records them, from P0 on, as decisions 47 to 54. The lead's
+choice is his word. SPEC.md records them as decisions 47 to 55: 47 to 54 in
+P0, and 55 in the resume's own commit. The lead's
 reading of each, where one is needed, follows it, marked as the lead's.
 
 1. "softfloat-bootstrap's README says the repository "stays private" (only
@@ -143,6 +144,14 @@ reading of each, where one is needed, follows it, marked as the lead's.
    desktop and CI both run 3.12.15, recorded in the ledger. Python's HTML
    parser reads edge cases differently between releases, so the gate itself
    would need checking first."
+9. "Your resume quotes cft-fp256's binary256 soak: 541 passes in 70 minutes,
+   0 failures. At the new pin the record also states the card's long stress
+   run (61 hours, 4,086 legs, 0 failures, 2026-10-19) and the nightly sweep
+   (10 nights, 20,759,013,456,650 cases, 0 disagreements). Should the resume
+   cite them too?" - "Add both, quoted (Recommended)": "Two short lines
+   beside the soak, each quoted from cft-fp256's record at the pin with its
+   file and line, as the resume's other lines are. The PDF and the text twin
+   follow."
 
 *The lead's readings:*
 - On 3: "found by" quotes cft-fp256's record of the report, since no
@@ -159,8 +168,15 @@ reading of each, where one is needed, follows it, marked as the lead's.
   `<repos>/loganw-dev-venv`, holding `verify/requirements.txt` installed by
   hash, so Miniconda's own packages are left as they are. Every gate this
   round runs with `PYTHON` set to it. CI can follow: actions/python-versions
-  lists 3.12.15 as stable for ubuntu-24.04. Before the change lands, the
-  full gate runs on main's tree with `.python-version` alone changed.
+  lists 3.12.15 as stable for ubuntu-24.04. Before the change landed, the
+  full gate ran on main's tree with `.python-version` alone changed, and
+  passed with nothing skipped. The question's "perhaps in the 10-26
+  toolchain reinstall" was the lead's guess, from cft-fp256's entry of
+  2026-10-26 (afternoon), not a measurement.
+- On 9: the two are one item of the resume, of two printed lines, so that
+  cft-fp256 still fits on the printout's first page: the run in the README's
+  own sentence on it, the sweep in the ledger's newest totals, beside the
+  ledger's sentence on what a case total adds. Commit `2cbb7e7`, after P0.
 - **The push** waits on Logan's word: decision 33, "Push when verified", was
   round 2's.
 
@@ -181,7 +197,8 @@ Each is a standing rule, with where it was given.
   as a recorded known limit, and a sentence that claims more than is true is
   restated at the merge (METHOD.md section 6).
 - **Logan's words.** About and the front page are his approved words
-  (decisions 26 and 29), every `stated()` figure is his statement
+  (decisions 26 and 29), every `stated()` figure is his statement, or is
+  drafted from his words and labelled so until he approves it
   (`build.SPEAKERS` names Logan alone),
   and the spec's choices are his. They change only at his word, except that
   a stated line a pin has overtaken may be replaced by a figure read from
@@ -232,8 +249,10 @@ Each is a standing rule, with where it was given.
 ## P0: the lead's
 
 On `round3`, from `797f588`, in three commits: `0e87fc2`, the gate's Python;
-`2f52525`, the rest, whose full gate passed with nothing skipped; and a third,
-the record link this section promised muse-softfloat's row. What it does:
+`2f52525`, the rest, whose full gate passed with nothing skipped; and
+`f57c22e`, the record link this section promised muse-softfloat's row. After
+P0, the lead's `2cbb7e7` adds decision 55's item to the resume. What P0
+does:
 
 - **`.python-version`:** 3.12.15 (decision 54), once the full gate had passed
   under it on main's tree, as its own commit, so its effect on the gate is
@@ -274,6 +293,9 @@ the record link this section promised muse-softfloat's row. What it does:
       form would print the newest pass a day early;
     - its agent-credited count;
     - its own front door as its check.
+
+    Neither row quotes the kit's README line that the repository "stays
+    private" (decision 47).
   - **cft-fp256's row** is re-read at the new pin.
 - **The map** (`site/data/relations.json`): the two nodes in the Determinism
   lane, born on their first commits at their pins, and their edges. Each
@@ -296,8 +318,8 @@ the record link this section promised muse-softfloat's row. What it does:
   replayed the earlier one, so the line now cites "That 1,068,915-case set
   was replayed", which keeps its claim. Whether the resume should also cite
   what the record states after the soak it quotes, the card's long stress
-  run and the nightly sweep, would change what it claims, and goes to Logan
-  with this plan.
+  run and the nightly sweep, would change what it claims, so it went to
+  Logan, whose word is to cite both (decision 55, in `2cbb7e7`).
 - **`build.SOURCE_PATHS`:** the paths P0's new labels name.
 - **SPEC.md:** decisions 47 to 54, and section 4's definition.
 
@@ -383,7 +405,9 @@ property is held.
   - the two new projects in the thread's lane. The map slice draws them
     from `relations.json`, and the account's words about them are P2's.
 - **Logan's, and staying:** the Determinism door, including its
-  "workloads" and "bit-identical everywhere" (decision 27).
+  "workloads" and "bit-identical everywhere" (decision 27). `propose.py`,
+  on no parcel's list, renders the door, and its own control reads the word
+  "workloads".
 - **The trap:** a check whose cost or reach changed at the new pin, and a
   check that names the browser replay as current for a week in which its
   record says it was stale.
@@ -427,14 +451,16 @@ property is held.
 
 The seams and the shared pages are the lead's: `site/facts.py`,
 `site/render.py`, `site/build.py`, `site/mapgen.py`, `site/printout.py`,
-`site/style.css`, `site/data/`, `pins.json`, `sources/`,
+`site/snapshot_github.py`, `site/style.css`, `site/data/`, `pins.json`,
+`sources/`, `verify/`,
 `site/pages/home.py`, `site/pages/work.py`, `site/pages/threads.py`,
 `site/pages/record.py`, `site/pages/resume.py`, `site/pages/_dossier.py`,
 `site/pages/_settled.py`, `site/pages/_p5.py`, `site/pages/front.py`,
 `site/pages/about.py`, and every document (README, CLAUDE.md, `docs/`). A
 stylesheet a parcel needs is a new file of its own under `site/styles/`.
-Every page module on no parcel's list stays as it is this round, and is the
-lead's if it must change. `public/` is generated: parcels rebuild it on their
+Every page module on no parcel's list keeps its code this round, and is the
+lead's if it must change; its rendered page still changes by what it reads,
+such as the map's new nodes and the numbering of figures. `public/` is generated: parcels rebuild it on their
 branches, and at each merge the lead rebuilds it rather than merging its
 text.
 
@@ -447,7 +473,8 @@ anything but reading, as in round 2:
   parent and whose tree is the parcel's plus two plants, with `public/`
   rebuilt from it. It carries the parcel's own message, author and dates,
   and sits on a branch of its own, named as a parcel's branch is, never on
-  `round3` (`tools/make_plant.py` in the ledger). The lead runs the full
+  `round3` (`tools/make_plant.py` in the ledger, which refuses `round3`,
+  `main` and any branch that already exists). The lead runs the full
   gate on it before dispatch, and every stage must pass, so no stage points
   at a plant.
 - **The plants** are faults of the kind the gates cannot read: a sentence
@@ -479,8 +506,8 @@ session from the request at 04:22:42. Its table goes in the round's entry in
 limits of the script: it counts the agents described "R3 " in the lead's own
 subagent folder, so a parcel's own subagents are not counted (each brief
 asks a parcel to say in its file when it spawns one); and it labels times at
-a fixed -0700, which is wrong after 2026-11-01 02:00, when the desktop's
-clock goes to -0800.
+a fixed -0700, which is wrong from 02:00 PDT on 2026-11-01 (09:00 UTC), when
+the desktop's clock goes to -0800.
 
 ## Time and cost (an estimate, not a measurement)
 
