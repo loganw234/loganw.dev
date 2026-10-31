@@ -206,6 +206,20 @@ def cft_block():
          ". A binary256 soak on the card ran ",
          q(V_(r"(\d+ passes in \d+ minutes, each a\s+resident run of a million elements at fma, add and mul)")),
          ", with ", q(V_(r"reference orbit to its checkpoint - (0 failures)")), "."],
+        # Decision 55 (2026-10-31): the record's longer runs, beside the soak,
+        # in one item of two printed lines, so that this project still fits on
+        # the printout's first page (it had 29 pt to spare). The run is the
+        # README's own sentence on it. The totals are the newest night's, so
+        # the last of the ledger's "Totals:" lines; and its units are the
+        # tools' own, as its entry on the long run says, so that sentence goes
+        # beside them.
+        ["A ", q(P(r"a (\d+-hour stress run of the card with\s+no failure)")),
+         "; then nightly sweeps: ",
+         q(V_(r"Totals: (\d+ nights, [\d,]+ cases, \d+ disagreements)", last=True)),
+         ", where the ",
+         q(V_(r"\*\*The units differ by item\.\*\* The (sweep's case totals add items whose tools count different "
+              r"things) \(above\)")),
+         "."],
         ["cft-rebound is ",
          q(prose("cft-rebound", "README.md", r"^(REBOUND's IAS15 integrator with its arithmetic routed through "
                                              r"libcft)")),

@@ -416,8 +416,8 @@ nightly case sweep, as well as a separate project which found an issue in the
 golden model that can go to the corrections page)". The plan is
 [ROUND3.md](ROUND3.md), which gives each question whole. His answers came
 through the question tool: the first four by 04:40:32, the next two by
-04:55:59, the seventh by 05:06:21 and the eighth by 05:11:18, each stamp from
-`date` right after the answer. Each answer is the option he chose, in the
+04:55:59, the seventh by 05:06:21, the eighth by 05:11:18 and the ninth by
+05:57:33, each stamp from `date` right after the answer. Each answer is the option he chose, in the
 words the lead wrote for that option; his choice is his word.
 
 47. **softfloat-bootstrap's visibility.** Its README says the repository
@@ -456,6 +456,17 @@ words the lead wrote for that option; his choice is his word.
     cases differently between releases, so the gate itself would need
     checking first." Before the change, the full gate passed on main's tree
     under 3.12.15 with nothing skipped.
+55. **The resume's hardware lines.** The resume quotes cft-fp256's binary256
+    soak; asked whether it should also cite the card's long stress run and
+    the nightly sweep, which the record states after it: "Add both, quoted
+    (Recommended)": "Two short lines beside the soak, each quoted from
+    cft-fp256's record at the pin with its file and line, as the resume's
+    other lines are. The PDF and the text twin follow." *What the site
+    does:* both are one item of the resume, so that cft-fp256 still fits on
+    the printout's first page. The run is quoted from the README's sentence
+    on it, "a 61-hour stress run of the card with no failure"; the sweep from
+    the ledger's newest totals, beside its own sentence on what a case
+    total adds.
 
 ---
 
